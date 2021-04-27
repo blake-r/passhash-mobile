@@ -18,12 +18,18 @@ GridLayout {
     property alias passwordLength: settings.passwordLength
 
     anchors.fill: parent
+    rowSpacing: 0
+    columnSpacing: 0
 
     GridLayout {
         // Placing elements from top to bottom is preferred
         flow: parent.width * 0.8 < parent.height ? GridLayout.TopToBottom : GridLayout.LeftToRight
+        rowSpacing: 6
+        columnSpacing: 6
         Layout.fillHeight: false
         Layout.alignment: Qt.AlignLeft | Qt.AlignTop
+        Layout.margins: 6
+        Layout.topMargin: 0
 
         GeneratorForm {
             id: generator

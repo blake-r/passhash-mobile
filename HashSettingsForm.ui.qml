@@ -11,8 +11,8 @@ GridLayout {
     property alias passwordLength: passwordLength
 
     columns: 2
-    columnSpacing: 7
-    rowSpacing: 7
+    columnSpacing: 6
+    rowSpacing: 6
 
     GroupBox {
         title: qsTr("Requirements")

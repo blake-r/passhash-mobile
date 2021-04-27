@@ -147,19 +147,18 @@ ApplicationWindow {
         }
     }
 
-    footer: Column {
-        leftPadding: 5
-        rightPadding: 5
-
-        readonly property int childWidth: width - 10
+    footer: ColumnLayout {
+        width: parent.width
 
         Label {
             // Label maintains status messages
             id: status
             text: "Status"
             opacity: 0.0
-            width: parent.childWidth
             horizontalAlignment: Text.AlignHCenter
+            Layout.fillWidth: true
+            Layout.margins: 6
+            Layout.bottomMargin: 0
 
             function show(message, color) {
                 if (statusTimer.running) {
@@ -194,7 +193,9 @@ ApplicationWindow {
 
         Button {
             text: qsTr("Save options")
-            width: parent.childWidth
+            Layout.fillWidth: true
+            Layout.margins: 6
+            Layout.topMargin: 0
 
             onClicked: {
                 requirements.digits = generatorPage.requireDigits.checked

@@ -16,8 +16,8 @@ Frame {
     GridLayout {
         anchors.fill: parent
         columns: 3
-        columnSpacing: 7
-        rowSpacing: 7
+        columnSpacing: 6
+        rowSpacing: 6
 
         // Row #1
         Label {
