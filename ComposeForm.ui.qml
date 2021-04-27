@@ -5,6 +5,7 @@ import QtQuick.Layouts 1.12
 GridLayout {
     property alias siteTag: generator.siteTag
     property alias masterKey: generator.masterKey
+    property alias hashWord: generator.hashWord
     property alias unmask: generator.unmask
     property alias bumpBtn: generator.bumpBtn
     property alias generateBtn: generator.generateBtn
@@ -19,7 +20,7 @@ GridLayout {
     anchors.fill: parent
 
     GridLayout {
-        // Placing element from top to bottom is preferred
+        // Placing elements from top to bottom is preferred
         flow: parent.width * 0.8 < parent.height ? GridLayout.TopToBottom : GridLayout.LeftToRight
         Layout.fillHeight: false
         Layout.alignment: Qt.AlignLeft | Qt.AlignTop
