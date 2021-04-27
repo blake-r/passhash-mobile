@@ -2,7 +2,7 @@ import QtQuick 2.12
 import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
 import Qt.labs.settings 1.0
-import ru.co_dev.passhash 2.0
+import ru.co_dev.passhash 3.0
 import "passhash-common.js" as WijjoPassHash
 
 ApplicationWindow {
@@ -28,6 +28,9 @@ ApplicationWindow {
     }
     QmlUrl {
         id: qmlUrl
+    }
+    QmlClipboard {
+        id: clipboard
     }
 
     header: Label {
@@ -80,6 +83,8 @@ ApplicationWindow {
                     clipboard.text = hashText
                     status.show(qsTr("Password hash copied into clipboard"),
                                 "green")
+                } else {
+                    status.show(qsTr('Password hash has not changed'), "gray")
                 }
             }
         }
@@ -115,8 +120,6 @@ ApplicationWindow {
                         }
                     }
                 }
-            }
-            onTextChanged: {
                 if (siteTag.text.trim() != siteTag.text) {
                     status.show(qsTr("Site tag has spaces around"), "orange")
                 }
@@ -133,29 +136,29 @@ ApplicationWindow {
 
         requireDigits {
             checked: requirements.digits
-            onCheckedChanged: generateBtn.clicked()
+            onToggled: generateBtn.clicked()
         }
         requirePunctuation {
             checked: requirements.punctuation
-            onCheckedChanged: generateBtn.clicked()
+            onToggled: generateBtn.clicked()
         }
         requireMixedCase {
             checked: requirements.mixedCase
-            onCheckedChanged: generateBtn.clicked()
+            onToggled: generateBtn.clicked()
         }
         restrictNoSpecial {
             checked: restrictions.noSpecial
-            onCheckedChanged: generateBtn.clicked()
+            onToggled: generateBtn.clicked()
         }
         restrictDigitsOnly {
             checked: restrictions.digitsOnly
-            onCheckedChanged: generateBtn.clicked()
+            onToggled: generateBtn.clicked()
         }
         passwordLength {
             currentIndex: passwordLength.model.findIndex(function (size) {
                 return size === restrictions.passwordLength
             })
-            onCurrentValueChanged: generateBtn.clicked()
+            onActivated: generateBtn.clicked()
         }
     }
 
