@@ -1,7 +1,6 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include "qmlurl.h"
-#include "qmlclipboard.h"
 
 
 int main(int argc, char *argv[])
@@ -15,8 +14,7 @@ int main(int argc, char *argv[])
     app.setOrganizationDomain("co-dev.ru");
     app.setApplicationName("Password Hasher");
 
-    qmlRegisterType<QmlUrl>("ru.co_dev.passhash", 1, 0, "QmlUrl");
-    qmlRegisterType<QmlClipboard>("ru.co_dev.passhash", 1, 0, "QmlClipboard");
+    qmlRegisterType<QmlUrl>("ru.co_dev.passhash", 2, 0, "QmlUrl");
 
     const QUrl url(QStringLiteral("qrc:/main.qml"));
     QQmlApplicationEngine engine;

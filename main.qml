@@ -2,7 +2,7 @@ import QtQuick 2.12
 import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
 import Qt.labs.settings 1.0
-import ru.co_dev.passhash 1.0
+import ru.co_dev.passhash 2.0
 import "passhash-common.js" as WijjoPassHash
 
 ApplicationWindow {
@@ -27,10 +27,7 @@ ApplicationWindow {
         property int passwordLength: 8
     }
     QmlUrl {
-        id: qmlurl
-    }
-    QmlClipboard {
-        id: clipboard
+        id: qmlUrl
     }
 
     header: Label {
@@ -73,7 +70,7 @@ ApplicationWindow {
                     return
                 }
                 let hashText = WijjoPassHash.PassHashCommon.generateHashWord(
-                        siteTag.text, masterKey.text,
+                        siteTag.text.toLocaleLowerCase(), masterKey.text,
                         parseInt(passwordLength.currentValue),
                         requireDigits.checked, requirePunctuation.checked,
                         requireMixedCase.checked, restrictNoSpecial.checked,
@@ -93,16 +90,31 @@ ApplicationWindow {
                 let data = splitVersion(siteTag.text)
                 if (isNaN(data[1])) {
                     // If no version, try to extract site tag from URL
-                    if (siteTag.text == clipboard.text) {
-                        // Only if pasted from clipboard
-                        siteTag.text = qmlurl.siteTagFromUrl(data[0])
-                        if (siteTag.text != data[0]) {
-                            status.show(qsTr("Site tag extracted from URL"),
-                                        "green")
+                    if (data[0].startsWith("http://") || data[0].startsWith(
+                                "https://")) {
+                        qmlUrl.url = data[0]
+                        if (qmlUrl.isValid) {
+                            let array = qmlUrl.host.split('.')
+                            let startIdx = 0
+                            let endIdx = array.length
+                            if (array[0] === 'www') {
+                                // www.google.com -> google.com
+                                ++startIdx
+                            }
+                            if (startIdx < endIdx) {
+                                // google.com -> google
+                                --endIdx
+                            }
+                            if (startIdx < endIdx) {
+                                siteTag.text = array.slice(startIdx,
+                                                           endIdx).join('.')
+                                status.show(qsTr(
+                                                "Site tag extracted from URL"),
+                                            "green")
+                            }
                         }
                     }
                 }
-                siteTag.text = siteTag.text.toLocaleLowerCase()
             }
             onTextChanged: {
                 if (siteTag.text.trim() != siteTag.text) {
