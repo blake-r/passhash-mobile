@@ -1,5 +1,6 @@
 import QtQuick 2.12
-import QtQuick.Controls 2.5
+import QtQuick.Controls 2.12
+import QtQuick.Layouts 1.12
 import Qt.labs.settings 1.0
 import ru.co_dev.passhash 1.0
 import "passhash-common.js" as WijjoPassHash
@@ -7,8 +8,8 @@ import "passhash-common.js" as WijjoPassHash
 ApplicationWindow {
     title: "Password Hasher"
     id: root
-    width: 720
-    height: 1280
+    width: 320
+    height: 480
     visible: true
 
     Settings {
@@ -32,21 +33,14 @@ ApplicationWindow {
         id: clipboard
     }
 
-    PageGeneratorForm {
-        id: generatorPage
+    header: Label {
+        text: root.title
         padding: 5
-        transform: [
-            Scale {
-                id: scaling
-                xScale: Math.min(root.width / generatorPage.width,
-                                 root.height / generatorPage.height)
-                yScale: xScale
-            },
-            Translate {
-                x: (root.width - generatorPage.width * scaling.xScale) / 2
-                y: 0
-            }
-        ]
+        horizontalAlignment: Text.AlignHCenter
+    }
+
+    ComposeForm {
+        id: generatorPage
 
         function splitVersion(siteTag) {
             let array = siteTag.split(':')
@@ -58,22 +52,16 @@ ApplicationWindow {
             return [array.join(':'), version]
         }
 
-        header: Label {
-            text: root.title
-            padding: 5
-            horizontalAlignment: Text.AlignHCenter
-        }
-
-        bump {
+        bumpBtn {
             enabled: siteTag.text.length > 0
             onClicked: {
                 let data = splitVersion(siteTag.text)
                 data[1] = isNaN(data[1]) ? 1 : data[1] + 1
                 siteTag.text = data.join(':')
-                generate.clicked()
+                generateBtn.clicked()
             }
         }
-        generate {
+        generateBtn {
             onClicked: {
                 if (siteTag.text.length == 0) {
                     status.show(qsTr("Site tag should not be empty"), "gray")
@@ -133,88 +121,89 @@ ApplicationWindow {
 
         requireDigits {
             checked: requirements.digits
-            onCheckedChanged: generate.clicked()
+            onCheckedChanged: generateBtn.clicked()
         }
         requirePunctuation {
             checked: requirements.punctuation
-            onCheckedChanged: generate.clicked()
+            onCheckedChanged: generateBtn.clicked()
         }
         requireMixedCase {
             checked: requirements.mixedCase
-            onCheckedChanged: generate.clicked()
+            onCheckedChanged: generateBtn.clicked()
         }
         restrictNoSpecial {
             checked: restrictions.noSpecial
-            onCheckedChanged: generate.clicked()
+            onCheckedChanged: generateBtn.clicked()
         }
         restrictDigitsOnly {
             checked: restrictions.digitsOnly
-            onCheckedChanged: generate.clicked()
+            onCheckedChanged: generateBtn.clicked()
         }
         passwordLength {
             currentIndex: passwordLength.model.findIndex(function (size) {
                 return size === restrictions.passwordLength
             })
-            onCurrentValueChanged: generate.clicked()
+            onCurrentValueChanged: generateBtn.clicked()
         }
+    }
 
-        footer: Column {
-            leftPadding: 5
-            rightPadding: 5
+    footer: ColumnLayout {
+        width: parent.width
 
-            readonly property int childWidth: width - 10
+        Label {
+            // Label maintains status messages
+            id: status
+            text: "Status"
+            opacity: 0.0
+            horizontalAlignment: Text.AlignHCenter
+            Layout.fillWidth: true
+            Layout.margins: 6
+            Layout.bottomMargin: 0
 
-            Label {
-                // Label maintains status messages
-                id: status
-                text: "Status"
-                opacity: 0.0
-                width: parent.childWidth
-                horizontalAlignment: Text.AlignHCenter
-
-                function show(message, color) {
-                    if (statusTimer.running) {
-                        statusTimer.stop()
-                    }
-                    if (statusOpacityAnim.running) {
-                        statusOpacityAnim.stop()
-                    }
-                    status.text = message
-                    status.color = color
-                    status.opacity = 1.0
-                    statusTimer.start()
+            function show(message, color) {
+                if (statusTimer.running) {
+                    statusTimer.stop()
                 }
-                Timer {
-                    id: statusTimer
-                    interval: 1000
-                    repeat: false
-                    triggeredOnStart: false
-
-                    onTriggered: {
-                        statusOpacityAnim.start()
-                    }
+                if (statusOpacityAnim.running) {
+                    statusOpacityAnim.stop()
                 }
-                OpacityAnimator {
-                    id: statusOpacityAnim
-                    target: status
-                    from: 1.0
-                    to: 0.0
-                    duration: 500
+                status.text = message
+                status.color = color
+                status.opacity = 1.0
+                statusTimer.start()
+            }
+            Timer {
+                id: statusTimer
+                interval: 1000
+                repeat: false
+                triggeredOnStart: false
+
+                onTriggered: {
+                    statusOpacityAnim.start()
                 }
             }
+            OpacityAnimator {
+                id: statusOpacityAnim
+                target: status
+                from: 1.0
+                to: 0.0
+                duration: 500
+            }
+        }
 
-            Button {
-                text: qsTr("Save options")
-                width: parent.childWidth
+        Button {
+            text: qsTr("Save options")
+            Layout.fillWidth: true
+            Layout.margins: 6
+            Layout.topMargin: 0
 
-                onClicked: {
-                    requirements.digits = generatorPage.requireDigits.checked
-                    requirements.punctuation = generatorPage.requirePunctuation.checked
-                    requirements.mixedCase = generatorPage.requireMixedCase.checked
-                    restrictions.noSpecial = generatorPage.restrictNoSpecial.checked
-                    restrictions.digitsOnly = generatorPage.restrictDigitsOnly.checked
-                    restrictions.passwordLength = generatorPage.passwordLength.model[generatorPage.passwordLength.currentIndex]
-                }
+            onClicked: {
+                requirements.digits = generatorPage.requireDigits.checked
+                requirements.punctuation = generatorPage.requirePunctuation.checked
+                requirements.mixedCase = generatorPage.requireMixedCase.checked
+                restrictions.noSpecial = generatorPage.restrictNoSpecial.checked
+                restrictions.digitsOnly = generatorPage.restrictDigitsOnly.checked
+                restrictions.passwordLength = generatorPage.passwordLength.model[generatorPage.passwordLength.currentIndex]
             }
         }
     }
