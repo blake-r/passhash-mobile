@@ -10,9 +10,11 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs depr
 
 SOURCES += \
         main.cpp \
+        qmlclipboard.cpp \
         qmlurl.cpp
 
 HEADERS += \
+    qmlclipboard.h \
     qmlurl.h
 
 RESOURCES += qml.qrc
