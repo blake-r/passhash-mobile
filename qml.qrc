@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>PageGeneratorForm.ui.qml</file>
+        <file>passhash-common.js</file>
+        <file>passhash-sha1.js</file>
+        <file>qtquickcontrols2.conf</file>
+    </qresource>
+</RCC>
