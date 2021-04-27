@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<QmlUrl>("ru.co_dev.passhash", 3, 0, "QmlUrl");
     qmlRegisterType<QmlClipboard>("ru.co_dev.passhash", 3, 0, "QmlClipboard");
 
-    const QUrl url(QStringLiteral("qrc:/main.qml"));
+    const QUrl url(QStringLiteral("qrc:/Application.qml"));
     QQmlApplicationEngine engine;
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated, &app, [url](QObject *obj, const QUrl &objUrl) {
         if (!obj && url == objUrl) {
