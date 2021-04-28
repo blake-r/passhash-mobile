@@ -165,45 +165,12 @@ ApplicationWindow {
     footer: ColumnLayout {
         width: parent.width
 
-        Label {
-            // Label maintains status messages
+        StatusLabel {
             id: status
-            text: "Status"
-            opacity: 0.0
             horizontalAlignment: Text.AlignHCenter
             Layout.fillWidth: true
             Layout.margins: 6
             Layout.bottomMargin: 0
-
-            function show(message, color) {
-                if (statusTimer.running) {
-                    statusTimer.stop()
-                }
-                if (statusOpacityAnim.running) {
-                    statusOpacityAnim.stop()
-                }
-                status.text = message
-                status.color = color
-                status.opacity = 1.0
-                statusTimer.start()
-            }
-            Timer {
-                id: statusTimer
-                interval: 1000
-                repeat: false
-                triggeredOnStart: false
-
-                onTriggered: {
-                    statusOpacityAnim.start()
-                }
-            }
-            OpacityAnimator {
-                id: statusOpacityAnim
-                target: status
-                from: 1.0
-                to: 0.0
-                duration: 500
-            }
         }
 
         Button {
