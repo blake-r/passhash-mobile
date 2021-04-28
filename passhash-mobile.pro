@@ -1,4 +1,4 @@
-TARGET = PasswordHasher
+TARGET = passhash-mobile
 
 QT += quick
 
@@ -18,9 +18,6 @@ HEADERS += \
     qmlurl.h
 
 RESOURCES += qml.qrc
-
-TRANSLATIONS += \
-    PassHash_en_150.ts
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =
