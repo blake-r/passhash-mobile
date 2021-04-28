@@ -33,7 +33,8 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 android {
 
     ANDROID_VERSION_NAME = $$system("date +%Y.%m.%d")
-    ANDROID_VERSION_CODE = $$system("date +%Y%m%d")
+    # Max value is 2100000000
+    ANDROID_VERSION_CODE = $$system("date +00%y%m%d%H")
 
     DISTFILES += \
         android/AndroidManifest.xml \
