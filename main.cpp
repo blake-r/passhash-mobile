@@ -1,6 +1,5 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
-#include <QTranslator>
 #include "qmlurl.h"
 #include "qmlclipboard.h"
 
