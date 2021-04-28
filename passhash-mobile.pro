@@ -36,17 +36,21 @@ android {
     # Max value is 2100000000
     ANDROID_VERSION_CODE = $$system("date +00%y%m%d%H")
 
+    greaterThan(QT_VERSION, 5.15) {
+        ANDROID_PACKAGE_SOURCE_DIR = \
+            $$PWD/android515
+    } else {
+        ANDROID_PACKAGE_SOURCE_DIR = \
+            $$PWD/android5142
+    }
+
     DISTFILES += \
-        android/AndroidManifest.xml \
-        android/build.gradle \
-        android/gradle.properties \
-        android/gradle/wrapper/gradle-wrapper.jar \
-        android/gradle/wrapper/gradle-wrapper.properties \
-        android/gradlew \
-        android/gradlew.bat \
-        android/res/values/libs.xml
-
-    ANDROID_PACKAGE_SOURCE_DIR = \
-        $$PWD/android
-
+        $$ANDROID_PACKAGE_SOURCE_DIR/AndroidManifest.xml \
+        $$ANDROID_PACKAGE_SOURCE_DIR/build.gradle \
+        $$ANDROID_PACKAGE_SOURCE_DIR/gradle.properties \
+        $$ANDROID_PACKAGE_SOURCE_DIR/gradle/wrapper/gradle-wrapper.jar \
+        $$ANDROID_PACKAGE_SOURCE_DIR/gradle/wrapper/gradle-wrapper.properties \
+        $$ANDROID_PACKAGE_SOURCE_DIR/gradlew \
+        $$ANDROID_PACKAGE_SOURCE_DIR/gradlew.bat \
+        $$ANDROID_PACKAGE_SOURCE_DIR/res/values/libs.xml
 }
