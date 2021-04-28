@@ -174,7 +174,7 @@ ApplicationWindow {
         }
 
         Button {
-            text: qsTr("Save options")
+            text: qsTr("Save settings")
             Layout.fillWidth: true
             Layout.margins: 6
             Layout.topMargin: 0
@@ -186,6 +186,7 @@ ApplicationWindow {
                 restrictions.noSpecial = generatorPage.restrictNoSpecial.checked
                 restrictions.digitsOnly = generatorPage.restrictDigitsOnly.checked
                 restrictions.passwordLength = generatorPage.passwordLength.model[generatorPage.passwordLength.currentIndex]
+                status.show(qsTr("Settings saved"), "green")
             }
         }
     }
