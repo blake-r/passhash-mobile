@@ -1,4 +1,3 @@
-#include <QUrl>
 #include "qmlurl.h"
 
 QString QmlUrl::resolved(const QString &relativeUrl)

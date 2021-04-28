@@ -186,7 +186,7 @@ ApplicationWindow {
                 restrictions.noSpecial = generatorPage.restrictNoSpecial.checked
                 restrictions.digitsOnly = generatorPage.restrictDigitsOnly.checked
                 restrictions.passwordLength = generatorPage.passwordLength.model[generatorPage.passwordLength.currentIndex]
-                status.show(qsTr("Settings saved"), "green")
+                status.show(qsTr("Settings are saved"), "green")
             }
         }
     }
