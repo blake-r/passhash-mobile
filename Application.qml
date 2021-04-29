@@ -12,6 +12,29 @@ ApplicationWindow {
     height: 480
     visible: true
 
+    readonly property int defaultMasterKeyClearTimeout: 30000
+    readonly property bool defaultConvertSiteTagLowerCase: true
+
+    property double masterKeyClearTime: 0
+
+    Connections {
+        target: Qt.application
+        function onStateChanged() {
+            if (Qt.application.state === Qt.ApplicationSuspended) {
+                masterKeyClearTime = Date.now() + defaultMasterKeyClearTimeout
+            } else if (Qt.application.state === Qt.ApplicationActive) {
+                if (masterKeyClearTime > 0) {
+                    if (Date.now() >= masterKeyClearTime) {
+                        generatorPage.masterKey.clear()
+                        status.show(qsTr("Application was invisible too long, clear master key value."),
+                                    "orange")
+                    }
+                    masterKeyClearTime = 0
+                }
+            }
+        }
+    }
+
     Settings {
         id: requirements
         category: "Requirements"
@@ -63,17 +86,24 @@ ApplicationWindow {
         }
         generateBtn {
             onClicked: {
-                if (siteTag.text.length == 0) {
+                let siteTagTxt = siteTag.text
+                if (siteTagTxt.length == 0) {
                     status.show(qsTr("Site tag should not be empty"), "gray")
                     return
                 }
-                if (!masterKey.text.length) {
+                let masterKeyTxt = masterKey.text
+                if (!masterKeyTxt.length) {
                     status.show(qsTr("Master key should not be empty"),
                                 "orange")
                     return
                 }
+
+                if (defaultConvertSiteTagLowerCase) {
+                    siteTagTxt = siteTagTxt.toLocaleLowerCase()
+                }
+
                 let hashText = WijjoPassHash.PassHashCommon.generateHashWord(
-                        siteTag.text.toLocaleLowerCase(), masterKey.text,
+                        siteTagTxt, masterKeyTxt,
                         parseInt(passwordLength.currentValue),
                         requireDigits.checked, requirePunctuation.checked,
                         requireMixedCase.checked, restrictNoSpecial.checked,
@@ -126,7 +156,7 @@ ApplicationWindow {
             }
         }
         masterKey {
-            onTextChanged: {
+            onTextEdited: {
                 hashWord.clear()
                 if (masterKey.text.trim() != masterKey.text) {
                     status.show(qsTr("Master key has spaces around"), "orange")
