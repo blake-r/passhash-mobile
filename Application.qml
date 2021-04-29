@@ -60,164 +60,229 @@ ApplicationWindow {
         text: root.title
         padding: 5
         horizontalAlignment: Text.AlignHCenter
+        font.bold: true
     }
 
-    ComposeForm {
-        id: generatorPage
+    StackLayout {
+        id: stack
+        anchors.fill: parent
+        currentIndex: tabs.currentIndex
 
-        function splitVersion(siteTag) {
-            let array = siteTag.split(':')
-            let lastIdx = array.length - 1
-            let version = array.length > 1 ? parseInt(array[lastIdx]) : NaN
-            if (!isNaN(version)) {
-                array = array.slice(0, lastIdx)
-            }
-            return [array.join(':'), version]
-        }
+        Page {
+            ComposeForm {
+                id: generatorPage
 
-        bumpBtn {
-            enabled: siteTag.text.length > 0
-            onClicked: {
-                let data = splitVersion(siteTag.text)
-                data[1] = isNaN(data[1]) ? 1 : data[1] + 1
-                siteTag.text = data.join(':')
-                generateBtn.clicked()
-            }
-        }
-        generateBtn {
-            onClicked: {
-                let siteTagTxt = siteTag.text
-                if (siteTagTxt.length == 0) {
-                    status.show(qsTr("Site tag should not be empty"), "gray")
-                    return
-                }
-                let masterKeyTxt = masterKey.text
-                if (!masterKeyTxt.length) {
-                    status.show(qsTr("Master key should not be empty"),
-                                "orange")
-                    return
+                function splitVersion(siteTag) {
+                    let array = siteTag.split(':')
+                    let lastIdx = array.length - 1
+                    let version = array.length > 1 ? parseInt(
+                                                         array[lastIdx]) : NaN
+                    if (!isNaN(version)) {
+                        array = array.slice(0, lastIdx)
+                    }
+                    return [array.join(':'), version]
                 }
 
-                if (defaultConvertSiteTagLowerCase) {
-                    siteTagTxt = siteTagTxt.toLocaleLowerCase()
+                bumpBtn {
+                    enabled: siteTag.text.length > 0
+                    onClicked: {
+                        let data = splitVersion(siteTag.text)
+                        data[1] = isNaN(data[1]) ? 1 : data[1] + 1
+                        siteTag.text = data.join(':')
+                        generateBtn.clicked()
+                    }
                 }
+                generateBtn {
+                    onClicked: {
+                        let siteTagTxt = siteTag.text
+                        if (siteTagTxt.length == 0) {
+                            status.show(qsTr("Site tag should not be empty"),
+                                        "gray")
+                            return
+                        }
+                        let masterKeyTxt = masterKey.text
+                        if (!masterKeyTxt.length) {
+                            status.show(qsTr("Master key should not be empty"),
+                                        "orange")
+                            return
+                        }
 
-                let hashText = WijjoPassHash.PassHashCommon.generateHashWord(
-                        siteTagTxt, masterKeyTxt,
-                        parseInt(passwordLength.currentValue),
-                        requireDigits.checked, requirePunctuation.checked,
-                        requireMixedCase.checked, restrictNoSpecial.checked,
-                        restrictDigitsOnly.checked)
-                if (hashWord.text != hashText) {
-                    hashWord.text = hashText
-                    clipboard.text = hashText
-                    status.show(qsTr("Password hash copied into clipboard"),
-                                "green")
-                } else {
-                    status.show(qsTr('Password hash has not changed'), "gray")
-                }
-            }
-        }
+                        if (defaultConvertSiteTagLowerCase) {
+                            siteTagTxt = siteTagTxt.toLocaleLowerCase()
+                        }
 
-        siteTag {
-            onTextEdited: {
-                hashWord.clear()
-                let data = splitVersion(siteTag.text)
-                if (isNaN(data[1])) {
-                    // If no version, try to extract site tag from URL
-                    if (data[0].startsWith("http://") || data[0].startsWith(
-                                "https://")) {
-                        qmlUrl.url = data[0]
-                        if (qmlUrl.isValid) {
-                            let array = qmlUrl.host.split('.')
-                            let startIdx = 0
-                            let endIdx = array.length
-                            if (array[0] === 'www') {
-                                // www.google.com -> google.com
-                                ++startIdx
-                            }
-                            if (startIdx < endIdx) {
-                                // google.com -> google
-                                --endIdx
-                            }
-                            if (startIdx < endIdx) {
-                                siteTag.text = array.slice(startIdx,
-                                                           endIdx).join('.')
-                                status.show(qsTr(
-                                                "Site tag extracted from URL"),
-                                            "green")
-                            }
+                        let hashText = WijjoPassHash.PassHashCommon.generateHashWord(
+                                siteTagTxt, masterKeyTxt,
+                                parseInt(passwordLength.currentValue),
+                                requireDigits.checked,
+                                requirePunctuation.checked,
+                                requireMixedCase.checked,
+                                restrictNoSpecial.checked,
+                                restrictDigitsOnly.checked)
+                        if (hashWord.text != hashText) {
+                            hashWord.text = hashText
+                            clipboard.text = hashText
+                            status.show(qsTr("Password hash copied into clipboard"),
+                                        "green")
+                        } else {
+                            status.show(qsTr('Password hash has not changed'),
+                                        "gray")
                         }
                     }
                 }
-                if (siteTag.text.trim() != siteTag.text) {
-                    status.show(qsTr("Site tag has spaces around"), "orange")
+
+                siteTag {
+                    onTextEdited: {
+                        hashWord.clear()
+                        let data = splitVersion(siteTag.text)
+                        if (isNaN(data[1])) {
+                            // If no version, try to extract site tag from URL
+                            if (data[0].startsWith("http://")
+                                    || data[0].startsWith("https://")) {
+                                qmlUrl.url = data[0]
+                                if (qmlUrl.isValid) {
+                                    let array = qmlUrl.host.split('.')
+                                    let startIdx = 0
+                                    let endIdx = array.length
+                                    if (array[0] === 'www') {
+                                        // www.google.com -> google.com
+                                        ++startIdx
+                                    }
+                                    if (startIdx < endIdx) {
+                                        // google.com -> google
+                                        --endIdx
+                                    }
+                                    if (startIdx < endIdx) {
+                                        siteTag.text = array.slice(
+                                                    startIdx, endIdx).join('.')
+                                        status.show(qsTr("Site tag extracted from URL"),
+                                                    "green")
+                                    }
+                                }
+                            }
+                        }
+                        if (siteTag.text.trim() != siteTag.text) {
+                            status.show(qsTr("Site tag has spaces around"),
+                                        "orange")
+                        }
+                    }
+                }
+                masterKey {
+                    onTextEdited: {
+                        hashWord.clear()
+                        if (masterKey.text.trim() != masterKey.text) {
+                            status.show(qsTr("Master key has spaces around"),
+                                        "orange")
+                        }
+                    }
+                }
+
+                requireDigits {
+                    checked: requirements.digits
+                    onToggled: generateBtn.clicked()
+                }
+                requirePunctuation {
+                    checked: requirements.punctuation
+                    onToggled: generateBtn.clicked()
+                }
+                requireMixedCase {
+                    checked: requirements.mixedCase
+                    onToggled: generateBtn.clicked()
+                }
+                restrictNoSpecial {
+                    checked: restrictions.noSpecial
+                    onToggled: generateBtn.clicked()
+                }
+                restrictDigitsOnly {
+                    checked: restrictions.digitsOnly
+                    onToggled: generateBtn.clicked()
+                }
+                passwordLength {
+                    currentIndex: passwordLength.model.findIndex(
+                                      function (size) {
+                                          return size === restrictions.passwordLength
+                                      })
+                    onActivated: generateBtn.clicked()
                 }
             }
-        }
-        masterKey {
-            onTextEdited: {
-                hashWord.clear()
-                if (masterKey.text.trim() != masterKey.text) {
-                    status.show(qsTr("Master key has spaces around"), "orange")
+
+            footer: ColumnLayout {
+                width: parent.width
+
+                StatusLabel {
+                    id: status
+                    horizontalAlignment: Text.AlignHCenter
+                    Layout.fillWidth: true
+                    Layout.margins: 6
+                    Layout.bottomMargin: 0
+                }
+
+                Button {
+                    text: qsTr("Save settings")
+                    Layout.fillWidth: true
+                    Layout.margins: 6
+                    Layout.topMargin: 0
+
+                    onClicked: {
+                        requirements.digits = generatorPage.requireDigits.checked
+                        requirements.punctuation = generatorPage.requirePunctuation.checked
+                        requirements.mixedCase = generatorPage.requireMixedCase.checked
+                        restrictions.noSpecial = generatorPage.restrictNoSpecial.checked
+                        restrictions.digitsOnly = generatorPage.restrictDigitsOnly.checked
+                        restrictions.passwordLength = generatorPage.passwordLength.model[generatorPage.passwordLength.currentIndex]
+                        status.show(qsTr("Settings are saved"), "green")
+                    }
                 }
             }
         }
 
-        requireDigits {
-            checked: requirements.digits
-            onToggled: generateBtn.clicked()
-        }
-        requirePunctuation {
-            checked: requirements.punctuation
-            onToggled: generateBtn.clicked()
-        }
-        requireMixedCase {
-            checked: requirements.mixedCase
-            onToggled: generateBtn.clicked()
-        }
-        restrictNoSpecial {
-            checked: restrictions.noSpecial
-            onToggled: generateBtn.clicked()
-        }
-        restrictDigitsOnly {
-            checked: restrictions.digitsOnly
-            onToggled: generateBtn.clicked()
-        }
-        passwordLength {
-            currentIndex: passwordLength.model.findIndex(function (size) {
-                return size === restrictions.passwordLength
-            })
-            onActivated: generateBtn.clicked()
+        Page {
+            padding: 6
+            bottomPadding: 0
+
+            Frame {
+                anchors.fill: parent
+                padding: 0
+
+                ScrollView {
+                    anchors.fill: parent
+                    ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+
+                    TextArea {
+                        id: keeper
+                        readOnly: true
+                        wrapMode: TextEdit.Wrap
+                        text: "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut libero venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc,"
+                    }
+                }
+            }
+
+            footer: RowLayout {
+                spacing: 0
+
+                Button {
+                    text: qsTr("Export")
+                    Layout.fillWidth: true
+                    Layout.margins: 6
+                }
+                Button {
+                    text: qsTr("Import")
+                    Layout.fillWidth: true
+                    Layout.margins: 6
+                }
+            }
         }
     }
 
-    footer: ColumnLayout {
+    footer: TabBar {
+        id: tabs
         width: parent.width
 
-        StatusLabel {
-            id: status
-            horizontalAlignment: Text.AlignHCenter
-            Layout.fillWidth: true
-            Layout.margins: 6
-            Layout.bottomMargin: 0
+        TabButton {
+            text: qsTr("Generator")
         }
-
-        Button {
-            text: qsTr("Save settings")
-            Layout.fillWidth: true
-            Layout.margins: 6
-            Layout.topMargin: 0
-
-            onClicked: {
-                requirements.digits = generatorPage.requireDigits.checked
-                requirements.punctuation = generatorPage.requirePunctuation.checked
-                requirements.mixedCase = generatorPage.requireMixedCase.checked
-                restrictions.noSpecial = generatorPage.restrictNoSpecial.checked
-                restrictions.digitsOnly = generatorPage.restrictDigitsOnly.checked
-                restrictions.passwordLength = generatorPage.passwordLength.model[generatorPage.passwordLength.currentIndex]
-                status.show(qsTr("Settings are saved"), "green")
-            }
+        TabButton {
+            text: qsTr("Keeper")
         }
     }
 }
