@@ -54,6 +54,7 @@ android {
         $$ANDROID_PACKAGE_SOURCE_DIR/gradlew \
         $$ANDROID_PACKAGE_SOURCE_DIR/gradlew.bat \
         $$ANDROID_PACKAGE_SOURCE_DIR/res/values/libs.xml
+
 }
 
 ios {
@@ -65,6 +66,7 @@ ios {
 
     CONFIG += sdk_no_version_check
 
-    QMAKE_ASSET_CATALOGS = $$PWD/ios/Images.xcassets
+    QMAKE_ASSET_CATALOGS = $$PWD/ios/Assets.xcassets
     QMAKE_ASSET_CATALOGS_APP_ICON = "AppIcon"
+
 }
