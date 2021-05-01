@@ -1,5 +1,4 @@
-TARGET = "Password Hasher"
-VERSION = $$system("date +%Y.%m.%d")
+TARGET = passhash-mobile
 
 
 QT += quick
@@ -34,7 +33,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 android {
 
-    ANDROID_VERSION_NAME = $$VERSION
+    ANDROID_VERSION_NAME = $$system("date +%Y.%m.%d")
     # Max value is 2100000000
     ANDROID_VERSION_CODE = $$system("date +00%y%m%d%H")
 
@@ -58,11 +57,14 @@ android {
 }
 
 ios {
+
+    TARGET = "Password Hasher"
+    VERSION = $$system("date +%Y.%m.%d%H")
     QMAKE_TARGET_BUNDLE_PREFIX = "ru.co-dev"
     QMAKE_BUNDLE = "passhash"
 
     CONFIG += sdk_no_version_check
 
-    ios_icon.files = $$files($$PWD/ios/AppIcon*.png)
-    QMAKE_BUNDLE_DATA += ios_icon
+    QMAKE_ASSET_CATALOGS = $$PWD/ios/Images.xcassets
+    QMAKE_ASSET_CATALOGS_APP_ICON = "AppIcon"
 }

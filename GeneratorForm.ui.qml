@@ -32,6 +32,7 @@ Frame {
         Button {
             id: bumpBtn
             text: "Bump"
+            Layout.fillWidth: true
         }
 
         // Row #2
@@ -65,6 +66,7 @@ Frame {
         Button {
             id: generateBtn
             text: "Generate"
+            Layout.fillWidth: true
         }
     }
 }
