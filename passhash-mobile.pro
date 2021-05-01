@@ -1,5 +1,6 @@
 TARGET = passhash-mobile
 
+
 QT += quick
 
 CONFIG += c++11
@@ -53,4 +54,19 @@ android {
         $$ANDROID_PACKAGE_SOURCE_DIR/gradlew \
         $$ANDROID_PACKAGE_SOURCE_DIR/gradlew.bat \
         $$ANDROID_PACKAGE_SOURCE_DIR/res/values/libs.xml
+
+}
+
+ios {
+
+    TARGET = "Password Hasher"
+    VERSION = $$system("date +%Y.%m.%d%H")
+    QMAKE_TARGET_BUNDLE_PREFIX = "ru.co-dev"
+    QMAKE_BUNDLE = "passhash"
+
+    CONFIG += sdk_no_version_check
+
+    QMAKE_ASSET_CATALOGS = $$PWD/ios/Assets.xcassets
+    QMAKE_ASSET_CATALOGS_APP_ICON = "AppIcon"
+
 }
