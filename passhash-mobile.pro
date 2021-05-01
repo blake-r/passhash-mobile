@@ -1,4 +1,6 @@
-TARGET = passhash-mobile
+TARGET = "Password Hasher"
+VERSION = $$system("date +%Y.%m.%d")
+
 
 QT += quick
 
@@ -32,7 +34,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 android {
 
-    ANDROID_VERSION_NAME = $$system("date +%Y.%m.%d")
+    ANDROID_VERSION_NAME = $$VERSION
     # Max value is 2100000000
     ANDROID_VERSION_CODE = $$system("date +00%y%m%d%H")
 
@@ -53,4 +55,14 @@ android {
         $$ANDROID_PACKAGE_SOURCE_DIR/gradlew \
         $$ANDROID_PACKAGE_SOURCE_DIR/gradlew.bat \
         $$ANDROID_PACKAGE_SOURCE_DIR/res/values/libs.xml
+}
+
+ios {
+    QMAKE_TARGET_BUNDLE_PREFIX = "ru.co-dev"
+    QMAKE_BUNDLE = "passhash"
+
+    CONFIG += sdk_no_version_check
+
+    ios_icon.files = $$files($$PWD/ios/AppIcon*.png)
+    QMAKE_BUNDLE_DATA += ios_icon
 }
