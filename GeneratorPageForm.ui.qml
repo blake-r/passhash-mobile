@@ -1,4 +1,3 @@
-import QtQuick 2.12
 import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
 
@@ -23,7 +22,7 @@ GridLayout {
 
     GridLayout {
         // Placing elements from top to bottom is preferred
-        flow: parent.width * 0.8 < parent.height ? GridLayout.TopToBottom : GridLayout.LeftToRight
+        flow: parent.width * 0.7 < parent.height ? GridLayout.TopToBottom : GridLayout.LeftToRight
         rowSpacing: 6
         columnSpacing: 6
         Layout.fillHeight: false

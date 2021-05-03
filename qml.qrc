@@ -6,7 +6,10 @@
         <file>qtquickcontrols2.conf</file>
         <file>GeneratorForm.ui.qml</file>
         <file>HashSettingsForm.ui.qml</file>
-        <file>ComposeForm.ui.qml</file>
         <file>StatusLabel.qml</file>
+        <file>GeneratorPage.qml</file>
+        <file>GeneratorPageForm.ui.qml</file>
+        <file>KeeperPage.qml</file>
+        <file>KeeperPageForm.ui.qml</file>
     </qresource>
 </RCC>

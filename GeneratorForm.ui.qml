@@ -1,4 +1,3 @@
-import QtQuick 2.12
 import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
 
@@ -19,6 +18,7 @@ Frame {
         columnSpacing: 6
         rowSpacing: 6
 
+        readonly property int thirdColumnMinimumWidth: 80
         readonly property int thirdColumnMaximumWidth: 90
 
         // Row #1
@@ -34,6 +34,7 @@ Frame {
         Button {
             id: bumpBtn
             text: "Bump"
+            Layout.minimumWidth: parent.thirdColumnMinimumWidth
             Layout.maximumWidth: parent.thirdColumnMaximumWidth
             Layout.fillWidth: true
         }
@@ -53,6 +54,7 @@ Frame {
             id: unmask
             text: qsTr("Unmask")
             padding: 0
+            Layout.minimumWidth: parent.thirdColumnMinimumWidth
             Layout.maximumWidth: parent.thirdColumnMaximumWidth
             Layout.fillWidth: true
         }
@@ -71,6 +73,7 @@ Frame {
         Button {
             id: generateBtn
             text: "Generate"
+            Layout.minimumWidth: parent.thirdColumnMinimumWidth
             Layout.maximumWidth: parent.thirdColumnMaximumWidth
             Layout.fillWidth: true
         }
