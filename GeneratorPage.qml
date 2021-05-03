@@ -155,8 +155,8 @@ Page {
                 if (text.length) {
                     const tags = keeper.data
                     for (var i = 0; i < tags.length; ++i) {
-                        if (tags[i].text.includes(text)) {
-                            model.push(tags[i].text)
+                        if (tags[i].tag.includes(text)) {
+                            model.push(tags[i].tag)
                         }
                     }
                 }

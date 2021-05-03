@@ -2,8 +2,10 @@ import QtQuick 2.12
 import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
 import Qt.labs.settings 1.0
+import "keeper-utils.js" as KeeperUtils
 
 Page {
+    id: page
     padding: 6
     bottomPadding: 0
 
@@ -21,29 +23,6 @@ Page {
         console.log('write() is not implemented yet')
     }
 
-    function updateData(text) {
-        let parsedData = []
-        text.split('\n').forEach(function (line) {
-            let array = line.split(' ', 1)
-            let siteTag = array[0], settings = array[1]
-            array = siteTag.split(':')
-            let lastIdx = array.length - 1
-            let version = lastIdx >= 0 ? parseInt(array[lastIdx]) : NaN
-            if (!isNaN(version)) {
-                array = array.slice(0, lastIdx)
-            }
-            let parsedLine = {
-                "siteTag": siteTag,
-                "array": array,
-                "text": array.join(':'),
-                "version": version,
-                "settings": settings
-            }
-            parsedData.push(parsedLine)
-        })
-        data = parsedData
-    }
-
     Settings {
         id: storage
         category: "Keeper"
@@ -58,7 +37,7 @@ Page {
             text: storage.data
             onTextChanged: {
                 storage.data = textArea.text
-                updateData(textArea.text)
+                page.data = KeeperUtils.parseKeeperText(textArea.text)
             }
         }
     }
