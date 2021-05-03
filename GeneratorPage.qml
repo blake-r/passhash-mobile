@@ -6,6 +6,8 @@ import ru.co_dev.passhash 3.0
 import "passhash-common.js" as WijjoPassHash
 
 Page {
+    default property KeeperPage keeper
+
     readonly property int defaultMasterKeyClearTimeout: 30000
     readonly property bool defaultConvertSiteTagLowerCase: true
 
@@ -53,6 +55,7 @@ Page {
 
     GeneratorPageForm {
         id: form
+        anchors.fill: parent
 
         function splitVersion(siteTag) {
             let array = siteTag.split(':')
@@ -91,6 +94,8 @@ Page {
                     siteTagTxt = siteTagTxt.toLocaleLowerCase()
                 }
 
+                keeper.read(siteTagTxt)
+
                 let hashText = WijjoPassHash.PassHashCommon.generateHashWord(
                         siteTagTxt, masterKeyTxt,
                         parseInt(passwordLength.currentValue),
@@ -105,6 +110,8 @@ Page {
                 } else {
                     status.show(qsTr('Password hash has not changed'), "gray")
                 }
+
+                keeper.write(siteTagTxt, requirements, restrictions)
             }
         }
 
@@ -142,6 +149,18 @@ Page {
                 if (siteTag.text.trim() != siteTag.text) {
                     status.show(qsTr("Site tag has spaces around"), "orange")
                 }
+
+                let model = []
+                let text = data[0]
+                if (text.length) {
+                    const tags = keeper.data
+                    for (var i = 0; i < tags.length; ++i) {
+                        if (tags[i].text.includes(text)) {
+                            model.push(tags[i].text)
+                        }
+                    }
+                }
+                form.hinter.model = model
             }
         }
         masterKey {
@@ -179,6 +198,20 @@ Page {
             })
             onActivated: generateBtn.clicked()
         }
+
+        hinter {
+            delegate: Label {
+                text: modelData
+
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        form.siteTag.text = modelData
+                        form.hinter.model = []
+                    }
+                }
+            }
+        }
     }
 
     footer: ColumnLayout {
@@ -199,7 +232,6 @@ Page {
             Layout.topMargin: 0
 
             onClicked: {
-                console.log(form.siteTag.width)
                 requirements.digits = form.requireDigits.checked
                 requirements.punctuation = form.requirePunctuation.checked
                 requirements.mixedCase = form.requireMixedCase.checked

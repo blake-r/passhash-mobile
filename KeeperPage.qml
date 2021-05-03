@@ -1,24 +1,64 @@
 import QtQuick 2.12
 import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
+import Qt.labs.settings 1.0
 
 Page {
     padding: 6
     bottomPadding: 0
 
-    Frame {
+    property var data: []
+
+    function read(siteTag, requirements, restrictions) {
+        console.log(siteTag)
+        console.log('read() not implemented yet')
+    }
+
+    function write(siteTag, requirements, restrictions) {
+        console.log(siteTag)
+        console.log(requirements)
+        console.log(restrictions)
+        console.log('write() is not implemented yet')
+    }
+
+    function updateData(text) {
+        let parsedData = []
+        text.split('\n').forEach(function (line) {
+            let array = line.split(' ', 1)
+            let siteTag = array[0], settings = array[1]
+            array = siteTag.split(':')
+            let lastIdx = array.length - 1
+            let version = lastIdx >= 0 ? parseInt(array[lastIdx]) : NaN
+            if (!isNaN(version)) {
+                array = array.slice(0, lastIdx)
+            }
+            let parsedLine = {
+                "siteTag": siteTag,
+                "array": array,
+                "text": array.join(':'),
+                "version": version,
+                "settings": settings
+            }
+            parsedData.push(parsedLine)
+        })
+        data = parsedData
+    }
+
+    Settings {
+        id: storage
+        category: "Keeper"
+        property string data: 'google\napple'
+    }
+
+    KeeperPageForm {
+        id: form
         anchors.fill: parent
-        padding: 0
 
-        ScrollView {
-            anchors.fill: parent
-            ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
-
-            TextArea {
-                id: keeper
-                readOnly: true
-                wrapMode: TextEdit.Wrap
-                text: "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut libero venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc,"
+        textArea {
+            text: storage.data
+            onTextChanged: {
+                storage.data = textArea.text
+                updateData(textArea.text)
             }
         }
     }

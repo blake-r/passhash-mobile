@@ -1,7 +1,10 @@
+import QtQuick 2.12
 import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
 
-GridLayout {
+ColumnLayout {
+    id: form
+
     property alias siteTag: generator.siteTag
     property alias masterKey: generator.masterKey
     property alias hashWord: generator.hashWord
@@ -16,13 +19,11 @@ GridLayout {
     property alias restrictDigitsOnly: settings.restrictDigitsOnly
     property alias passwordLength: settings.passwordLength
 
-    anchors.fill: parent
-    rowSpacing: 0
-    columnSpacing: 0
+    property alias hinter: hinter
 
     GridLayout {
         // Placing elements from top to bottom is preferred
-        flow: parent.width * 0.7 < parent.height ? GridLayout.TopToBottom : GridLayout.LeftToRight
+        flow: form.width * 0.7 < form.height ? GridLayout.TopToBottom : GridLayout.LeftToRight
         rowSpacing: 6
         columnSpacing: 6
         Layout.fillHeight: false
@@ -36,6 +37,20 @@ GridLayout {
 
         HashSettingsForm {
             id: settings
+        }
+    }
+
+    Flow {
+        flow: Flow.LeftToRight
+        Layout.fillHeight: true
+        Layout.fillWidth: true
+        Layout.leftMargin: 6
+        Layout.rightMargin: 6
+        spacing: 6
+
+        Repeater {
+            id: hinter
+            model: []
         }
     }
 }

@@ -21,8 +21,13 @@ ApplicationWindow {
         anchors.fill: parent
         currentIndex: tabs.currentIndex
 
-        GeneratorPage {}
-        KeeperPage {}
+        GeneratorPage {
+            id: generator
+            keeper: keeper
+        }
+        KeeperPage {
+            id: keeper
+        }
     }
 
     footer: TabBar {
