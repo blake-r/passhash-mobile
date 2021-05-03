@@ -14,4 +14,5 @@ Project uses source code written by Steve Cooper: https://wijjo.com/passhash/
 P.S. I know, there are other similar applications like this. First of all, they provide lesser abilities for adjusting generation algorithm. And secondly. I've been using Steve's algorithm since the middle of 2000s and wouldn't like to change all my passwords.
 
 iOS: https://apps.apple.com/us/app/password-hasher/id1565669128
+
 Android: https://play.google.com/store/apps/details?id=ru.co_dev.passhash
