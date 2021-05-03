@@ -32,6 +32,8 @@ Frame {
         Button {
             id: bumpBtn
             text: "Bump"
+            Layout.maximumWidth: 100
+            Layout.fillWidth: true
         }
 
         // Row #2
@@ -65,13 +67,15 @@ Frame {
         Button {
             id: generateBtn
             text: "Generate"
+            Layout.maximumWidth: 100
+            Layout.fillWidth: true
         }
     }
 }
 
 /*##^##
 Designer {
-    D{i:0;autoSize:true;formeditorColor:"#000000";height:480;width:500}
+    D{i:0;autoSize:true;formeditorColor:"#000000";width:320}
 }
 ##^##*/
 
