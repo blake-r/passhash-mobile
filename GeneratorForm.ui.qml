@@ -19,6 +19,8 @@ Frame {
         columnSpacing: 6
         rowSpacing: 6
 
+        readonly property int thirdColumnMaximumWidth: 90
+
         // Row #1
         Label {
             text: qsTr("Site tag")
@@ -32,6 +34,8 @@ Frame {
         Button {
             id: bumpBtn
             text: "Bump"
+            Layout.maximumWidth: parent.thirdColumnMaximumWidth
+            Layout.fillWidth: true
         }
 
         // Row #2
@@ -49,6 +53,8 @@ Frame {
             id: unmask
             text: qsTr("Unmask")
             padding: 0
+            Layout.maximumWidth: parent.thirdColumnMaximumWidth
+            Layout.fillWidth: true
         }
 
         // Row #3
@@ -65,13 +71,15 @@ Frame {
         Button {
             id: generateBtn
             text: "Generate"
+            Layout.maximumWidth: parent.thirdColumnMaximumWidth
+            Layout.fillWidth: true
         }
     }
 }
 
 /*##^##
 Designer {
-    D{i:0;autoSize:true;formeditorColor:"#000000";height:480;width:500}
+    D{i:0;autoSize:true;formeditorColor:"#000000";width:500}
 }
 ##^##*/
 
