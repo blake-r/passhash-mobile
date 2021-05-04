@@ -171,8 +171,13 @@ Page {
             clipboard.text = generator.hashWord.text
             status.show(qsTr("Password hash copied into clipboard"), "green")
         }
-        function onHinterClicked(siteObj) {
-            generator.siteTag.text = SiteTagUtils.toString(siteObj)
+        function onHinterClicked(keepObj) {
+            generator.siteTag.text = SiteTagUtils.toString(keepObj)
+            settings.digits.checked = keepObj.settings.digits
+            settings.punctuation.checked = keepObj.settings.punctuation
+            settings.mixedCase.checked = keepObj.settings.mixedCase
+            settings.noSpecial.checked = keepObj.settings.noSpecial
+            settings.digitsOnly.checked = keepObj.settings.digisOnly
             hinter.model = []
         }
     }
