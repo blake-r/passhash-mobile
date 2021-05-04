@@ -3,6 +3,7 @@ import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
 import Qt.labs.settings 1.0
 import ru.co_dev.passhash 3.0
+import "utils-site-tag.js" as SiteTagUtils
 import "passhash-common.js" as WijjoPassHash
 
 Page {
@@ -58,21 +59,15 @@ Page {
         anchors.fill: parent
 
         function splitVersion(siteTag) {
-            let array = siteTag.split(':')
-            let lastIdx = array.length - 1
-            let version = array.length > 1 ? parseInt(array[lastIdx]) : NaN
-            if (!isNaN(version)) {
-                array = array.slice(0, lastIdx)
-            }
-            return [array.join(':'), version]
+            return
         }
 
         bumpBtn {
             enabled: siteTag.text.length > 0
             onClicked: {
-                let data = splitVersion(siteTag.text)
-                data[1] = isNaN(data[1]) ? 1 : data[1] + 1
-                siteTag.text = data.join(':')
+                const siteObj = SiteTagUtils.parseSiteInput(siteTag.text)
+                siteObj.ver = isNaN(siteObj.ver) ? 1 : siteObj.ver + 1
+                siteTag.text = [siteObj.tag, siteObj.ver].join(':')
                 generateBtn.clicked()
             }
         }
@@ -118,12 +113,12 @@ Page {
         siteTag {
             onTextEdited: {
                 hashWord.clear()
-                let data = splitVersion(siteTag.text)
-                if (isNaN(data[1])) {
+                const siteObj = SiteTagUtils.parseSiteInput(siteTag.text)
+                if (isNaN(siteObj.ver)) {
                     // If no version, try to extract site tag from URL
-                    if (data[0].startsWith("http://") || data[0].startsWith(
-                                "https://")) {
-                        qmlUrl.url = data[0]
+                    if (siteObj.tag.startsWith("http://")
+                            || siteObj.tag.startsWith("https://")) {
+                        qmlUrl.url = siteObj.tag
                         if (qmlUrl.isValid) {
                             let array = qmlUrl.host.split('.')
                             let startIdx = 0
@@ -137,8 +132,8 @@ Page {
                                 --endIdx
                             }
                             if (startIdx < endIdx) {
-                                siteTag.text = array.slice(startIdx,
-                                                           endIdx).join('.')
+                                array = array.slice(startIdx, endIdx)
+                                siteObj.tag = array.join('.')
                                 status.show(qsTr(
                                                 "Site tag extracted from URL"),
                                             "green")
@@ -146,21 +141,13 @@ Page {
                         }
                     }
                 }
-                if (siteTag.text.trim() != siteTag.text) {
+                const text = SiteTagUtils.toString(siteObj)
+                if (text.trim() != text) {
                     status.show(qsTr("Site tag has spaces around"), "orange")
                 }
+                siteTag.text = text
 
-                let model = []
-                let text = data[0]
-                if (text.length) {
-                    const tags = keeper.data
-                    for (var i = 0; i < tags.length; ++i) {
-                        if (tags[i].tag.includes(text)) {
-                            model.push(tags[i].tag)
-                        }
-                    }
-                }
-                form.hinter.model = model
+                hinter.model = keeper.findHints(siteObj)
             }
         }
         masterKey {
@@ -201,12 +188,12 @@ Page {
 
         hinter {
             delegate: Label {
-                text: modelData
+                text: modelData.tag
 
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
-                        form.siteTag.text = modelData
+                        form.siteTag.text = SiteTagUtils.toString(modelData)
                         form.hinter.model = []
                     }
                 }

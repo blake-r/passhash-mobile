@@ -11,8 +11,8 @@
         <file>GeneratorPageForm.ui.qml</file>
         <file>KeeperPage.qml</file>
         <file>KeeperPageForm.ui.qml</file>
-        <file>site-tag-utils.js</file>
-        <file>keeper-utils.js</file>
+        <file>utils-site-tag.js</file>
+        <file>utils-keeper.js</file>
     </qresource>
     <qresource prefix="/scripts"/>
 </RCC>
