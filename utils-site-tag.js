@@ -3,8 +3,7 @@
 function toString(siteObj) {
     if (isNaN(siteObj.ver))
         return siteObj.tag
-    else
-        return siteObj.tag + ':' + siteObj.ver
+    return [siteObj.tag, siteObj.ver].join(':')
 }
 
 function parseSiteInput(input) {

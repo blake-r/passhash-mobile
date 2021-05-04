@@ -34,6 +34,7 @@ Frame {
         Button {
             id: bumpBtn
             text: "Bump"
+            enabled: siteTag.length > 0
             Layout.minimumWidth: parent.thirdColumnMinimumWidth
             Layout.maximumWidth: parent.thirdColumnMaximumWidth
             Layout.fillWidth: true

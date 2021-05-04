@@ -16,7 +16,7 @@ Page {
         target: Qt.application
         function onStateChanged() {
             if (SystemUtils.needCleanupMasterKey()) {
-                form.masterKey.clear()
+                form.generator.masterKey.clear()
                 status.show(qsTr("Application was invisible too long, clear master key value."),
                             "orange")
             }
@@ -62,6 +62,8 @@ Page {
         id: form
         anchors.fill: parent
 
+        property var siteObj: SiteTagUtils.parseSiteInput('')
+
         generator.bumpBtn.onClicked: onBumpBtnClicked()
         generator.generateBtn.onClicked: onGenerateBtnClicked()
         generator.siteTag.onTextEdited: onSiteTagEdited()
@@ -77,18 +79,16 @@ Page {
 
         hinter.delegate: Label {
             text: modelData.tag
+            font.underline: modelData.tag === form.siteObj.tag
 
             MouseArea {
                 anchors.fill: parent
-                onClicked: {
-                    form.siteTag.text = SiteTagUtils.toString(modelData)
-                    form.hinter.model = []
-                }
+                onClicked: form.onHinterClicked(modelData)
             }
         }
 
         function onBumpBtnClicked() {
-            const siteObj = SiteTagUtils.parseSiteInput(generator.siteTag.text)
+            const siteObj = form.siteObj
             siteObj.ver = isNaN(siteObj.ver) ? 1 : siteObj.ver + 1
             generator.siteTag.text = SiteTagUtils.toString(siteObj)
             if (generator.masterKey.text.length > 0) {
@@ -156,6 +156,7 @@ Page {
                 status.show(qsTr("Site tag has spaces around"), "orange")
             }
             generator.siteTag.text = text
+            form.siteObj = siteObj
 
             hinter.model = keeper.findHints(siteObj)
         }
@@ -169,6 +170,10 @@ Page {
         function onHashWordChanged() {
             clipboard.text = generator.hashWord.text
             status.show(qsTr("Password hash copied into clipboard"), "green")
+        }
+        function onHinterClicked(siteObj) {
+            generator.siteTag.text = SiteTagUtils.toString(siteObj)
+            hinter.model = []
         }
     }
 
