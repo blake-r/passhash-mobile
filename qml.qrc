@@ -13,6 +13,7 @@
         <file>KeeperPageForm.ui.qml</file>
         <file>utils-site-tag.js</file>
         <file>utils-keeper.js</file>
+        <file>utils-system.js</file>
     </qresource>
     <qresource prefix="/scripts"/>
 </RCC>

@@ -45,6 +45,10 @@ Page {
         id: storage
         category: "Keeper"
         property string data: 'google:1 DpCsO8\napple:2\nya'
+
+        Component.onCompleted: {
+            form.textArea.text = data
+        }
     }
 
     KeeperPageForm {
@@ -52,10 +56,7 @@ Page {
         anchors.fill: parent
 
         textArea {
-            text: storage.data
-
             onTextChanged: {
-                storage.data = textArea.text
                 page.data = KeeperUtils.parseKeeperText(textArea.text)
             }
         }

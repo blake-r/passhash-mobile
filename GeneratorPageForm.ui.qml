@@ -5,21 +5,9 @@ import QtQuick.Layouts 1.12
 ColumnLayout {
     id: form
 
-    property alias siteTag: generator.siteTag
-    property alias masterKey: generator.masterKey
-    property alias hashWord: generator.hashWord
-    property alias unmask: generator.unmask
-    property alias bumpBtn: generator.bumpBtn
-    property alias generateBtn: generator.generateBtn
-
-    property alias requireDigits: settings.requireDigits
-    property alias requirePunctuation: settings.requirePunctuation
-    property alias requireMixedCase: settings.requireMixedCase
-    property alias restrictNoSpecial: settings.restrictNoSpecial
-    property alias restrictDigitsOnly: settings.restrictDigitsOnly
-    property alias passwordLength: settings.passwordLength
-
-    property alias hinter: hinter
+    readonly property alias generator: generator
+    readonly property alias settings: settings
+    readonly property alias hinter: hinter
 
     GridLayout {
         // Placing elements from top to bottom is preferred

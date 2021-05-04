@@ -73,6 +73,7 @@ Frame {
         Button {
             id: generateBtn
             text: "Generate"
+            enabled: siteTag.text.length > 0
             Layout.minimumWidth: parent.thirdColumnMinimumWidth
             Layout.maximumWidth: parent.thirdColumnMaximumWidth
             Layout.fillWidth: true

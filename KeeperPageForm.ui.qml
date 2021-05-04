@@ -2,7 +2,7 @@ import QtQuick 2.12
 import QtQuick.Controls 2.12
 
 Frame {
-    property alias textArea: textArea
+    readonly property alias textArea: textArea
 
     padding: 0
 

@@ -7,11 +7,6 @@ function toString(siteObj) {
         return siteObj.tag + ':' + siteObj.ver
 }
 
-function SiteObject(tag, ver) {
-    this.tag = tag
-    this.ver = ver
-}
-
 function parseSiteInput(input) {
     const array = input.split(':')
     const lastIdx = array.length - 1
@@ -23,5 +18,8 @@ function parseSiteInput(input) {
     } else {
         tag = input
     }
-    return new SiteObject(tag, version)
+    return {
+        "tag": tag,
+        "ver": version
+    }
 }
