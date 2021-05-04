@@ -38,9 +38,9 @@ Page {
         property bool mixedCase: true
 
         Component.onCompleted: {
-            form.settings.requireDigits.checked = digits
-            form.settings.requirePunctuation.checked = punctuation
-            form.settings.requireMixedCase.checked = mixedCase
+            form.settings.digits.checked = digits
+            form.settings.punctuation.checked = punctuation
+            form.settings.mixedCase.checked = mixedCase
         }
     }
     Settings {
@@ -51,9 +51,9 @@ Page {
         property int passwordLength: 8
 
         Component.onCompleted: {
-            form.settings.restrictNoSpecial.checked = noSpecial
-            form.settings.restrictDigitsOnly.checked = digitsOnly
-            form.settings.passwordLength.currentIndex = form.settings.passwordLength.model.indexOf(
+            form.settings.noSpecial.checked = noSpecial
+            form.settings.digitsOnly.checked = digitsOnly
+            form.settings.length.currentIndex = form.settings.length.model.indexOf(
                         passwordLength)
         }
     }
@@ -68,12 +68,12 @@ Page {
         generator.masterKey.onTextEdited: onMasterKeyEdited()
         generator.hashWord.onTextChanged: onHashWordChanged()
 
-        settings.requireDigits.onToggled: generator.generateBtn.clicked()
-        settings.requirePunctuation.onToggled: generator.generateBtn.clicked()
-        settings.requireMixedCase.onToggled: generator.generateBtn.clicked()
-        settings.restrictNoSpecial.onToggled: generator.generateBtn.clicked()
-        settings.restrictDigitsOnly.onToggled: generator.generateBtn.clicked()
-        settings.passwordLength.onActivated: generator.generateBtn.clicked()
+        settings.digits.onToggled: generator.generateBtn.clicked()
+        settings.punctuation.onToggled: generator.generateBtn.clicked()
+        settings.mixedCase.onToggled: generator.generateBtn.clicked()
+        settings.noSpecial.onToggled: generator.generateBtn.clicked()
+        settings.digitsOnly.onToggled: generator.generateBtn.clicked()
+        settings.length.onActivated: generator.generateBtn.clicked()
 
         hinter.delegate: Label {
             text: modelData.tag
@@ -113,12 +113,12 @@ Page {
 
             const hashText = WijjoPassHash.PassHashCommon.generateHashWord(
                                siteTagTxt, masterKeyTxt,
-                               parseInt(settings.passwordLength.currentValue),
-                               settings.requireDigits.checked,
-                               settings.requirePunctuation.checked,
-                               settings.requireMixedCase.checked,
-                               settings.restrictNoSpecial.checked,
-                               settings.restrictDigitsOnly.checked)
+                               parseInt(settings.length.currentValue),
+                               settings.digits.checked,
+                               settings.punctuation.checked,
+                               settings.mixedCase.checked,
+                               settings.noSpecial.checked,
+                               settings.digitsOnly.checked)
             generator.hashWord.text = hashText
         }
         function onSiteTagEdited() {
@@ -190,13 +190,13 @@ Page {
             Layout.topMargin: 0
 
             onClicked: {
-                requirements.digits = form.requireDigits.checked
-                requirements.punctuation = form.requirePunctuation.checked
-                requirements.mixedCase = form.requireMixedCase.checked
-                restrictions.noSpecial = form.restrictNoSpecial.checked
-                restrictions.digitsOnly = form.restrictDigitsOnly.checked
+                requirements.digits = form.settings.digits.checked
+                requirements.punctuation = form.settings.punctuation.checked
+                requirements.mixedCase = form.settings.mixedCase.checked
+                restrictions.noSpecial = form.settings.noSpecial.checked
+                restrictions.digitsOnly = form.settings.digitsOnly.checked
                 restrictions.passwordLength
-                        = form.passwordLength.model[form.passwordLength.currentIndex]
+                        = form.settings.length.model[form.settings.length.currentIndex]
                 status.show(qsTr("Settings are saved"), "green")
             }
         }

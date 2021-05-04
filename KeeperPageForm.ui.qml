@@ -2,9 +2,9 @@ import QtQuick 2.12
 import QtQuick.Controls 2.12
 
 Frame {
-    readonly property alias textArea: textArea
-
     padding: 0
+
+    readonly property alias textArea: textArea
 
     ScrollView {
         anchors.fill: parent

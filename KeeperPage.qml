@@ -56,6 +56,8 @@ Page {
         anchors.fill: parent
 
         textArea {
+            text: ' '
+
             onTextChanged: {
                 page.data = KeeperUtils.parseKeeperText(textArea.text)
             }

@@ -2,16 +2,16 @@ import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
 
 GridLayout {
-    property alias requireDigits: requireDigits
-    property alias requirePunctuation: requirePunctuation
-    property alias requireMixedCase: requireMixedCase
-    property alias restrictNoSpecial: restrictNoSpecial
-    property alias restrictDigitsOnly: restrictDigitsOnly
-    property alias passwordLength: passwordLength
-
     columns: 2
     columnSpacing: 6
     rowSpacing: 6
+
+    readonly property alias digits: digits
+    readonly property alias punctuation: punctuation
+    readonly property alias mixedCase: mixedCase
+    readonly property alias noSpecial: noSpecial
+    readonly property alias digitsOnly: digitsOnly
+    readonly property alias length: length
 
     GroupBox {
         title: qsTr("Requirements")
@@ -20,21 +20,20 @@ GridLayout {
 
         ColumnLayout {
             CheckBox {
-                id: requireDigits
+                id: digits
                 text: qsTr("Digits")
                 Layout.fillWidth: true
             }
             CheckBox {
-                id: requirePunctuation
+                id: punctuation
                 text: qsTr("Punctuation")
-                enabled: !restrictNoSpecial.checked
-                         && !restrictDigitsOnly.checked
+                enabled: !noSpecial.checked && !digitsOnly.checked
                 Layout.fillWidth: true
             }
             CheckBox {
-                id: requireMixedCase
+                id: mixedCase
                 text: qsTr("Mixed case")
-                enabled: !restrictDigitsOnly.checked
+                enabled: !digitsOnly.checked
                 Layout.fillWidth: true
             }
         }
@@ -47,12 +46,12 @@ GridLayout {
 
         ColumnLayout {
             CheckBox {
-                id: restrictNoSpecial
+                id: noSpecial
                 text: qsTr("No special")
                 Layout.fillWidth: true
             }
             CheckBox {
-                id: restrictDigitsOnly
+                id: digitsOnly
                 text: qsTr("Digits only")
                 Layout.fillWidth: true
             }
@@ -65,7 +64,7 @@ GridLayout {
                     Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
                 }
                 ComboBox {
-                    id: passwordLength
+                    id: length
                     Layout.fillHeight: false
                     model: [4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26]
                     flat: true

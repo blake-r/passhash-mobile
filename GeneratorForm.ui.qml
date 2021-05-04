@@ -5,12 +5,12 @@ Frame {
     Layout.fillWidth: true
     Layout.fillHeight: true
 
-    property alias siteTag: siteTag
-    property alias masterKey: masterKey
-    property alias hashWord: hashWord
-    property alias unmask: unmask
-    property alias bumpBtn: bumpBtn
-    property alias generateBtn: generateBtn
+    readonly property alias siteTag: siteTag
+    readonly property alias masterKey: masterKey
+    readonly property alias hashWord: hashWord
+    readonly property alias unmask: unmask
+    readonly property alias bumpBtn: bumpBtn
+    readonly property alias generateBtn: generateBtn
 
     GridLayout {
         anchors.fill: parent
