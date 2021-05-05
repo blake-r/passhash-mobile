@@ -44,9 +44,10 @@ Page {
     Settings {
         id: storage
         category: "Keeper"
-        property string data: 'google:1 DpCsO8\napple:2\nya'
+        property string data
 
         Component.onCompleted: {
+            data = 'google:1 DpMso8\napple:2\nya'
             form.textArea.text = data
         }
     }

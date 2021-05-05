@@ -172,12 +172,16 @@ Page {
             status.show(qsTr("Password hash copied into clipboard"), "green")
         }
         function onHinterClicked(keepObj) {
+            console.log(JSON.stringify(keepObj))
             generator.siteTag.text = SiteTagUtils.toString(keepObj)
-            settings.digits.checked = keepObj.settings.digits
-            settings.punctuation.checked = keepObj.settings.punctuation
-            settings.mixedCase.checked = keepObj.settings.mixedCase
-            settings.noSpecial.checked = keepObj.settings.noSpecial
-            settings.digitsOnly.checked = keepObj.settings.digisOnly
+            settings.digits.checked = (keepObj.settings.digits ?? requirements.digits)
+            settings.punctuation.checked = (keepObj.settings.punctuation
+                                            ?? requirements.punctuation)
+            settings.mixedCase.checked = (keepObj.settings.mixedCase ?? requirements.mixedCase)
+            settings.noSpecial.checked = !(keepObj.settings.noSpecial ?? !restrictions.noSpecial)
+            settings.digitsOnly.checked = (keepObj.settings.digitsOnly ?? restrictions.digitsOnly)
+            settings.length.currentIndex = settings.length.model.indexOf(
+                        keepObj.length ?? restrictions.passwordLength)
             hinter.model = []
         }
     }
