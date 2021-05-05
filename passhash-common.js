@@ -247,8 +247,7 @@ var PassHashCommon = {
                     Components.interfaces.nsILoginManager)
         return loginManager.findLogins({}, this.host, "passhash", null)
     },
-    "getDomain"
-    // TODO: There's probably a better way
+    "getDomain"// TODO: There's probably a better way
     : function (input) {
         var h = input.host.split(".")
         if (h.length <= 1)
@@ -259,8 +258,7 @@ var PassHashCommon = {
             return h[h.length - 3] + '.' + h[h.length - 2] + '.' + h[h.length - 1]
         return h[h.length - 2] + '.' + h[h.length - 1]
     },
-    "generateHashWord"
-    // IMPORTANT: This function should be changed carefully.  It must be
+    "generateHashWord"// IMPORTANT: This function should be changed carefully.  It must be
     // completely deterministic and consistent between releases.  Otherwise
     // users would be forced to update their passwords.  In other words, the
     // algorithm must always be backward-compatible.  It's only acceptable to
@@ -306,8 +304,7 @@ var PassHashCommon = {
         // Trim it to size.
         return s.substr(0, hashWordSize)
     },
-    "injectSpecialCharacter"
-    // This is a very specialized method to inject a character chosen from a
+    "injectSpecialCharacter"// This is a very specialized method to inject a character chosen from a
     // range of character codes into a block at the front of a string if one of
     // those characters is not already present.
     // Parameters:
@@ -336,8 +333,7 @@ var PassHashCommon = {
                                                    pos + 1, sInput.length) : "")
         return (sHead + sInject + sTail)
     },
-    "removeSpecialCharacters"
-    // Another specialized method to replace a class of character, e.g.
+    "removeSpecialCharacters"// Another specialized method to replace a class of character, e.g.
     // punctuation, with plain letters and numbers.
     // Parameters:
     //  sInput = input string
@@ -359,8 +355,7 @@ var PassHashCommon = {
             s += sInput.substring(i)
         return s
     },
-    "convertToDigits"
-    // Convert input string to digits-only.
+    "convertToDigits"// Convert input string to digits-only.
     // Parameters:
     //  sInput = input string
     //  seed   = seed for pseudo-randomizing the position and injected character
@@ -393,8 +388,7 @@ var PassHashCommon = {
         }
         return tag
     },
-    "isTextNode"
-    // Returns true if an HTML node is some kind of text field.
+    "isTextNode"// Returns true if an HTML node is some kind of text field.
     : function (node) {
         try {
             var name = node.localName.toUpperCase()
@@ -407,8 +401,7 @@ var PassHashCommon = {
         }
         return false
     },
-    "openUILinkIn"
-    // From Mozilla utilityOverlay.js
+    "openUILinkIn"// From Mozilla utilityOverlay.js
     // TODO: Can I access it directly?
     : function (url, where) {
         if (!where)
@@ -453,8 +446,7 @@ var PassHashCommon = {
             break
         }
     },
-    "getTopWin"
-    // From Mozilla utilityOverlay.js
+    "getTopWin"// From Mozilla utilityOverlay.js
     : function () {
         var windowManager = Components.classes['@mozilla.org/appshell/window-mediator;1'].getService()
         var windowManagerInterface = windowManager.QueryInterface(
@@ -467,8 +459,7 @@ var PassHashCommon = {
 
         return null
     },
-    "getBoolPref"
-    // From Mozilla utilityOverlay.js
+    "getBoolPref"// From Mozilla utilityOverlay.js
     : function (prefname, def) {
         try {
             var pref = Components.classes["@mozilla.org/preferences-service;1"].getService(
@@ -478,8 +469,7 @@ var PassHashCommon = {
             return def
         }
     },
-    "getSavedEntries"
-    // Build an array sorted by domain name with properties populated, as
+    "getSavedEntries"// Build an array sorted by domain name with properties populated, as
     // available, for site tag, master key and options.
     : function () {
         // Because of Javascript limitations on associative arrays, e.g. not
@@ -543,8 +533,7 @@ var PassHashCommon = {
         }
         return entries
     },
-    "getAllLoginManagerEntries"
-    // Gather all extension-related FF3 login manager entries.  Return as 3
+    "getAllLoginManagerEntries"// Gather all extension-related FF3 login manager entries.  Return as 3
     // arrays for site tags, master keys and options.
     : function (siteTags, masterKeys, options) {
         var logins = this.findAllLoginManagerLogins()
@@ -578,8 +567,7 @@ var PassHashCommon = {
             }
         }
     },
-    "getAllPasswordManagerEntries"
-    // Gather all extension-related FF2 login manager entries.  Return as 3
+    "getAllPasswordManagerEntries"// Gather all extension-related FF2 login manager entries.  Return as 3
     // arrays for site tags, master keys and options.
     : function (siteTags, masterKeys, options) {
         var passwordManager = Components.classes["@mozilla.org/passwordmanager;1"].createInstance()
@@ -648,8 +636,7 @@ var PassHashCommon = {
         stream.write(line, line.length)
         stream.write("\n", 1)
     },
-    "expandLine"
-    // Expand variables and return resulting string
+    "expandLine"// Expand variables and return resulting string
     : function (lineIn) {
         var strings = document.getElementById("pshOpt_strings")
         var lineOut = ""
@@ -669,8 +656,7 @@ var PassHashCommon = {
         lineOut += lineIn.substr(splicePos)
         return lineOut
     },
-    "streamWriteExpandedLine"
-    // Expand variables and write line to output stream
+    "streamWriteExpandedLine"// Expand variables and write line to output stream
     : function (stream, line) {
         PassHashCommon.streamWriteLine(stream, PassHashCommon.expandLine(line))
     },

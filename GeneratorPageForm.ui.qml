@@ -16,8 +16,6 @@ ColumnLayout {
         columnSpacing: 6
         Layout.fillHeight: false
         Layout.alignment: Qt.AlignLeft | Qt.AlignTop
-        Layout.margins: 6
-        Layout.topMargin: 0
 
         GeneratorForm {
             id: generator
@@ -28,24 +26,26 @@ ColumnLayout {
         }
     }
 
-    Flow {
-        flow: Flow.LeftToRight
-        Layout.fillHeight: true
+    GroupBox {
+        title: qsTr("Site tag hints")
         Layout.fillWidth: true
-        Layout.leftMargin: 6
-        Layout.rightMargin: 6
-        spacing: 6
+        Layout.fillHeight: true
 
-        Repeater {
-            id: hinter
-            model: []
+        Flow {
+            flow: Flow.LeftToRight
+            spacing: 6
+
+            Repeater {
+                id: hinter
+                model: []
+            }
         }
     }
 }
 
 /*##^##
 Designer {
-    D{i:0;formeditorColor:"#4c4e50";height:480;width:320}
+    D{i:0;autoSize:true;formeditorColor:"#4c4e50";height:480;width:320}
 }
 ##^##*/
 

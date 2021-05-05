@@ -1,6 +1,8 @@
 .pragma library
 .import "utils-site-tag.js" as SiteTagUtils
 
+var DATA = []
+
 const SETTING_CODES = new Map([['D', 'digits'], ['P', 'punctuation'], ['M', 'mixedCase'], ['S', 'special'], ['O', 'digitsOnly']])
 
 function parseKeeperLine(input) {
@@ -19,7 +21,7 @@ function parseKeeperSettings(input) {
         result[kv] = null
     })
     let length = 0
-    for (let i in input) {
+    for (const i in input) {
         const char = input[i]
         const charUpper = char.toUpperCase()
         const key = SETTING_CODES.get(charUpper)
@@ -42,4 +44,32 @@ function parseKeeperText(input) {
         result.push(parseKeeperLine(line))
     })
     return result
+}
+
+function findHints(siteObj) {
+    const parts = siteObj.tag.split('.')
+    const result = []
+    for (const i in parts) {
+        const part = parts[i]
+        if (part.length) {
+            findHintsForString(part, result)
+        }
+    }
+    return result
+}
+
+function findHintsForString(input, inoutHints) {
+    for (const i in DATA) {
+        const keepObj = DATA[i]
+        if (inoutHints.includes(keepObj)) {
+            continue
+        }
+        for (const j in keepObj.path) {
+            const part = keepObj.path[j]
+            if (part.startsWith(input)) {
+                inoutHints.push(keepObj)
+                break
+            }
+        }
+    }
 }

@@ -9,8 +9,6 @@ Page {
     padding: 6
     bottomPadding: 0
 
-    property var data: []
-
     function read(siteTag, requirements, restrictions) {
         console.log(siteTag)
         console.log('read() not implemented yet')
@@ -21,24 +19,6 @@ Page {
         console.log(requirements)
         console.log(restrictions)
         console.log('write() is not implemented yet')
-    }
-
-    function findHints(siteObj) {
-        const result = []
-        const tag = siteObj.tag
-        if (tag.length > 0) {
-            for (const i in data) {
-                const keepObj = data[i]
-                for (const j in keepObj.path) {
-                    const part = keepObj.path[j]
-                    if (part.startsWith(tag)) {
-                        result.push(keepObj)
-                        break
-                    }
-                }
-            }
-        }
-        return result
     }
 
     Settings {
@@ -60,7 +40,7 @@ Page {
             text: ' '
 
             onTextChanged: {
-                page.data = KeeperUtils.parseKeeperText(textArea.text)
+                KeeperUtils.DATA = KeeperUtils.parseKeeperText(textArea.text)
             }
         }
     }

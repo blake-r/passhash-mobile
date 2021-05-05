@@ -3,12 +3,14 @@ import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
 import Qt.labs.settings 1.0
 import ru.co_dev.passhash 3.0
+import "utils-keeper.js" as KeeperUtils
 import "utils-site-tag.js" as SiteTagUtils
 import "utils-system.js" as SystemUtils
 import "passhash-common.js" as WijjoPassHash
 
 Page {
-    default property KeeperPage keeper
+    leftPadding: 6
+    rightPadding: 6
 
     readonly property bool defaultConvertSiteTagLowerCase: true
 
@@ -158,7 +160,7 @@ Page {
             generator.siteTag.text = text
             form.siteObj = siteObj
 
-            hinter.model = keeper.findHints(siteObj)
+            hinter.model = KeeperUtils.findHints(siteObj)
         }
         function onMasterKeyEdited() {
             generator.hashWord.clear()

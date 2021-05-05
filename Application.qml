@@ -23,7 +23,6 @@ ApplicationWindow {
 
         GeneratorPage {
             id: generator
-            keeper: keeper
         }
         KeeperPage {
             id: keeper
