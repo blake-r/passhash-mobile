@@ -6,8 +6,13 @@ import "utils-keeper.js" as KeeperUtils
 
 Page {
     id: page
-    padding: 6
-    bottomPadding: 0
+    leftPadding: 6
+    rightPadding: 6
+
+    function onDataChange(keeperTxt) {
+        storage.data = keeperTxt
+        form.textArea.text = keeperTxt
+    }
 
     Settings {
         id: storage
@@ -15,22 +20,14 @@ Page {
         property string data
 
         Component.onCompleted: {
-            data = 'google:1 DpMso8\napple:2\nya'
-            form.textArea.text = data
+            data = 'google:1=DpMso8\napple:2=dPmsO24'
+            KeeperUtils.initKeeperData(data, onDataChange)
         }
     }
 
     KeeperPageForm {
         id: form
         anchors.fill: parent
-
-        textArea {
-            text: ' '
-
-            onTextChanged: {
-                KeeperUtils.initKeeperData(textArea.text)
-            }
-        }
     }
 
     footer: RowLayout {

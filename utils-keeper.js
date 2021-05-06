@@ -4,6 +4,7 @@
 const DATA = new Map()
 
 const SETTING_CODES = new Map([['D', 'digits'], ['P', 'punctuation'], ['M', 'mixedCase'], ['S', 'special'], ['O', 'digitsOnly']])
+let onDataChange
 
 function createKeepObj(siteTag, settings) {
     const keepObj = SiteTagUtils.createSiteObj(siteTag)
@@ -12,9 +13,23 @@ function createKeepObj(siteTag, settings) {
     return keepObj
 }
 
-function parseKeeperLine(record) {
+function initKeeperData(keeperTxt, onDataChangeFunc) {
+    DATA.length = 0
+    keeperTxt.split('\n').forEach(function (line) {
+        line = line.trim()
+        if (!line.length) {
+            return
+        }
+        const keepObj = parseKeeperRecord(line)
+        DATA.set(keepObj.tag, keepObj)
+    })
+    onDataChange = onDataChangeFunc
+    onDataChange(keeperTxt)
+}
+
+function parseKeeperRecord(record) {
     // Example: "google DpMso8"
-    const array = record.split(' ')
+    const array = record.split('=')
     const settingsString = array.length > 1 ? array.pop() : ''
     const settings = parseKeeperSettings(settingsString)
     return createKeepObj(array.join(' '), settings)
@@ -45,58 +60,34 @@ function parseKeeperSettings(str) {
     return result
 }
 
-function initKeeperData(keeperTxt) {
-    DATA.length = 0
-    keeperTxt.split('\n').forEach(function (line) {
-        line = line.trim()
-        if (!line.length) {
-            return
-        }
-        const keepObj = parseKeeperLine(line)
-        DATA.set(keepObj.tag, keepObj)
-    })
+function storeSiteTag(siteTag, settings) {
+    const keepObj = createKeepObj(siteTag, settings)
+    DATA.set(keepObj.tag, keepObj)
+    onDataChange(makeKeeperText())
 }
 
-function findHints(siteObj) {
+function makeKeeperText() {
     const result = []
-    const fullTag = siteObj.tag
-    const parts = fullTag.split('.')
-    // Show full match first
-    findHintsForString(fullTag, result, function (part, str) {
-        return part === str
-    })
-    // Show part matches second
-    parts.forEach(function (part) {
-        findHintsForString(part, result, function (part, str) {
-            return part === str
-        })
-    })
-    // Show partial part matches at the end
-    parts.forEach(function (part) {
-        findHintsForString(part, result, function (part, str) {
-            return part.startsWith(str)
-        })
-    })
-    return result
-}
-
-function findHintsForString(str, inoutHints, compFunc) {
-    if (!str.length) {
-        return
-    }
     DATA.forEach(function (keepObj) {
-        if (inoutHints.includes(keepObj)) {
-            // Don't add a duplicate
-            return
-        }
-        for (const j in keepObj.path) {
-            const part = keepObj.path[j]
-            if (compFunc(part, str)) {
-                inoutHints.push(keepObj)
-                break
-            }
-        }
+        const siteTag = SiteTagUtils.toString(keepObj)
+        const settingsString = makeSettingsText(keepObj.settings)
+        const record = [siteTag, settingsString].join('=')
+        result.push(record)
     })
+    result.sort()
+    return result.join('\n')
 }
 
-function storeSiteTag(siteTag, settings) {}
+function makeSettingsText(settings) {
+    const result = []
+    SETTING_CODES.forEach(function (key, char) {
+        const value = (settings[key] ?? null)
+        if (value !== null) {
+            result.push(value ? char : char.toLowerCase())
+        }
+    })
+    if (typeof settings.length === 'number') {
+        result.push(settings.length.toString())
+    }
+    return result.join('')
+}

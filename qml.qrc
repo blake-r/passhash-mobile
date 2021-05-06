@@ -14,6 +14,7 @@
         <file>utils-site-tag.js</file>
         <file>utils-keeper.js</file>
         <file>utils-system.js</file>
+        <file>utils-hinter.js</file>
     </qresource>
     <qresource prefix="/scripts"/>
 </RCC>

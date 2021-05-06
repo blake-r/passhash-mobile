@@ -3,6 +3,7 @@ import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
 import Qt.labs.settings 1.0
 import ru.co_dev.passhash 3.0
+import "utils-hinter.js" as HinterUtils
 import "utils-keeper.js" as KeeperUtils
 import "utils-site-tag.js" as SiteTagUtils
 import "utils-system.js" as SystemUtils
@@ -64,11 +65,10 @@ Page {
         id: form
         anchors.fill: parent
 
-        property var siteObj: []
-
         generator.bumpBtn.onClicked: onBumpBtnClicked()
         generator.generateBtn.onClicked: onGenerateBtnClicked()
         generator.siteTag.onTextEdited: onSiteTagEdited()
+        generator.masterKey.onAccepted: generator.generateBtn.clicked()
         generator.masterKey.onTextEdited: onMasterKeyEdited()
         generator.hashWord.onTextChanged: onHashWordChanged()
 
@@ -81,7 +81,8 @@ Page {
 
         hinter.delegate: Label {
             text: modelData.tag
-            font.underline: modelData.tag === form.siteObj.tag
+            font.underline: SiteTagUtils.toString(
+                                modelData) === form.generator.siteTag.text
 
             MouseArea {
                 anchors.fill: parent
@@ -90,7 +91,7 @@ Page {
         }
 
         function onBumpBtnClicked() {
-            const siteObj = form.siteObj
+            const siteObj = SiteTagUtils.createSiteObj(generator.siteTag.text)
             siteObj.ver = isNaN(siteObj.ver) ? 1 : siteObj.ver + 1
             generator.siteTag.text = SiteTagUtils.toString(siteObj)
             if (generator.masterKey.text.length > 0) {
@@ -160,9 +161,8 @@ Page {
                 status.show(qsTr("Site tag has spaces around"), "orange")
             }
             generator.siteTag.text = text
-            form.siteObj = siteObj
 
-            hinter.model = KeeperUtils.findHints(siteObj)
+            hinter.model = HinterUtils.findHints(siteObj)
         }
 
         function onMasterKeyEdited() {
@@ -174,12 +174,16 @@ Page {
         }
 
         function onHashWordChanged() {
-            clipboard.text = generator.hashWord.text
+            const hashWord = generator.hashWord.text
+            if (!hashWord.length) {
+                return
+            }
+            clipboard.text = hashWord
             status.show(qsTr("Password hash copied into clipboard"), "green")
             KeeperUtils.storeSiteTag(generator.siteTag.text, {
                                          "digits": settings.digits.checked,
                                          "punctuation": settings.punctuation.checked,
-                                         "mixedCsae": settings.mixedCase.checked,
+                                         "mixedCase": settings.mixedCase.checked,
                                          "special": !settings.noSpecial.checked,
                                          "digitsOnly": settings.digitsOnly.checked,
                                          "length": settings.length.currentValue
@@ -192,11 +196,14 @@ Page {
             settings.punctuation.checked = (keepObj.settings.punctuation
                                             ?? requirements.punctuation)
             settings.mixedCase.checked = (keepObj.settings.mixedCase ?? requirements.mixedCase)
-            settings.noSpecial.checked = !(keepObj.settings.noSpecial ?? !restrictions.noSpecial)
+            settings.noSpecial.checked = !(keepObj.settings.special ?? !restrictions.noSpecial)
             settings.digitsOnly.checked = (keepObj.settings.digitsOnly ?? restrictions.digitsOnly)
             settings.length.currentIndex = settings.length.model.indexOf(
-                        keepObj.length ?? restrictions.passwordLength)
+                        keepObj.settings.length ?? restrictions.passwordLength)
             hinter.model = []
+            if (generator.masterKey.text.length) {
+                generator.generateBtn.clicked()
+            }
         }
     }
 
