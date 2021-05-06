@@ -64,7 +64,7 @@ Page {
         id: form
         anchors.fill: parent
 
-        property var siteObj: SiteTagUtils.parseSiteInput('')
+        property var siteObj: []
 
         generator.bumpBtn.onClicked: onBumpBtnClicked()
         generator.generateBtn.onClicked: onGenerateBtnClicked()
@@ -97,6 +97,7 @@ Page {
                 generator.generateBtn.clicked()
             }
         }
+
         function onGenerateBtnClicked() {
             let siteTagTxt = generator.siteTag.text
             if (!siteTagTxt.length) {
@@ -123,9 +124,10 @@ Page {
                                settings.digitsOnly.checked)
             generator.hashWord.text = hashText
         }
+
         function onSiteTagEdited() {
             generator.hashWord.clear()
-            const siteObj = SiteTagUtils.parseSiteInput(generator.siteTag.text)
+            const siteObj = SiteTagUtils.createSiteObj(generator.siteTag.text)
             if (isNaN(siteObj.ver)) {
                 // If no version, try to extract site tag from URL
                 if (siteObj.tag.startsWith("http://") || siteObj.tag.startsWith(
@@ -162,6 +164,7 @@ Page {
 
             hinter.model = KeeperUtils.findHints(siteObj)
         }
+
         function onMasterKeyEdited() {
             generator.hashWord.clear()
             const masterKeyTxt = generator.masterKey.text
@@ -169,12 +172,21 @@ Page {
                 status.show(qsTr("Master key has spaces around"), "orange")
             }
         }
+
         function onHashWordChanged() {
             clipboard.text = generator.hashWord.text
             status.show(qsTr("Password hash copied into clipboard"), "green")
+            KeeperUtils.storeSiteTag(generator.siteTag.text, {
+                                         "digits": settings.digits.checked,
+                                         "punctuation": settings.punctuation.checked,
+                                         "mixedCsae": settings.mixedCase.checked,
+                                         "special": !settings.noSpecial.checked,
+                                         "digitsOnly": settings.digitsOnly.checked,
+                                         "length": settings.length.currentValue
+                                     })
         }
+
         function onHinterClicked(keepObj) {
-            console.log(JSON.stringify(keepObj))
             generator.siteTag.text = SiteTagUtils.toString(keepObj)
             settings.digits.checked = (keepObj.settings.digits ?? requirements.digits)
             settings.punctuation.checked = (keepObj.settings.punctuation

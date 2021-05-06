@@ -6,8 +6,8 @@ function toString(siteObj) {
     return [siteObj.tag, siteObj.ver].join(':')
 }
 
-function parseSiteInput(input) {
-    const array = input.split(':')
+function createSiteObj(siteTag) {
+    const array = siteTag.split(':')
     const lastIdx = array.length - 1
     const version = lastIdx > 0 ? parseInt(array[lastIdx]) : NaN
     let tag
@@ -15,7 +15,7 @@ function parseSiteInput(input) {
         array.pop()
         tag = array.join(':')
     } else {
-        tag = input
+        tag = siteTag
     }
     return {
         "tag": tag,

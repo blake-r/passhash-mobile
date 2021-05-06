@@ -1,33 +1,40 @@
 .pragma library
 .import "utils-site-tag.js" as SiteTagUtils
 
-var DATA = []
+const DATA = new Map()
 
 const SETTING_CODES = new Map([['D', 'digits'], ['P', 'punctuation'], ['M', 'mixedCase'], ['S', 'special'], ['O', 'digitsOnly']])
 
-function parseKeeperLine(input) {
-    // Example: "google DpMso8"
-    const array = input.split(' ')
-    const settings = array.length > 1 ? array.pop() : ''
-    const siteObj = SiteTagUtils.parseSiteInput(array.join(' '))
-    siteObj.path = siteObj.tag.split('.')
-    siteObj.settings = parseKeeperSettings(settings)
-    return siteObj
+function createKeepObj(siteTag, settings) {
+    const keepObj = SiteTagUtils.createSiteObj(siteTag)
+    keepObj.path = keepObj.tag.split('.')
+    keepObj.settings = settings
+    return keepObj
 }
 
-function parseKeeperSettings(input) {
+function parseKeeperLine(record) {
+    // Example: "google DpMso8"
+    const array = record.split(' ')
+    const settingsString = array.length > 1 ? array.pop() : ''
+    const settings = parseKeeperSettings(settingsString)
+    return createKeepObj(array.join(' '), settings)
+}
+
+function parseKeeperSettings(str) {
     const result = {}
-    SETTING_CODES.forEach(function (kv) {
-        result[kv] = null
+    SETTING_CODES.forEach(function (value) {
+        result[value] = null
     })
     let length = 0
-    for (const i in input) {
-        const char = input[i]
+    for (const i in str) {
+        const char = str[i]
         const charUpper = char.toUpperCase()
         const key = SETTING_CODES.get(charUpper)
         if (key === undefined) {
             if (char >= '0' && char <= '9') {
                 length = length * 10 + parseInt(char)
+            } else {
+                console.warn('Symbol "' + char + '" is not a setting code')
             }
         } else {
             result[key] = (char === charUpper)
@@ -38,38 +45,58 @@ function parseKeeperSettings(input) {
     return result
 }
 
-function parseKeeperText(input) {
-    let result = []
-    input.split('\n').forEach(function (line) {
-        result.push(parseKeeperLine(line))
+function initKeeperData(keeperTxt) {
+    DATA.length = 0
+    keeperTxt.split('\n').forEach(function (line) {
+        line = line.trim()
+        if (!line.length) {
+            return
+        }
+        const keepObj = parseKeeperLine(line)
+        DATA.set(keepObj.tag, keepObj)
+    })
+}
+
+function findHints(siteObj) {
+    const result = []
+    const fullTag = siteObj.tag
+    const parts = fullTag.split('.')
+    // Show full match first
+    findHintsForString(fullTag, result, function (part, str) {
+        return part === str
+    })
+    // Show part matches second
+    parts.forEach(function (part) {
+        findHintsForString(part, result, function (part, str) {
+            return part === str
+        })
+    })
+    // Show partial part matches at the end
+    parts.forEach(function (part) {
+        findHintsForString(part, result, function (part, str) {
+            return part.startsWith(str)
+        })
     })
     return result
 }
 
-function findHints(siteObj) {
-    const parts = siteObj.tag.split('.')
-    const result = []
-    for (const i in parts) {
-        const part = parts[i]
-        if (part.length) {
-            findHintsForString(part, result)
-        }
+function findHintsForString(str, inoutHints, compFunc) {
+    if (!str.length) {
+        return
     }
-    return result
-}
-
-function findHintsForString(input, inoutHints) {
-    for (const i in DATA) {
-        const keepObj = DATA[i]
+    DATA.forEach(function (keepObj) {
         if (inoutHints.includes(keepObj)) {
-            continue
+            // Don't add a duplicate
+            return
         }
         for (const j in keepObj.path) {
             const part = keepObj.path[j]
-            if (part.startsWith(input)) {
+            if (compFunc(part, str)) {
                 inoutHints.push(keepObj)
                 break
             }
         }
-    }
+    })
 }
+
+function storeSiteTag(siteTag, settings) {}

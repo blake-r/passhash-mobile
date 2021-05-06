@@ -9,18 +9,6 @@ Page {
     padding: 6
     bottomPadding: 0
 
-    function read(siteTag, requirements, restrictions) {
-        console.log(siteTag)
-        console.log('read() not implemented yet')
-    }
-
-    function write(siteTag, requirements, restrictions) {
-        console.log(siteTag)
-        console.log(requirements)
-        console.log(restrictions)
-        console.log('write() is not implemented yet')
-    }
-
     Settings {
         id: storage
         category: "Keeper"
@@ -40,7 +28,7 @@ Page {
             text: ' '
 
             onTextChanged: {
-                KeeperUtils.DATA = KeeperUtils.parseKeeperText(textArea.text)
+                KeeperUtils.initKeeperData(textArea.text)
             }
         }
     }
