@@ -32,6 +32,8 @@ ColumnLayout {
         Layout.fillHeight: true
 
         Flow {
+            anchors.fill: parent
+            clip: true
             flow: Flow.LeftToRight
             spacing: 6
 
