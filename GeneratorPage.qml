@@ -13,8 +13,6 @@ Page {
     leftPadding: 6
     rightPadding: 6
 
-    readonly property bool defaultConvertSiteTagLowerCase: true
-
     Connections {
         target: Qt.application
         function onStateChanged() {
@@ -111,10 +109,6 @@ Page {
                 return
             }
 
-            if (defaultConvertSiteTagLowerCase) {
-                siteTagTxt = siteTagTxt.toLocaleLowerCase()
-            }
-
             const hashText = WijjoPassHash.PassHashCommon.generateHashWord(
                                siteTagTxt, masterKeyTxt,
                                parseInt(settings.length.currentValue),
@@ -124,6 +118,15 @@ Page {
                                settings.noSpecial.checked,
                                settings.digitsOnly.checked)
             generator.hashWord.text = hashText
+
+            KeeperUtils.storeSiteTag(generator.siteTag.text, {
+                                         "digits": settings.digits.checked,
+                                         "punctuation": settings.punctuation.checked,
+                                         "mixedCase": settings.mixedCase.checked,
+                                         "special": !settings.noSpecial.checked,
+                                         "digitsOnly": settings.digitsOnly.checked,
+                                         "length": settings.length.currentValue
+                                     })
         }
 
         function onSiteTagEdited() {
@@ -156,7 +159,7 @@ Page {
                 }
             }
 
-            const text = SiteTagUtils.toString(siteObj)
+            const text = SiteTagUtils.toString(siteObj).toLocaleLowerCase()
             if (text.trim() !== text) {
                 status.show(qsTr("Site tag has spaces around"), "orange")
             }
@@ -180,14 +183,6 @@ Page {
             }
             clipboard.text = hashWord
             status.show(qsTr("Password hash copied into clipboard"), "green")
-            KeeperUtils.storeSiteTag(generator.siteTag.text, {
-                                         "digits": settings.digits.checked,
-                                         "punctuation": settings.punctuation.checked,
-                                         "mixedCase": settings.mixedCase.checked,
-                                         "special": !settings.noSpecial.checked,
-                                         "digitsOnly": settings.digitsOnly.checked,
-                                         "length": settings.length.currentValue
-                                     })
         }
 
         function onHinterClicked(keepObj) {

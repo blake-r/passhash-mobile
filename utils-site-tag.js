@@ -7,7 +7,7 @@ function toString(siteObj) {
 }
 
 function createSiteObj(siteTag) {
-    const array = siteTag.split(':')
+    const array = siteTag.toLocaleLowerCase().split(':')
     const lastIdx = array.length - 1
     const version = lastIdx > 0 ? parseInt(array[lastIdx]) : NaN
     let tag
