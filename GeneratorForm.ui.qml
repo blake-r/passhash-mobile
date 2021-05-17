@@ -1,4 +1,3 @@
-import QtQuick 2.12
 import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
 
@@ -6,12 +5,12 @@ Frame {
     Layout.fillWidth: true
     Layout.fillHeight: true
 
-    property alias siteTag: siteTag
-    property alias masterKey: masterKey
-    property alias hashWord: hashWord
-    property alias unmask: unmask
-    property alias bumpBtn: bumpBtn
-    property alias generateBtn: generateBtn
+    readonly property alias siteTag: siteTag
+    readonly property alias masterKey: masterKey
+    readonly property alias hashWord: hashWord
+    readonly property alias unmask: unmask
+    readonly property alias bumpBtn: bumpBtn
+    readonly property alias generateBtn: generateBtn
 
     GridLayout {
         anchors.fill: parent
@@ -19,6 +18,7 @@ Frame {
         columnSpacing: 6
         rowSpacing: 6
 
+        readonly property int thirdColumnMinimumWidth: 80
         readonly property int thirdColumnMaximumWidth: 90
 
         // Row #1
@@ -34,6 +34,8 @@ Frame {
         Button {
             id: bumpBtn
             text: "Bump"
+            enabled: siteTag.length > 0
+            Layout.minimumWidth: parent.thirdColumnMinimumWidth
             Layout.maximumWidth: parent.thirdColumnMaximumWidth
             Layout.fillWidth: true
         }
@@ -53,6 +55,7 @@ Frame {
             id: unmask
             text: qsTr("Unmask")
             padding: 0
+            Layout.minimumWidth: parent.thirdColumnMinimumWidth
             Layout.maximumWidth: parent.thirdColumnMaximumWidth
             Layout.fillWidth: true
         }
@@ -71,6 +74,8 @@ Frame {
         Button {
             id: generateBtn
             text: "Generate"
+            enabled: siteTag.text.length > 0
+            Layout.minimumWidth: parent.thirdColumnMinimumWidth
             Layout.maximumWidth: parent.thirdColumnMaximumWidth
             Layout.fillWidth: true
         }

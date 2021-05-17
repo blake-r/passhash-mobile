@@ -6,7 +6,15 @@
         <file>qtquickcontrols2.conf</file>
         <file>GeneratorForm.ui.qml</file>
         <file>HashSettingsForm.ui.qml</file>
-        <file>ComposeForm.ui.qml</file>
         <file>StatusLabel.qml</file>
+        <file>GeneratorPage.qml</file>
+        <file>GeneratorPageForm.ui.qml</file>
+        <file>KeeperPage.qml</file>
+        <file>KeeperPageForm.ui.qml</file>
+        <file>utils-site-tag.js</file>
+        <file>utils-keeper.js</file>
+        <file>utils-system.js</file>
+        <file>utils-hinter.js</file>
     </qresource>
+    <qresource prefix="/scripts"/>
 </RCC>
