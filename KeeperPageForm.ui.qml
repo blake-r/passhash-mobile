@@ -17,3 +17,10 @@ Frame {
         }
     }
 }
+
+/*##^##
+Designer {
+    D{i:0;autoSize:true;formeditorColor:"#000000";height:480;width:640}
+}
+##^##*/
+

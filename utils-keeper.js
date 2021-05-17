@@ -4,7 +4,7 @@
 const DATA = new Map()
 
 const SETTING_CODES = new Map([['D', 'digits'], ['P', 'punctuation'], ['M', 'mixedCase'], ['S', 'special'], ['O', 'digitsOnly']])
-let onDataChange
+let changeData
 
 function createKeepObj(siteTag, settings) {
     const keepObj = SiteTagUtils.createSiteObj(siteTag)
@@ -13,7 +13,11 @@ function createKeepObj(siteTag, settings) {
     return keepObj
 }
 
-function initKeeperData(keeperTxt, onDataChangeFunc) {
+function initKeeperData(changeDataFunc) {
+    changeData = changeDataFunc
+}
+
+function updateKeeperData(keeperTxt) {
     DATA.length = 0
     keeperTxt.split('\n').forEach(function (line) {
         line = line.trim()
@@ -23,8 +27,12 @@ function initKeeperData(keeperTxt, onDataChangeFunc) {
         const keepObj = parseKeeperRecord(line)
         DATA.set(keepObj.tag, keepObj)
     })
-    onDataChange = onDataChangeFunc
-    onDataChange(keeperTxt)
+}
+
+function storeSiteTag(siteTag, settings) {
+    const keepObj = createKeepObj(siteTag, settings)
+    DATA.set(keepObj.tag, keepObj)
+    changeData(makeKeeperText())
 }
 
 function parseKeeperRecord(record) {
@@ -58,12 +66,6 @@ function parseKeeperSettings(str) {
     length -= length % 2 // Hash word length should be aligned to 2
     result.length = length > 0 ? length : null
     return result
-}
-
-function storeSiteTag(siteTag, settings) {
-    const keepObj = createKeepObj(siteTag, settings)
-    DATA.set(keepObj.tag, keepObj)
-    onDataChange(makeKeeperText())
 }
 
 function makeKeeperText() {
