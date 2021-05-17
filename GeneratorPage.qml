@@ -37,7 +37,7 @@ Page {
         id: requirements
         category: "Requirements"
         property bool digits: true
-        property bool punctuation: false
+        property bool punctuation: true
         property bool mixedCase: true
 
         Component.onCompleted: {
