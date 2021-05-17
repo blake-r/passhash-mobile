@@ -18,7 +18,7 @@ function initKeeperData(changeDataFunc) {
 }
 
 function updateKeeperData(keeperTxt) {
-    DATA.length = 0
+    DATA.clear()
     keeperTxt.split('\n').forEach(function (line) {
         line = line.trim()
         if (!line.length) {
