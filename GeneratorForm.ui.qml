@@ -29,6 +29,7 @@ Frame {
         TextField {
             id: siteTag
             placeholderText: qsTr("Site tag")
+            inputMethodHints: Qt.ImhSensitiveData | Qt.ImhNoAutoUppercase | Qt.ImhPreferLowercase
             Layout.fillWidth: true
         }
         Button {

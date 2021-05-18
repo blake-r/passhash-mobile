@@ -132,6 +132,7 @@ Page {
         function onSiteTagEdited() {
             generator.hashWord.clear()
             const siteObj = SiteTagUtils.createSiteObj(generator.siteTag.text)
+
             if (isNaN(siteObj.ver)) {
                 // If no version, try to extract site tag from URL
                 if (siteObj.tag.startsWith("http://") || siteObj.tag.startsWith(
@@ -159,7 +160,7 @@ Page {
                 }
             }
 
-            const text = SiteTagUtils.toString(siteObj).toLocaleLowerCase()
+            const text = SiteTagUtils.toString(siteObj)
             if (text.trim() !== text) {
                 status.show(qsTr("Site tag has spaces around"), "orange")
             }
@@ -187,14 +188,19 @@ Page {
 
         function onHinterClicked(keepObj) {
             generator.siteTag.text = SiteTagUtils.toString(keepObj)
-            settings.digits.checked = (keepObj.settings.digits ?? requirements.digits)
-            settings.punctuation.checked = (keepObj.settings.punctuation
-                                            ?? requirements.punctuation)
-            settings.mixedCase.checked = (keepObj.settings.mixedCase ?? requirements.mixedCase)
-            settings.noSpecial.checked = !(keepObj.settings.special ?? !restrictions.noSpecial)
-            settings.digitsOnly.checked = (keepObj.settings.digitsOnly ?? restrictions.digitsOnly)
+            settings.digits.checked = KeeperUtils.ifnull(
+                        keepObj.settings.digits, requirements.digits)
+            settings.punctuation.checked = KeeperUtils.ifnull(
+                        keepObj.settings.punctuation, requirements.punctuation)
+            settings.mixedCase.checked = KeeperUtils.ifnull(
+                        keepObj.settings.mixedCase, requirements.mixedCase)
+            settings.noSpecial.checked = !KeeperUtils.ifnull(
+                        keepObj.settings.special, !restrictions.noSpecial)
+            settings.digitsOnly.checked = KeeperUtils.ifnull(
+                        keepObj.settings.digitsOnly, restrictions.digitsOnly)
             settings.length.currentIndex = settings.length.model.indexOf(
-                        keepObj.settings.length ?? restrictions.passwordLength)
+                        SystemUtils.ifnull(keepObj.settings.length,
+                                           restrictions.passwordLength))
             hinter.model = []
             if (generator.masterKey.text.length) {
                 generator.generateBtn.clicked()

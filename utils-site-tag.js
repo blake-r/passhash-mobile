@@ -13,10 +13,8 @@ function createSiteObj(siteTag) {
     let tag
     if (!isNaN(version)) {
         array.pop()
-        tag = array.join(':')
-    } else {
-        tag = siteTag
     }
+    tag = array.join(':')
     return {
         "tag": tag,
         "ver": version
