@@ -8,7 +8,6 @@ let changeData
 
 function createKeepObj(siteTag, settings) {
     const keepObj = SiteTagUtils.createSiteObj(siteTag)
-    keepObj.tag = keepObj.tag
     keepObj.path = keepObj.tag.split('.')
     keepObj.settings = settings
     return keepObj

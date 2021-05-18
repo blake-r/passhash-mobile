@@ -132,6 +132,7 @@ Page {
         function onSiteTagEdited() {
             generator.hashWord.clear()
             const siteObj = SiteTagUtils.createSiteObj(generator.siteTag.text)
+
             if (isNaN(siteObj.ver)) {
                 // If no version, try to extract site tag from URL
                 if (siteObj.tag.startsWith("http://") || siteObj.tag.startsWith(
@@ -159,7 +160,7 @@ Page {
                 }
             }
 
-            const text = SiteTagUtils.toString(siteObj).toLocaleLowerCase()
+            const text = SiteTagUtils.toString(siteObj)
             if (text.trim() !== text) {
                 status.show(qsTr("Site tag has spaces around"), "orange")
             }
