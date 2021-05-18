@@ -84,7 +84,7 @@ function makeKeeperText() {
 function makeSettingsText(settings) {
     const result = []
     SETTING_CODES.forEach(function (key, char) {
-        const value = (settings[key] ?? null)
+        const value = ifnull(settings[key], null)
         if (value !== null) {
             result.push(value ? char : char.toLowerCase())
         }
@@ -93,4 +93,11 @@ function makeSettingsText(settings) {
         result.push(settings.length.toString())
     }
     return result.join('')
+}
+
+function ifnull(value, defval) {
+    if (value === null || value === undefined) {
+        return defval
+    }
+    return value
 }
