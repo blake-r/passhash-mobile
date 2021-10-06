@@ -152,7 +152,7 @@ Page {
                         }
                         if (startIdx < endIdx) {
                             array = array.slice(startIdx, endIdx)
-                            siteObj.tag = array.join('.')
+                            siteObj.tag = array.join('.').toLocaleLowerCase()
                             status.show(qsTr("Site tag extracted from URL"),
                                         "green")
                         }

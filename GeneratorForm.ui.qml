@@ -49,6 +49,7 @@ Frame {
         TextField {
             id: masterKey
             placeholderText: qsTr("Master key")
+            inputMethodHints: Qt.ImhSensitiveData | Qt.ImhNoAutoUppercase | Qt.ImhPreferLowercase
             echoMode: unmask.checked ? "Normal" : "Password"
             Layout.fillWidth: true
         }
@@ -69,6 +70,7 @@ Frame {
         TextField {
             id: hashWord
             placeholderText: qsTr("Password")
+            inputMethodHints: Qt.ImhSensitiveData | Qt.ImhNoAutoUppercase
             readOnly: true
             Layout.fillWidth: true
         }
