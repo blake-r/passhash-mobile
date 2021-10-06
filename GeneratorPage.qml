@@ -18,6 +18,7 @@ Page {
         function onStateChanged() {
             if (SystemUtils.needCleanupMasterKey()) {
                 form.generator.masterKey.clear()
+                form.generator.hashWord.clear()
                 status.show(qsTr("Application was invisible too long, clear master key value."),
                             "orange")
             }
