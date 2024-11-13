@@ -200,7 +200,7 @@ Page {
             settings.digitsOnly.checked = KeeperUtils.ifnull(
                         keepObj.settings.digitsOnly, restrictions.digitsOnly)
             settings.length.currentIndex = settings.length.model.indexOf(
-                        SystemUtils.ifnull(keepObj.settings.length,
+                        KeeperUtils.ifnull(keepObj.settings.length,
                                            restrictions.passwordLength))
             hinter.model = []
             if (generator.masterKey.text.length) {
