@@ -5,7 +5,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.6.0'
+        classpath 'com.android.tools.build:gradle:8.1.2'
     }
 }
 
@@ -36,7 +36,11 @@ android {
 
     compileSdkVersion androidCompileSdkVersion.toInteger()
 
-    buildToolsVersion '28.0.3'
+    buildToolsVersion '35.0.0'
+
+    namespace 'ru.co_dev.passhash'
+
+    buildFeatures.aidl = true
 
     sourceSets {
         main {
@@ -71,7 +75,13 @@ android {
 
     defaultConfig {
         resConfig "en"
-        minSdkVersion = 31
+        minSdkVersion = 33
         targetSdkVersion = 35
+    }
+
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging = true
+        }
     }
 }
