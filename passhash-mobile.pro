@@ -57,7 +57,7 @@ android {
 ios {
 
     TARGET = "Password Hasher"
-    VERSION = $$system("date +%Y.%m.%d%H")
+    VERSION = $$system("date +%Y.%m.%d")$$system("git log --oneline | wc -l")
     QMAKE_TARGET_BUNDLE_PREFIX = "ru.co-dev"
     QMAKE_BUNDLE = "passhash"
 
