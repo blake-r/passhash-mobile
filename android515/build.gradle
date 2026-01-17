@@ -33,6 +33,8 @@ android {
      * updated by QtCreator and androiddeployqt tools.
      * Changing them manually might break the compilation!
      *******************************************************/
+    
+    ndkVersion "28.2.13676358"
 
     compileSdkVersion androidCompileSdkVersion.toInteger()
 
@@ -80,12 +82,6 @@ android {
     }
 
     packagingOptions {
-        jniLibs {
-            useLegacyPackaging = false
-        }
-    }
-
-    packaging {
         jniLibs {
             useLegacyPackaging = false
         }
