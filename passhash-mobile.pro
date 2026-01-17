@@ -33,17 +33,14 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 android {
 
+    QMAKE_LFLAGS += -Wl,-z,max-page-size=16384
+    QMAKE_LFLAGS_RELEASE += -Wl,-z,max-page-size=16384
+
     ANDROID_VERSION_NAME = $$system("date +%Y.%m.%d")
     # Max value is 2100000000
     ANDROID_VERSION_CODE = $$system("date +00%y%m%d%H")
 
-    greaterThan(QT_VERSION, 5.15) {
-        ANDROID_PACKAGE_SOURCE_DIR = \
-            $$PWD/android515
-    } else {
-        ANDROID_PACKAGE_SOURCE_DIR = \
-            $$PWD/android5142
-    }
+    ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android515
 
     DISTFILES += \
         $$ANDROID_PACKAGE_SOURCE_DIR/AndroidManifest.xml \
