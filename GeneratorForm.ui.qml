@@ -70,6 +70,7 @@ Frame {
         TextField {
             id: hashWord
             placeholderText: qsTr("Password")
+            font.family: "Monospace"
             inputMethodHints: Qt.ImhSensitiveData | Qt.ImhNoAutoUppercase
             readOnly: true
             Layout.fillWidth: true
