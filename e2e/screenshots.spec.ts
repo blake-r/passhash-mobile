@@ -1,8 +1,9 @@
 // E2E Screenshot tests - Generate screenshots for all screens and all supported languages
 // Languages: English (en), German (de), Russian (ru)
 
-import { test, expect } from "./fixtures";
 import * as path from "path";
+
+import { test, expect } from "./fixtures";
 
 // Supported languages for screenshot testing
 const LANGUAGES = [

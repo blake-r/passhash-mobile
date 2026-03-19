@@ -1,7 +1,7 @@
 // QtSettingsMigration.ts - Native module interface for Qt settings migration
 // This module provides automatic migration of settings from Qt QSettings to React Native AsyncStorage
 
-import { NativeModule, NativeModules } from 'react-native';
+import { NativeModule, NativeModules } from "react-native";
 
 // Define the interface for the Qt Settings Migration native module
 interface QtSettingsMigrationInterface extends NativeModule {
@@ -16,13 +16,13 @@ interface QtSettingsMigrationInterface extends NativeModule {
    * @returns Promise that resolves to a map of migrated key-value pairs, or null if no Qt settings found
    */
   migrateQtSettings(): Promise<{
-    'Requirements.digits'?: boolean;
-    'Requirements.punctuation'?: boolean;
-    'Requirements.mixedCase'?: boolean;
-    'Restrictions.noSpecial'?: boolean;
-    'Restrictions.digitsOnly'?: boolean;
-    'Restrictions.passwordLength'?: number;
-    'Keeper.data'?: string;
+    "Requirements.digits"?: boolean;
+    "Requirements.punctuation"?: boolean;
+    "Requirements.mixedCase"?: boolean;
+    "Restrictions.noSpecial"?: boolean;
+    "Restrictions.digitsOnly"?: boolean;
+    "Restrictions.passwordLength"?: number;
+    "Keeper.data"?: string;
   } | null>;
 
   /**
@@ -44,12 +44,12 @@ export const QtSettingsMigrationModule: QtSettingsMigrationInterface = QtSetting
 export async function checkQtMigrationAvailable(): Promise<boolean> {
   try {
     if (!QtSettingsMigrationModule) {
-      console.warn('QtSettingsMigration native module not available');
+      console.warn("QtSettingsMigration native module not available");
       return false;
     }
     return await QtSettingsMigrationModule.hasQtSettings();
   } catch (error) {
-    console.error('Error checking Qt migration availability:', error);
+    console.error("Error checking Qt migration availability:", error);
     return false;
   }
 }
@@ -57,19 +57,19 @@ export async function checkQtMigrationAvailable(): Promise<boolean> {
 /**
  * Perform migration from Qt settings to React Native AsyncStorage.
  * This should be called once on first app launch if Qt settings are detected.
- * 
+ *
  * @returns Object with migration results
  */
 export async function performQtMigration(): Promise<{
   success: boolean;
   migratedSettings: {
-    'Requirements.digits'?: boolean;
-    'Requirements.punctuation'?: boolean;
-    'Requirements.mixedCase'?: boolean;
-    'Restrictions.noSpecial'?: boolean;
-    'Restrictions.digitsOnly'?: boolean;
-    'Restrictions.passwordLength'?: number;
-    'Keeper.data'?: string;
+    "Requirements.digits"?: boolean;
+    "Requirements.punctuation"?: boolean;
+    "Requirements.mixedCase"?: boolean;
+    "Restrictions.noSpecial"?: boolean;
+    "Restrictions.digitsOnly"?: boolean;
+    "Restrictions.passwordLength"?: number;
+    "Keeper.data"?: string;
   } | null;
   error?: string;
 }> {
@@ -78,17 +78,17 @@ export async function performQtMigration(): Promise<{
       return {
         success: false,
         migratedSettings: null,
-        error: 'QtSettingsMigration native module not available',
+        error: "QtSettingsMigration native module not available",
       };
     }
 
     const migratedSettings = await QtSettingsMigrationModule.migrateQtSettings();
-    
+
     if (migratedSettings === null) {
       return {
         success: false,
         migratedSettings: null,
-        error: 'No Qt settings found to migrate',
+        error: "No Qt settings found to migrate",
       };
     }
 
@@ -97,7 +97,7 @@ export async function performQtMigration(): Promise<{
       migratedSettings,
     };
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return {
       success: false,
       migratedSettings: null,
@@ -113,12 +113,12 @@ export async function performQtMigration(): Promise<{
 export async function clearQtSettingsAfterMigration(): Promise<boolean> {
   try {
     if (!QtSettingsMigrationModule) {
-      console.warn('QtSettingsMigration native module not available');
+      console.warn("QtSettingsMigration native module not available");
       return false;
     }
     return await QtSettingsMigrationModule.clearQtSettings();
   } catch (error) {
-    console.error('Error clearing Qt settings:', error);
+    console.error("Error clearing Qt settings:", error);
     return false;
   }
 }

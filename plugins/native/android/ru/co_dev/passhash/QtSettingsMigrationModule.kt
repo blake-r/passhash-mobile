@@ -8,10 +8,24 @@ import java.io.File
 /**
  * Native module for migrating settings from Qt QSettings to React Native AsyncStorage.
  *
- * Qt QSettings on Android storage:
- * - Qt.labs.settings uses INI files (QSettings INI format)
- * - Path: /data/data/<package>/files/settings/<OrganizationName>.ini
- * - Or: /data/data/<package>/shared_prefs/<Application Name>.xml (SharedPreferences backend)
+ * Qt QSettings on Android storage locations (Qt 5.15, QtQuick2):
+ *
+ * QSettings formats and paths:
+ * 1. INI format (Qt.labs.settings or QSettings::IniFormat):
+ *    - /data/user/0/<PACKAGE>/files/.config/<ORG_NAME>/<APP_NAME>.conf
+ *    - /data/user/0/<PACKAGE>/files/<ORG_NAME>.ini
+ *    - /data/user/0/<PACKAGE>/files/settings/<ORG_NAME>/<APP_NAME>.ini
+ *    - /data/data/<PACKAGE>/files/.config/<ORG_NAME>/<APP_NAME>.conf
+ *    - /data/data/<PACKAGE>/files/<ORG_NAME>.ini
+ *    - /data/data/<PACKAGE>/files/settings/<ORG_NAME>/<APP_NAME>.ini
+ *
+ * 2. NativePreferences (QSettings::NativeFormat / SharedPreferences):
+ *    - /data/user/0/<PACKAGE>/shared_prefs/<ORG_NAME>/<APP_NAME>.xml
+ *    - /data/user/0/<PACKAGE>/shared_prefs/<APP_NAME>.xml
+ *    - /data/data/<PACKAGE>/shared_prefs/<ORG_NAME>/<APP_NAME>.xml
+ *    - /data/data/<PACKAGE>/shared_prefs/<APP_NAME>.xml
+ *
+ * Note: /data/user/0/<PACKAGE> is typically a symlink to /data/data/<PACKAGE>
  *
  * Organization: "Oleg Blednov"
  * Application: "Password Hasher"
@@ -24,22 +38,10 @@ class QtSettingsMigrationModule(reactContext: ReactApplicationContext) : ReactCo
     companion object {
         private const val QT_ORGANIZATION = "Oleg Blednov"
         private const val QT_APPLICATION = "Password Hasher"
-        
-        // Qt preference keys
-        private const val KEY_SECURITY_LEVEL = "optSecurityLevel"
-        private const val KEY_GUESS_SITE_TAG = "optGuessSiteTag"
-        private const val KEY_REMEMBER_SITE_TAG = "optRememberSiteTag"
-        private const val KEY_REMEMBER_MASTER_KEY = "optRememberMasterKey"
-        private const val KEY_REVEAL_SITE_TAG = "optRevealSiteTag"
-        private const val KEY_REVEAL_HASH_WORD = "optRevealHashWord"
-        private const val KEY_SHOW_MARKER = "optShowMarker"
-        private const val KEY_UNMASK_MARKER = "optUnmaskMarker"
-        private const val KEY_GUESS_FULL_DOMAIN = "optGuessFullDomain"
-        private const val KEY_DIGIT_DEFAULT = "optDigitDefault"
-        private const val KEY_PUNCTUATION_DEFAULT = "optPunctuationDefault"
-        private const val KEY_MIXED_CASE_DEFAULT = "optMixedCaseDefault"
-        private const val KEY_HASH_WORD_SIZE_DEFAULT = "optHashWordSizeDefault"
-        
+
+        // Qt INI file path
+        private const val QT_CONFIG_PATH = "files/.config/$QT_ORGANIZATION/$QT_APPLICATION.conf"
+
         // React Native AsyncStorage keys (matching storage.ts)
         private const val RN_KEY_DIGITS = "Requirements.digits"
         private const val RN_KEY_PUNCTUATION = "Requirements.punctuation"
@@ -58,10 +60,10 @@ class QtSettingsMigrationModule(reactContext: ReactApplicationContext) : ReactCo
     @ReactMethod
     fun hasQtSettings(promise: Promise) {
         try {
-            val qtPrefs = getQtSharedPreferences()
-            val hasSettings = qtPrefs != null && !qtPrefs.all.isNullOrEmpty()
-            promise.resolve(hasSettings)
+            val qtConfigFile = getQtConfigFile()
+            promise.resolve(qtConfigFile != null && qtConfigFile.exists())
         } catch (e: Exception) {
+            android.util.Log.e("QtMigration", "Error checking Qt settings", e)
             promise.reject("MIGRATION_ERROR", "Failed to check Qt settings", e)
         }
     }
@@ -73,255 +75,266 @@ class QtSettingsMigrationModule(reactContext: ReactApplicationContext) : ReactCo
     @ReactMethod
     fun migrateQtSettings(promise: Promise) {
         try {
-            val qtPrefs = getQtSharedPreferences()
-            if (qtPrefs == null || qtPrefs.all.isNullOrEmpty()) {
+            android.util.Log.d("QtMigration", "=== STARTING QT SETTINGS MIGRATION ===")
+
+            val qtConfigFile = getQtConfigFile()
+            if (qtConfigFile == null || !qtConfigFile.exists()) {
+                android.util.Log.w("QtMigration", "Qt config file not found at: $QT_CONFIG_PATH")
+                promise.resolve(null)
+                return
+            }
+
+            android.util.Log.d("QtMigration", "Found Qt config file: ${qtConfigFile.absolutePath}")
+
+            // Parse INI file
+            val iniData = parseQtIniFile(qtConfigFile)
+            if (iniData.isEmpty()) {
+                android.util.Log.w("QtMigration", "Qt config file is empty or invalid")
                 promise.resolve(null)
                 return
             }
 
             val migratedSettings = Arguments.createMap()
-            
-            // Migrate boolean settings
-            migrateBooleanSetting(qtPrefs, KEY_DIGIT_DEFAULT, RN_KEY_DIGITS, migratedSettings)
-            migrateBooleanSetting(qtPrefs, KEY_PUNCTUATION_DEFAULT, RN_KEY_PUNCTUATION, migratedSettings)
-            migrateBooleanSetting(qtPrefs, KEY_MIXED_CASE_DEFAULT, RN_KEY_MIXED_CASE, migratedSettings)
-            
-            // Migrate restrictions (note: Qt doesn't have these directly, use defaults)
-            // noSpecial and digitsOnly are new in RN version
-            if (!migratedSettings.hasKey(RN_KEY_NO_SPECIAL)) {
-                migratedSettings.putBoolean(RN_KEY_NO_SPECIAL, false)
+            var migrationCount = 0
+
+            // Migrate Requirements section
+            android.util.Log.d("QtMigration", "Migrating Requirements section...")
+            iniData["Requirements"]?.let { section ->
+                section["digits"]?.let { value ->
+                    migratedSettings.putBoolean(RN_KEY_DIGITS, value.toBoolean())
+                    migrationCount++
+                    android.util.Log.d("QtMigration", "  Requirements.digits = $value")
+                }
+                section["mixedCase"]?.let { value ->
+                    migratedSettings.putBoolean(RN_KEY_MIXED_CASE, value.toBoolean())
+                    migrationCount++
+                    android.util.Log.d("QtMigration", "  Requirements.mixedCase = $value")
+                }
+                section["punctuation"]?.let { value ->
+                    migratedSettings.putBoolean(RN_KEY_PUNCTUATION, value.toBoolean())
+                    migrationCount++
+                    android.util.Log.d("QtMigration", "  Requirements.punctuation = $value")
+                }
             }
-            if (!migratedSettings.hasKey(RN_KEY_DIGITS_ONLY)) {
-                migratedSettings.putBoolean(RN_KEY_DIGITS_ONLY, false)
+
+            // Migrate Restrictions section
+            android.util.Log.d("QtMigration", "Migrating Restrictions section...")
+            iniData["Restrictions"]?.let { section ->
+                section["digitsOnly"]?.let { value ->
+                    migratedSettings.putBoolean(RN_KEY_DIGITS_ONLY, value.toBoolean())
+                    migrationCount++
+                    android.util.Log.d("QtMigration", "  Restrictions.digitsOnly = $value")
+                }
+                section["noSpecial"]?.let { value ->
+                    migratedSettings.putBoolean(RN_KEY_NO_SPECIAL, value.toBoolean())
+                    migrationCount++
+                    android.util.Log.d("QtMigration", "  Restrictions.noSpecial = $value")
+                }
+                section["passwordLength"]?.let { value ->
+                    migratedSettings.putInt(RN_KEY_PASSWORD_LENGTH, value.toInt())
+                    migrationCount++
+                    android.util.Log.d("QtMigration", "  Restrictions.passwordLength = $value")
+                }
             }
-            
-            // Migrate password length
-            val hashWordSize = qtPrefs.getInt(KEY_HASH_WORD_SIZE_DEFAULT, 8)
-            migratedSettings.putInt(RN_KEY_PASSWORD_LENGTH, hashWordSize)
-            
-            // Migrate keeper data from LoginManager/PasswordManager
-            // Qt stores keeper entries with keys like "site-tag-<domain>", "master-key-<domain>", "options-<domain>"
-            val keeperData = migrateKeeperData(qtPrefs)
-            migratedSettings.putString(RN_KEY_KEEPER_DATA, keeperData)
-            
+
+            // Migrate Keeper section
+            android.util.Log.d("QtMigration", "Migrating Keeper section...")
+            iniData["Keeper"]?.let { section ->
+                section["data"]?.let { keeperData ->
+                    val parsedKeeperData = parseKeeperData(keeperData)
+                    migratedSettings.putString(RN_KEY_KEEPER_DATA, parsedKeeperData)
+                    migrationCount++
+                    android.util.Log.d("QtMigration", "  Keeper.data migrated (${parsedKeeperData.lines().size} entries)")
+                    if (parsedKeeperData.isNotEmpty()) {
+                        android.util.Log.d("QtMigration", "  Keeper.data preview: ${parsedKeeperData.take(100)}")
+                    }
+                }
+            }
+
+            android.util.Log.d("QtMigration", "=== MIGRATION COMPLETE: $migrationCount settings migrated ===")
             promise.resolve(migratedSettings)
         } catch (e: Exception) {
-            promise.reject("MIGRATION_ERROR", "Failed to migrate Qt settings", e)
+            android.util.Log.e("QtMigration", "Migration failed with exception", e)
+            promise.reject("MIGRATION_ERROR", "Failed to migrate Qt settings: ${e.message}", e)
         }
     }
 
     /**
-     * Get Qt SharedPreferences instance.
-     * Qt QSettings on Android can use INI files or SharedPreferences.
+     * Get Qt config file from the standard location.
      */
-    private fun getQtSharedPreferences(): SharedPreferences? {
-        val dataDir = context.applicationInfo.dataDir
-        android.util.Log.d("QtMigration", "Data dir: $dataDir")
-
-        // Method 1: Try Qt INI file (Qt.labs.settings default on Android)
-        // Path: /data/data/<package>/files/settings/Oleg Blednov/Password Hasher.ini
-        val settingsDir = File(context.filesDir, "settings/$QT_ORGANIZATION")
-        android.util.Log.d("QtMigration", "Checking settings dir: ${settingsDir.absolutePath}, exists: ${settingsDir.exists()}")
-        if (settingsDir.exists()) {
-            val iniFile = File(settingsDir, "$QT_APPLICATION.ini")
-            android.util.Log.d("QtMigration", "Checking INI file: ${iniFile.absolutePath}, exists: ${iniFile.exists()}")
-            if (iniFile.exists()) {
-                android.util.Log.d("QtMigration", "Found Qt INI settings")
-                // Parse INI file and create temporary SharedPreferences
-                return parseQtIniFile(iniFile)
-            }
+    private fun getQtConfigFile(): File? {
+        val configFile = File(context.filesDir, ".config/$QT_ORGANIZATION/$QT_APPLICATION.conf")
+        android.util.Log.d("QtMigration", "Checking Qt config file: ${configFile.absolutePath}")
+        android.util.Log.d("QtMigration", "  Exists: ${configFile.exists()}")
+        android.util.Log.d("QtMigration", "  Can read: ${configFile.canRead()}")
+        if (configFile.exists()) {
+            android.util.Log.d("QtMigration", "  Size: ${configFile.length()} bytes")
         }
-
-        // Method 2: Try Qt application name with organization path (SharedPreferences)
-        // Path: /data/data/<package>/shared_prefs/Oleg Blednov/Password Hasher.xml
-        val orgDir = File(dataDir, "shared_prefs/$QT_ORGANIZATION")
-        android.util.Log.d("QtMigration", "Checking org dir: ${orgDir.absolutePath}, exists: ${orgDir.exists()}")
-        if (orgDir.exists()) {
-            val prefsFile = File(orgDir, "$QT_APPLICATION.xml")
-            android.util.Log.d("QtMigration", "Checking prefs file: ${prefsFile.absolutePath}, exists: ${prefsFile.exists()}")
-            if (prefsFile.exists()) {
-                android.util.Log.d("QtMigration", "Found Qt settings in org dir")
-                return context.getSharedPreferences("$QT_ORGANIZATION/$QT_APPLICATION", Context.MODE_PRIVATE)
-            }
-        }
-
-        // Method 3: Try Qt application name directly (fallback)
-        // Path: /data/data/<package>/shared_prefs/Password Hasher.xml
-        android.util.Log.d("QtMigration", "Trying direct SharedPreferences: $QT_APPLICATION")
-        val directPrefs = context.getSharedPreferences(QT_APPLICATION, Context.MODE_PRIVATE)
-        if (!directPrefs.all.isNullOrEmpty()) {
-            android.util.Log.d("QtMigration", "Found Qt settings directly, count: ${directPrefs.all.size}")
-            return directPrefs
-        }
-
-        // Method 4: Try all SharedPreferences files to find Qt settings
-        android.util.Log.d("QtMigration", "Scanning all SharedPreferences files...")
-        val sharedPrefsDir = File(dataDir, "shared_prefs")
-        sharedPrefsDir.listFiles()?.forEach { file ->
-            android.util.Log.d("QtMigration", "Found prefs file: ${file.name}")
-            if (file.extension == "xml") {
-                val prefsName = file.nameWithoutExtension
-                val prefs = context.getSharedPreferences(prefsName, Context.MODE_PRIVATE)
-                // Check if this prefs contains Qt-specific keys
-                if (prefs.contains(KEY_SECURITY_LEVEL) ||
-                    prefs.contains(KEY_GUESS_SITE_TAG) ||
-                    prefs.contains(KEY_DIGIT_DEFAULT)) {
-                    android.util.Log.d("QtMigration", "Found Qt settings by key match in: $prefsName")
-                    return prefs
-                }
-
-                // Also check for keeper data patterns
-                prefs.all.keys.forEach { key ->
-                    if (key.startsWith("site-tag-") ||
-                        key.startsWith("master-key-") ||
-                        key.startsWith("options-")) {
-                        android.util.Log.d("QtMigration", "Found keeper data in: $prefsName, key: $key")
-                        return prefs
-                    }
-                }
-            }
-        }
-
-        android.util.Log.w("QtMigration", "Qt settings not found")
-        return null
+        return configFile
     }
 
     /**
-     * Parse Qt INI file and return as SharedPreferences-like map.
+     * Parse Qt INI file and return as a map of sections to key-value pairs.
      * Qt INI format:
-     * [Category]
+     * [SectionName]
      * key=value
      */
-    private fun parseQtIniFile(iniFile: File): SharedPreferences? {
+    private fun parseQtIniFile(iniFile: File): Map<String, Map<String, String>> {
+        val result = mutableMapOf<String, MutableMap<String, String>>()
+        var currentSection = ""
+
         try {
             val lines = iniFile.readLines()
-            val tempPrefs = context.getSharedPreferences("qt_migration_temp", Context.MODE_PRIVATE)
-            val editor = tempPrefs.edit()
+            android.util.Log.d("QtMigration", "Parsing INI file with ${lines.size} lines")
 
-            var currentCategory = ""
             for (line in lines) {
                 val trimmed = line.trim()
+
+                // Skip empty lines and comments
+                if (trimmed.isEmpty() || trimmed.startsWith("#") || trimmed.startsWith(";")) {
+                    continue
+                }
+
+                // Section header
                 if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
-                    currentCategory = trimmed.substring(1, trimmed.length - 1)
-                } else if (trimmed.contains("=") && !trimmed.startsWith("#")) {
+                    currentSection = trimmed.substring(1, trimmed.length - 1)
+                    if (!result.containsKey(currentSection)) {
+                        result[currentSection] = mutableMapOf()
+                    }
+                    android.util.Log.d("QtMigration", "  Found section: [$currentSection]")
+                    continue
+                }
+
+                // Key=value pair
+                if (trimmed.contains("=")) {
                     val parts = trimmed.split("=", limit = 2)
                     if (parts.size == 2) {
-                        val key = "${currentCategory}.${parts[0].trim()}"
-                        val value = parts[1].trim()
-                        // Store as string for later parsing
-                        editor.putString(key, value)
+                        val key = parts[0].trim()
+                        var value = parts[1].trim()
+
+                        // Remove surrounding quotes if present
+                        if (value.startsWith("\"") && value.endsWith("\"")) {
+                            value = value.substring(1, value.length - 1)
+                        }
+
+                        if (currentSection.isNotEmpty()) {
+                            result[currentSection]!![key] = value
+                            android.util.Log.d("QtMigration", "    $key = $value")
+                        }
                     }
                 }
             }
-            editor.apply()
-            android.util.Log.d("QtMigration", "Parsed INI file, keys: ${tempPrefs.all.size}")
-            return tempPrefs
+
+            android.util.Log.d("QtMigration", "INI parsing complete: ${result.size} sections found")
         } catch (e: Exception) {
-            android.util.Log.e("QtMigration", "Failed to parse INI file: ${e.message}")
-            return null
+            android.util.Log.e("QtMigration", "Failed to parse INI file: ${e.message}", e)
         }
+
+        return result
     }
 
     /**
-     * Migrate a boolean setting from Qt to React Native format.
+     * Parse Keeper data from Qt format to React Native format.
+     *
+     * Qt format (escaped string with \n separators and \xNN hex escapes):
+     * "0=DpMSo8\\n192.168.31.123=DpMSo8\\n\\x43a\\x43e\\x448\\x435\\x43b\\x435\\x43a=DpMSo8\\n..."
+     *
+     * React Native format (plain text with UTF-8, one entry per line):
+     * "0=DpMSo8\n192.168.31.123=DpMSo8\nкошелек=DpMSo8\n..."
      */
-    private fun migrateBooleanSetting(
-        qtPrefs: SharedPreferences,
-        qtKey: String,
-        rnKey: String,
-        result: WritableMap
-    ) {
-        if (qtPrefs.contains(qtKey)) {
-            val value = qtPrefs.getBoolean(qtKey, true)
-            result.putBoolean(rnKey, value)
-        }
+    private fun parseKeeperData(qtData: String): String {
+        android.util.Log.d("QtMigration", "Parsing Keeper data, length: ${qtData.length} chars")
+
+        // Step 1: Replace escaped newlines with actual newlines
+        var unescapedData = qtData.replace("\\n", "\n")
+
+        // Step 2: Decode hex escape sequences (\xNN -> character)
+        unescapedData = decodeHexEscapes(unescapedData)
+
+        // Filter out empty lines and return
+        val lines = unescapedData.split("\n").filter { it.isNotBlank() }
+        android.util.Log.d("QtMigration", "Keeper data has ${lines.size} non-empty entries")
+
+        return lines.joinToString("\n")
     }
 
     /**
-     * Migrate keeper data from Qt format to React Native format.
-     * Qt stores keeper entries using LoginManager/PasswordManager with keys:
-     * - site-tag-<domain>
-     * - master-key-<domain>
-     * - options-<domain>
-     * 
-     * React Native uses a text format: "<domain>=<settings>"
+     * Decode hex escape sequences in string.
+     * Qt uses \xNNNN format where NNNN is 2-4 hex digits representing Unicode codepoint.
+     * Example: \x43a -> U+043A (Cyrillic 'к'), \x41 -> 'A'
      */
-    private fun migrateKeeperData(qtPrefs: SharedPreferences): String {
-        val entries = mutableMapOf<String, MutableMap<String, Any?>>()
-        
-        // Collect all Qt keeper entries
-        qtPrefs.all.forEach { (key, value) ->
-            val domain = when {
-                key.startsWith("site-tag-") -> key.removePrefix("site-tag-")
-                key.startsWith("master-key-") -> key.removePrefix("master-key-")
-                key.startsWith("options-") -> key.removePrefix("options-")
-                else -> null
-            }
-            
-            if (domain != null) {
-                if (!entries.containsKey(domain)) {
-                    entries[domain] = mutableMapOf()
+    private fun decodeHexEscapes(input: String): String {
+        val result = StringBuilder()
+        var i = 0
+
+        while (i < input.length) {
+            // Check for \xNNNN pattern (2-4 hex digits)
+            if (i + 3 < input.length &&
+                input[i] == '\\' &&
+                input[i + 1] == 'x' &&
+                isHexDigit(input[i + 2]) &&
+                isHexDigit(input[i + 3])
+            ) {
+                // Collect 2-4 hex digits
+                var hexEnd = i + 4
+                // Check for 3rd hex digit
+                if (hexEnd < input.length && isHexDigit(input[hexEnd])) {
+                    hexEnd++
+                    // Check for 4th hex digit
+                    if (hexEnd < input.length && isHexDigit(input[hexEnd])) {
+                        hexEnd++
+                    }
                 }
                 
-                when {
-                    key.startsWith("site-tag-") -> entries[domain]!!["siteTag"] = value
-                    key.startsWith("master-key-") -> entries[domain]!!["masterKey"] = value
-                    key.startsWith("options-") -> entries[domain]!!["options"] = value
+                val hexValue = input.substring(i + 2, hexEnd)
+                try {
+                    val charCode = hexValue.toInt(16)
+                    result.append(charCode.toChar())
+                    i = hexEnd
+                } catch (e: NumberFormatException) {
+                    // If parsing fails, keep original
+                    result.append(input[i])
+                    i++
                 }
+            } else {
+                result.append(input[i])
+                i++
             }
         }
-        
-        // Convert to React Native keeper text format
-        // Format: "<domain>=<settings>" e.g., "google=DpM8"
-        val result = StringBuilder()
-        entries.entries.sortedBy { it.key }.forEach { (domain, data) ->
-            val optionsStr = data["options"] as? String
-            val settingsString = if (!optionsStr.isNullOrEmpty()) {
-                parseQtOptionsToSettingsString(optionsStr)
-            } else {
-                ""
-            }
-            
-            if (settingsString.isNotEmpty()) {
-                result.appendLine("$domain=$settingsString")
-            } else {
-                result.appendLine(domain)
-            }
-        }
-        
-        return result.toString().trimEnd()
+
+        return result.toString()
     }
 
     /**
-     * Parse Qt options string to React Native settings string.
-     * Qt may store options as a serialized format.
+     * Check if character is a hex digit (0-9, a-f, A-F).
      */
-    private fun parseQtOptionsToSettingsString(optionsStr: String): String {
-        // Qt might store options in various formats
-        // Try to parse common formats
-        
-        // If it's already in the expected format (e.g., "DpM8"), return as-is
-        if (optionsStr.matches(Regex("[DdPpMmSsOo0-9]+"))) {
-            return optionsStr
-        }
-        
-        // Try to extract settings from JSON or other serialized format
-        // This is a fallback - adjust based on actual Qt storage format
-        return optionsStr
+    private fun isHexDigit(c: Char): Boolean {
+        return c in '0'..'9' || c in 'a'..'f' || c in 'A'..'F'
     }
 
     /**
-     * Clear Qt settings after successful migration (optional).
+     * Clear Qt config file after successful migration (optional).
+     * This renames the file to .backup to preserve data.
      */
     @ReactMethod
     fun clearQtSettings(promise: Promise) {
         try {
-            val qtPrefs = getQtSharedPreferences()
-            if (qtPrefs != null) {
-                qtPrefs.edit().clear().apply()
+            val qtConfigFile = getQtConfigFile()
+            if (qtConfigFile != null && qtConfigFile.exists()) {
+                val backupFile = File(qtConfigFile.parentFile, "${qtConfigFile.name}.backup")
+                if (qtConfigFile.renameTo(backupFile)) {
+                    android.util.Log.d("QtMigration", "Qt config file backed up to: ${backupFile.absolutePath}")
+                    promise.resolve(true)
+                } else {
+                    android.util.Log.w("QtMigration", "Failed to backup Qt config file")
+                    promise.resolve(false)
+                }
+            } else {
+                android.util.Log.d("QtMigration", "Qt config file not found, nothing to clear")
+                promise.resolve(true)
             }
-            promise.resolve(true)
         } catch (e: Exception) {
+            android.util.Log.e("QtMigration", "Error clearing Qt settings", e)
             promise.reject("CLEAR_ERROR", "Failed to clear Qt settings", e)
         }
     }

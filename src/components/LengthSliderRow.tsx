@@ -1,8 +1,8 @@
 // LengthSliderRow.tsx - Row container for password length slider
 
+import Slider from "@react-native-community/slider";
 import React from "react";
 import { View, StyleSheet, Text, Platform } from "react-native";
-import Slider from "@react-native-community/slider";
 
 export interface LengthSliderRowProps {
   value: number;

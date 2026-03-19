@@ -73,6 +73,7 @@ function LanguageSelector({ onLanguageChange }: LanguageSelectorProps): React.JS
             key={lang.code}
             label={`${lang.nativeName} (${lang.name})`}
             value={lang.code}
+            color="#333"
           />
         ))}
       </Picker>

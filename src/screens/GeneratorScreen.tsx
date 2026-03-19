@@ -90,6 +90,7 @@ function GeneratorScreen({ route }: GeneratorScreenProps): React.JSX.Element {
 
   const [statusMsg, setStatusMsg] = useState<StatusMessage>({ text: "", color: "gray" });
   const masterKeyTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const blurTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const showStatus = useCallback(
     (text: string, color: string) => {
@@ -356,6 +357,12 @@ function GeneratorScreen({ route }: GeneratorScreenProps): React.JSX.Element {
   // Handle hint selection from dropdown
   const handleHintSelect = useCallback(
     (keepObj: KeepObj) => {
+      // Clear any pending blur timeout to prevent hints from hiding before selection
+      if (blurTimeoutRef.current) {
+        clearTimeout(blurTimeoutRef.current);
+        blurTimeoutRef.current = null;
+      }
+
       const tagStr = toString(keepObj);
       setSiteTag(tagStr);
       setShowHints(false);
@@ -452,7 +459,10 @@ function GeneratorScreen({ route }: GeneratorScreenProps): React.JSX.Element {
                   }}
                   onBlur={() => {
                     // Delay hiding to allow hint selection
-                    setTimeout(() => setShowHints(false), 200);
+                    blurTimeoutRef.current = setTimeout(() => {
+                      setShowHints(false);
+                      blurTimeoutRef.current = null;
+                    }, 200);
                   }}
                   autoCapitalize="none"
                   autoCorrect={false}
@@ -695,6 +705,7 @@ const styles = StyleSheet.create({
     height: 48,
     fontFamily: Platform.OS === "ios" ? "Menlo" : "monospace",
     backgroundColor: "#fff",
+    color: "#333",
   },
   passwordOutput: {
     backgroundColor: "#f9f9f9",

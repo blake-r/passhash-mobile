@@ -1,9 +1,9 @@
 // LengthSlider.tsx - Password length slider with visual indicator
 // Works on both mobile and web
 
+import Slider from "@react-native-community/slider";
 import React from "react";
 import { View, StyleSheet, Text } from "react-native";
-import Slider from "@react-native-community/slider";
 
 export interface LengthSliderProps {
   value: number;

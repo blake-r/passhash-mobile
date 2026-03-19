@@ -11,8 +11,8 @@ import "./i18n/i18n";
 import GeneratorScreen from "./screens/GeneratorScreen";
 import KeeperScreen from "./screens/KeeperScreen";
 import { setChangeDataCallback } from "./utils/keeper";
-import { loadSettings, saveSettings, applyMigratedSettings, isFirstLaunch } from "./utils/storage";
 import { checkQtMigrationAvailable, performQtMigration } from "./utils/QtSettingsMigration";
+import { loadSettings, saveSettings, applyMigratedSettings, isFirstLaunch } from "./utils/storage";
 
 const Tab = createBottomTabNavigator();
 

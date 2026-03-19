@@ -161,37 +161,37 @@ export async function clearSettings(): Promise<void> {
  * This function takes the raw migrated settings and saves them to AsyncStorage.
  */
 export async function applyMigratedSettings(migratedSettings: {
-  'Requirements.digits'?: boolean;
-  'Requirements.punctuation'?: boolean;
-  'Requirements.mixedCase'?: boolean;
-  'Restrictions.noSpecial'?: boolean;
-  'Restrictions.digitsOnly'?: boolean;
-  'Restrictions.passwordLength'?: number;
-  'Keeper.data'?: string;
+  "Requirements.digits"?: boolean;
+  "Requirements.punctuation"?: boolean;
+  "Requirements.mixedCase"?: boolean;
+  "Restrictions.noSpecial"?: boolean;
+  "Restrictions.digitsOnly"?: boolean;
+  "Restrictions.passwordLength"?: number;
+  "Keeper.data"?: string;
 }): Promise<void> {
   try {
     const items: [string, string][] = [];
 
-    if (migratedSettings['Requirements.digits'] !== undefined) {
-      items.push([SETTINGS_KEYS.DIGITS, migratedSettings['Requirements.digits']!.toString()]);
+    if (migratedSettings["Requirements.digits"] !== undefined) {
+      items.push([SETTINGS_KEYS.DIGITS, migratedSettings["Requirements.digits"]!.toString()]);
     }
-    if (migratedSettings['Requirements.punctuation'] !== undefined) {
-      items.push([SETTINGS_KEYS.PUNCTUATION, migratedSettings['Requirements.punctuation']!.toString()]);
+    if (migratedSettings["Requirements.punctuation"] !== undefined) {
+      items.push([SETTINGS_KEYS.PUNCTUATION, migratedSettings["Requirements.punctuation"]!.toString()]);
     }
-    if (migratedSettings['Requirements.mixedCase'] !== undefined) {
-      items.push([SETTINGS_KEYS.MIXED_CASE, migratedSettings['Requirements.mixedCase']!.toString()]);
+    if (migratedSettings["Requirements.mixedCase"] !== undefined) {
+      items.push([SETTINGS_KEYS.MIXED_CASE, migratedSettings["Requirements.mixedCase"]!.toString()]);
     }
-    if (migratedSettings['Restrictions.noSpecial'] !== undefined) {
-      items.push([SETTINGS_KEYS.NO_SPECIAL, migratedSettings['Restrictions.noSpecial']!.toString()]);
+    if (migratedSettings["Restrictions.noSpecial"] !== undefined) {
+      items.push([SETTINGS_KEYS.NO_SPECIAL, migratedSettings["Restrictions.noSpecial"]!.toString()]);
     }
-    if (migratedSettings['Restrictions.digitsOnly'] !== undefined) {
-      items.push([SETTINGS_KEYS.DIGITS_ONLY, migratedSettings['Restrictions.digitsOnly']!.toString()]);
+    if (migratedSettings["Restrictions.digitsOnly"] !== undefined) {
+      items.push([SETTINGS_KEYS.DIGITS_ONLY, migratedSettings["Restrictions.digitsOnly"]!.toString()]);
     }
-    if (migratedSettings['Restrictions.passwordLength'] !== undefined) {
-      items.push([SETTINGS_KEYS.PASSWORD_LENGTH, migratedSettings['Restrictions.passwordLength']!.toString()]);
+    if (migratedSettings["Restrictions.passwordLength"] !== undefined) {
+      items.push([SETTINGS_KEYS.PASSWORD_LENGTH, migratedSettings["Restrictions.passwordLength"]!.toString()]);
     }
-    if (migratedSettings['Keeper.data'] !== undefined && migratedSettings['Keeper.data'] !== '') {
-      items.push([SETTINGS_KEYS.KEEPER_DATA, migratedSettings['Keeper.data']!]);
+    if (migratedSettings["Keeper.data"] !== undefined && migratedSettings["Keeper.data"] !== "") {
+      items.push([SETTINGS_KEYS.KEEPER_DATA, migratedSettings["Keeper.data"]!]);
     }
 
     if (items.length > 0) {

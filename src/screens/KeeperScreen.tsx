@@ -1,9 +1,9 @@
 // KeeperScreen.tsx - Keeper data management screen
 // Based on QtQuick KeeperPage.qml from the original project
 
+import { useFocusEffect } from "@react-navigation/native";
 import * as Clipboard from "expo-clipboard";
 import { useState, useEffect, useCallback } from "react";
-import { useFocusEffect } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
 import { View, TextInput, StyleSheet, Platform, Alert, Text } from "react-native";
 
