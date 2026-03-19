@@ -89,7 +89,7 @@ if [ -n "$AAB_PATH" ]; then
     echo "AAB: $AAB_PATH"
     # Verify bundle with bundletool if available
     if command -v bundletool &> /dev/null; then
-        if bundletool validate --bundle="$AAB_PATH" 2>/dev/null; then
+        if bundletool validate --bundle="$AAB_PATH" >/dev/null 2>&1; then
             echo "✓ AAB is valid"
         else
             echo "Note: AAB validation failed or bundletool not configured"
