@@ -31,7 +31,8 @@
       "expo-font",
       "./plugins/withVersion.js",
       "./plugins/withQtMigration.js",
-      "./plugins/withReleaseSigning.js"
+      "./plugins/withReleaseSigning.js",
+      "./plugins/withAndroidIcon.js"
     ]
   }
 }
