@@ -19,10 +19,11 @@ PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 # Compute version components (same as Qt project)
 VERSION_NAME=$(date +%Y.%m.%d)
 COMMIT_COUNT=$(git -C "$PROJECT_ROOT" log --oneline 2>/dev/null | wc -l | tr -d ' ')
+COMMIT_COUNT=$((COMMIT_COUNT % 100))
 VERSION_IOS="${VERSION_NAME}${COMMIT_COUNT}"
 
-COMMIT_COUNT_PADDED=$(printf "%04d" "$COMMIT_COUNT")
-VERSION_CODE=$(date +%y%m)${COMMIT_COUNT_PADDED}
+COMMIT_COUNT_PADDED=$(printf "%02d" "$COMMIT_COUNT")
+VERSION_CODE=$(date +%y%m%d)${COMMIT_COUNT_PADDED}
 
 # Output version info (parsed by withVersion.js plugin)
 echo "VERSION_NAME: $VERSION_NAME"
