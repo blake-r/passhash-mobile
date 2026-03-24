@@ -1,73 +1,57 @@
-# This file is used to ignore files which are generated
-# ----------------------------------------------------------------------------
+# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
 
-*~
-*.autosave
-*.a
-*.core
-*.moc
-*.o
-*.obj
-*.orig
-*.rej
-*.so
-*.so.*
-*_pch.h.cpp
-*_resource.rc
-*.qm
-.#*
-*.*#
-core
-!core/
-tags
+# dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Native
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Metro
+.metro-health-check*
+
+# debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
 .DS_Store
-.directory
-*.debug
-Makefile*
-*.prl
-*.app
-moc_*.cpp
-ui_*.h
-qrc_*.cpp
-Thumbs.db
-*.res
-*.rc
-/.qmake.cache
-/.qmake.stash
+*.pem
 
-# qtcreator generated files
-*.pro.user*
+# local env files
+.env
+.env*.local
 
-# xemacs temporary files
-*.flc
+# typescript
+*.tsbuildinfo
 
-# Vim temporary files
-.*.swp
+# Playwright
+playwright-report/
+playwright/.cache/
+test-results/
 
-# Visual Studio generated files
-*.ib_pdb_index
-*.idb
-*.ilk
-*.pdb
-*.sln
-*.suo
-*.vcproj
-*vcproj.*.*.user
-*.ncb
-*.sdf
-*.opensdf
-*.vcxproj
-*vcxproj.*
+# Screenshots (keep directory, ignore files)
+e2e/screenshots/*.png
+!e2e/screenshots/.gitkeep
 
-# MinGW generated files
-*.Debug
-*.Release
+# generated native folders
+/ios
+/android
+!/.android
+e2e/screenshot.spec.ts-snapshots/
 
-# Python byte code
-*.pyc
-
-# Binaries
-# --------
-*.dll
-*.exe
+# Qt migration native sources (keep these!)
+!/plugins/native
 

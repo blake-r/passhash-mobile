@@ -1,0 +1,17 @@
+--- passhash.js
++++ passhash.js
+@@ -35,6 +35,8 @@
+ 
+ // Modification by Torne: functions not used by PawHash have been removed.
+ 
++import { b64_hmac_sha1 } from './sha1.js';
++
+ var PassHashCommon =
+ {
+     // IMPORTANT: This function should be changed carefully.  It must be
+@@ -170,3 +172,5 @@ var PassHashCommon =
+         return s;
+     }
+ }
++
++export { PassHashCommon };

@@ -1,0 +1,85 @@
+{
+  "app": {
+    "name": "Password Hasher",
+    "version": "Version"
+  },
+  "tabs": {
+    "generator": "Generator",
+    "keeper": "Verwalter"
+  },
+  "generator": {
+    "siteTag": {
+      "label": "Site-Tag",
+      "placeholder": "Domain ohne TLD",
+      "empty": "Site-Tag darf nicht leer sein",
+      "extractedFromUrl": "Site-Tag aus URL extrahiert",
+      "hasSpaces": "Site-Tag hat Leerzeichen"
+    },
+    "masterKey": {
+      "label": "Hauptschlüssel",
+      "placeholder": "Ihre geheime Phrase",
+      "empty": "Hauptschlüssel darf nicht leer sein",
+      "hasSpaces": "Hauptschlüssel hat Leerzeichen",
+      "unmask": "Unmask",
+      "autoClearWarning": "Anwendung war zu lange unsichtbar, Hauptschlüssel wird gelöscht."
+    },
+    "password": {
+      "label": "Passwort",
+      "copied": "Passwort-Hash in Zwischenablage kopiert"
+    },
+    "buttons": {
+      "bump": "Erhöhen",
+      "generate": "Generieren",
+      "saveSettings": "Einstellungen speichern",
+      "settingsSaved": "Einstellungen gespeichert"
+    },
+    "requirements": {
+      "title": "Anforderungen",
+      "digits": "Ziffern",
+      "punctuation": "Interpunktion",
+      "mixedCase": "Groß-/Kleinschreibung",
+      "digitsSymbol": "0-9",
+      "punctuationSymbol": "!@#",
+      "mixedCaseSymbol": "Aa"
+    },
+    "restrictions": {
+      "title": "Einschränkungen",
+      "noSpecial": "Keine Sonderzeichen",
+      "digitsOnly": "Nur Ziffern",
+      "size": "Größe",
+      "noSpecialSymbol": "A-Za-z",
+      "digitsOnlySymbol": "0-9"
+    },
+    "hints": {
+      "title": "Site-Tag-Hinweise",
+      "placeholder": "Site-Tag eingeben, um Hinweise zu erhalten..."
+    }
+  },
+  "keeper": {
+    "export": "Exportieren",
+    "import": "Importieren",
+    "exportSuccess": "Verwalter-Daten in Zwischenablage exportiert",
+    "exportFailed": "Export fehlgeschlagen",
+    "importSuccess": "Verwalter-Daten aus Zwischenablage importiert",
+    "importFailed": "Import fehlgeschlagen",
+    "importConfirmation": {
+      "title": "Import bestätigen",
+      "message": "Import ersetzt die aktuellen Verwalter-Daten durch den aktuellen Zwischenablage-Inhalt.\nSind Sie sicher, dass Sie importieren möchten?",
+      "cancel": "Abbrechen",
+      "ok": "OK",
+      "unchanged": "Verwalter-Daten bleiben unverändert"
+    },
+    "emptyClipboard": "Zwischenablage ist leer",
+    "emptyState": "Drücken Sie 'Exportieren', um Daten zu speichern, oder 'Importieren', um Daten zu laden"
+  },
+  "settings": {
+    "language": {
+      "label": "Sprache"
+    }
+  },
+  "common": {
+    "cancel": "Abbrechen",
+    "ok": "OK",
+    "passwordLength": "Passwortlänge"
+  }
+}

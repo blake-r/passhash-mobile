@@ -1,0 +1,85 @@
+{
+  "app": {
+    "name": "Password Hasher",
+    "version": "Version"
+  },
+  "tabs": {
+    "generator": "Generator",
+    "keeper": "Keeper"
+  },
+  "generator": {
+    "siteTag": {
+      "label": "Site tag",
+      "placeholder": "domain without tld",
+      "empty": "Site tag should not be empty",
+      "extractedFromUrl": "Site tag extracted from URL",
+      "hasSpaces": "Site tag has spaces around"
+    },
+    "masterKey": {
+      "label": "Master key",
+      "placeholder": "your secret phrase",
+      "empty": "Master key should not be empty",
+      "hasSpaces": "Master key has spaces around",
+      "unmask": "Unmask",
+      "autoClearWarning": "Application was invisible too long, clear master key value."
+    },
+    "password": {
+      "label": "Password",
+      "copied": "Password hash copied into clipboard"
+    },
+    "buttons": {
+      "bump": "Bump",
+      "generate": "Generate",
+      "saveSettings": "Save settings",
+      "settingsSaved": "Settings are saved"
+    },
+    "requirements": {
+      "title": "Requirements",
+      "digits": "Digits",
+      "punctuation": "Punctuation",
+      "mixedCase": "Mixed case",
+      "digitsSymbol": "0-9",
+      "punctuationSymbol": "!@#",
+      "mixedCaseSymbol": "Aa"
+    },
+    "restrictions": {
+      "title": "Restrictions",
+      "noSpecial": "No special",
+      "digitsOnly": "Digits only",
+      "size": "Size",
+      "noSpecialSymbol": "A-Za-z",
+      "digitsOnlySymbol": "0-9"
+    },
+    "hints": {
+      "title": "Site tag hints",
+      "placeholder": "Enter site tag to get hints..."
+    }
+  },
+  "keeper": {
+    "export": "Export",
+    "import": "Import",
+    "exportSuccess": "Keeper data exported into clipboard",
+    "exportFailed": "Failed to export data",
+    "importSuccess": "Keeper data imported from clipboard",
+    "importFailed": "Failed to import data",
+    "importConfirmation": {
+      "title": "Import confirmation",
+      "message": "Import replaces the current keeper data with the current clipboard text.\nAre you sure you want to import?",
+      "cancel": "Cancel",
+      "ok": "OK",
+      "unchanged": "Keeper data is left unchanged"
+    },
+    "emptyClipboard": "Clipboard is empty",
+    "emptyState": "Press 'Export' to save data or 'Import' to load data"
+  },
+  "settings": {
+    "language": {
+      "label": "Language"
+    }
+  },
+  "common": {
+    "cancel": "Cancel",
+    "ok": "OK",
+    "passwordLength": "Password length"
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "app": {
+    "name": "Password Hasher",
+    "version": "Версия"
+  },
+  "tabs": {
+    "generator": "Генератор",
+    "keeper": "Хранитель"
+  },
+  "generator": {
+    "siteTag": {
+      "label": "Сайт тег",
+      "placeholder": "домен без tld",
+      "empty": "Сайт тег не должен быть пустым",
+      "extractedFromUrl": "Сайт тег извлечён из URL",
+      "hasSpaces": "Сайт тег имеет пробелы вокруг"
+    },
+    "masterKey": {
+      "label": "Мастер-ключ",
+      "placeholder": "ваша секретная фраза",
+      "empty": "Мастер-ключ не должен быть пустым",
+      "hasSpaces": "Мастер-ключ имеет пробелы вокруг",
+      "unmask": "Unmask",
+      "autoClearWarning": "Приложение было невидимо слишком долго, значение мастер-ключа очищено."
+    },
+    "password": {
+      "label": "Пароль",
+      "copied": "Хэш пароля скопирован в буфер обмена"
+    },
+    "buttons": {
+      "bump": "Увеличить",
+      "generate": "Сгенерировать",
+      "saveSettings": "Сохранить настройки",
+      "settingsSaved": "Настройки сохранены"
+    },
+    "requirements": {
+      "title": "Требования",
+      "digits": "Цифры",
+      "punctuation": "Пунктуация",
+      "mixedCase": "Разные регистры",
+      "digitsSymbol": "0-9",
+      "punctuationSymbol": "!@#",
+      "mixedCaseSymbol": "Аа"
+    },
+    "restrictions": {
+      "title": "Ограничения",
+      "noSpecial": "Без спецсимволов",
+      "digitsOnly": "Только цифры",
+      "size": "Размер",
+      "noSpecialSymbol": "A-Za-z",
+      "digitsOnlySymbol": "0-9"
+    },
+    "hints": {
+      "title": "Подсказки сайт тегов",
+      "placeholder": "Введите сайт тег для получения подсказок..."
+    }
+  },
+  "keeper": {
+    "export": "Экспорт",
+    "import": "Импорт",
+    "exportSuccess": "Данные хранителя экспортированы в буфер обмена",
+    "exportFailed": "Не удалось экспортировать данные",
+    "importSuccess": "Данные хранителя импортированы из буфера обмена",
+    "importFailed": "Не удалось импортировать данные",
+    "importConfirmation": {
+      "title": "Подтверждение импорта",
+      "message": "Импорт заменит текущие данные хранителя содержимым буфера обмена.\nВы уверены, что хотите импортировать?",
+      "cancel": "Отмена",
+      "ok": "ОК",
+      "unchanged": "Данные хранителя остались без изменений"
+    },
+    "emptyClipboard": "Буфер обмена пуст",
+    "emptyState": "Нажмите 'Экспорт' для сохранения данных или 'Импорт' для загрузки"
+  },
+  "settings": {
+    "language": {
+      "label": "Язык"
+    }
+  },
+  "common": {
+    "cancel": "Отмена",
+    "ok": "ОК",
+    "passwordLength": "Длина пароля"
+  }
+}

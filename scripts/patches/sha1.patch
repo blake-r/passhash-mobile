@@ -1,0 +1,7 @@
+--- sha1.js
++++ sha1.js
+@@ -232,3 +232,4 @@
+
+ return b64_hmac_sha1;
+ })();
++export { b64_hmac_sha1 };
