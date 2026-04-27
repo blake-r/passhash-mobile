@@ -689,12 +689,14 @@ const styles = StyleSheet.create({
     zIndex: 9999,
     elevation: 10,
   },
-  hintsDropdownWrapper: {
-    position: "absolute",
-    top: 48,
-    left: 0,
-    right: 50,
-  },
+hintsDropdownWrapper: {
+  position: "absolute",
+  top: 48,
+  left: 0,
+  right: 50,
+  zIndex: 10000,
+  elevation: 20,
+},
   textInput: {
     flex: 1,
     borderWidth: 1,
