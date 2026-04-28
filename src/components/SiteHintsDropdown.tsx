@@ -21,6 +21,8 @@ function SiteHintsDropdown({
 }: SiteHintsDropdownProps): React.JSX.Element {
   const { t } = useTranslation();
 
+  console.log('SiteHintsDropdown rendered with hints length:', hints.length, 'onSelect:', typeof onSelect);
+
   const hasHints = hints.length > 0;
 
   if (!hasHints) {
@@ -41,12 +43,18 @@ function SiteHintsDropdown({
               style={[styles.hintItem, isSelected && styles.hintItemSelected]}
               onPress={() => {
                 console.log('TouchableOpacity pressed for:', tagStr);
-                onSelect(item);
+                try {
+                  onSelect(item);
+                  console.log('onSelect executed successfully for:', tagStr);
+                } catch (error) {
+                  console.error('Error in onSelect for:', tagStr, error);
+                }
               }}
               accessibilityRole="button"
               accessibilityLabel={`Select site tag: ${tagStr}`}
               accessibilityState={{ selected: isSelected }}
               activeOpacity={0.7}
+              hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
             >
               <Text style={[styles.hintText, isSelected && styles.hintTextSelected]}>
                 {tagStr}
@@ -62,6 +70,7 @@ function SiteHintsDropdown({
         style={styles.scrollView}
         contentContainerStyle={styles.scrollViewContent}
         overScrollMode="never"
+        paddingBottom={20}
       />
     </View>
   );
