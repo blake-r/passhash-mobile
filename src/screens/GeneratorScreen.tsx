@@ -355,54 +355,54 @@ function GeneratorScreen({ route }: GeneratorScreenProps): React.JSX.Element {
   }, [siteTag, masterKey, generateHash]);
 
   // Handle hint selection from dropdown
-  const handleHintSelect = useCallback(
-    (keepObj: KeepObj) => {
-      // Clear any pending blur timeout to prevent hints from hiding before selection
-      if (blurTimeoutRef.current) {
-        clearTimeout(blurTimeoutRef.current);
-        blurTimeoutRef.current = null;
-      }
+   const handleHintSelect = useCallback(
+     (keepObj: KeepObj) => {
+       // Clear any pending blur timeout to prevent hints from hiding before selection
+       if (blurTimeoutRef.current) {
+         clearTimeout(blurTimeoutRef.current);
+         blurTimeoutRef.current = null;
+       }
 
-      const tagStr = toString(keepObj);
-      setSiteTag(tagStr);
-      setShowHints(false);
+       const tagStr = toString(keepObj);
+       setSiteTag(tagStr);
 
-      // Apply saved settings
-      if (keepObj.settings) {
-        const newDigits = keepObj.settings.digits ?? digits;
-        const newPunctuation = keepObj.settings.punctuation ?? punctuation;
-        const newMixedCase = keepObj.settings.mixedCase ?? mixedCase;
-        const newNoSpecial = keepObj.settings.special !== null && keepObj.settings.special !== undefined
-          ? !keepObj.settings.special
-          : noSpecial;
-        const newDigitsOnly = keepObj.settings.digitsOnly ?? digitsOnly;
-        const newPasswordLength = keepObj.settings.length ?? passwordLength;
+       // Apply saved settings
+       let overrideSettings = undefined;
+       if (keepObj.settings) {
+         const newDigits = keepObj.settings.digits ?? digits;
+         const newPunctuation = keepObj.settings.punctuation ?? punctuation;
+         const newMixedCase = keepObj.settings.mixedCase ?? mixedCase;
+         const newNoSpecial = keepObj.settings.special !== null && keepObj.settings.special !== undefined
+           ? !keepObj.settings.special
+           : noSpecial;
+         const newDigitsOnly = keepObj.settings.digitsOnly ?? digitsOnly;
+         const newPasswordLength = keepObj.settings.length ?? passwordLength;
 
-        setDigits(newDigits);
-        setPunctuation(newPunctuation);
-        setMixedCase(newMixedCase);
-        setNoSpecial(newNoSpecial);
-        setDigitsOnly(newDigitsOnly);
-        setPasswordLength(newPasswordLength);
+         setDigits(newDigits);
+         setPunctuation(newPunctuation);
+         setMixedCase(newMixedCase);
+         setNoSpecial(newNoSpecial);
+         setDigitsOnly(newDigitsOnly);
+         setPasswordLength(newPasswordLength);
 
-        if (masterKey.length > 0) {
-          generateHash({
-            digits: newDigits,
-            punctuation: newPunctuation,
-            mixedCase: newMixedCase,
-            noSpecial: newNoSpecial,
-            digitsOnly: newDigitsOnly,
-            passwordLength: newPasswordLength,
-          }, tagStr);
-        }
-      } else {
-        if (masterKey.length > 0) {
-          generateHash(undefined, tagStr);
-        }
-      }
-    },
-    [masterKey, digits, punctuation, mixedCase, noSpecial, digitsOnly, passwordLength, generateHash],
-  );
+         overrideSettings = {
+           digits: newDigits,
+           punctuation: newPunctuation,
+           mixedCase: newMixedCase,
+           noSpecial: newNoSpecial,
+           digitsOnly: newDigitsOnly,
+           passwordLength: newPasswordLength,
+         };
+       }
+
+       setShowHints(false);
+
+       if (masterKey.length > 0) {
+         generateHash(overrideSettings, tagStr);
+       }
+     },
+     [masterKey, digits, punctuation, mixedCase, noSpecial, digitsOnly, passwordLength, generateHash],
+   );
 
   const handleSaveSettings = useCallback((): void => {
     saveSetting("digits", digits);
@@ -439,7 +439,7 @@ function GeneratorScreen({ route }: GeneratorScreenProps): React.JSX.Element {
 
   return (
     <View style={styles.container}>
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent} scrollEnabled={!showHints}>
         {/* Card 1: Generation */}
         <Card style={styles.generationCard}>
           {/* Site tag input with version bump */}
