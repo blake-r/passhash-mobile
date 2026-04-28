@@ -357,6 +357,7 @@ function GeneratorScreen({ route }: GeneratorScreenProps): React.JSX.Element {
   // Handle hint selection from dropdown
    const handleHintSelect = useCallback(
      (keepObj: KeepObj) => {
+       console.log('handleHintSelect called with:', keepObj);
        // Clear any pending blur timeout to prevent hints from hiding before selection
        if (blurTimeoutRef.current) {
          clearTimeout(blurTimeoutRef.current);
@@ -364,11 +365,13 @@ function GeneratorScreen({ route }: GeneratorScreenProps): React.JSX.Element {
        }
 
        const tagStr = toString(keepObj);
+       console.log('tagStr:', tagStr);
        setSiteTag(tagStr);
 
        // Apply saved settings
        let overrideSettings = undefined;
        if (keepObj.settings) {
+         console.log('keepObj.settings:', keepObj.settings);
          const newDigits = keepObj.settings.digits ?? digits;
          const newPunctuation = keepObj.settings.punctuation ?? punctuation;
          const newMixedCase = keepObj.settings.mixedCase ?? mixedCase;
@@ -398,6 +401,7 @@ function GeneratorScreen({ route }: GeneratorScreenProps): React.JSX.Element {
        setShowHints(false);
 
        if (masterKey.length > 0) {
+         console.log('calling generateHash with overrideSettings:', overrideSettings, 'and siteTag:', tagStr);
          generateHash(overrideSettings, tagStr);
        }
      },
