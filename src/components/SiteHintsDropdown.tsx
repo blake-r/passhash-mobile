@@ -35,13 +35,18 @@ function SiteHintsDropdown({
         renderItem={({ item }) => {
           const tagStr = item.tag;
           const isSelected = tagStr === currentSiteTag;
+          console.log('Rendering hint item for:', tagStr, 'selected:', isSelected);
           return (
             <TouchableOpacity
               style={[styles.hintItem, isSelected && styles.hintItemSelected]}
-              onPress={() => onSelect(item)}
+              onPress={() => {
+                console.log('TouchableOpacity pressed for:', tagStr);
+                onSelect(item);
+              }}
               accessibilityRole="button"
               accessibilityLabel={`Select site tag: ${tagStr}`}
               accessibilityState={{ selected: isSelected }}
+              activeOpacity={0.7}
             >
               <Text style={[styles.hintText, isSelected && styles.hintTextSelected]}>
                 {tagStr}
