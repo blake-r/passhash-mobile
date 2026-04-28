@@ -235,42 +235,47 @@ function GeneratorScreen({ route }: GeneratorScreenProps): React.JSX.Element {
   }, [digits, punctuation, mixedCase, noSpecial, digitsOnly, passwordLength, hashWord, siteTag, masterKey, generateHash]);
 
   // Filter and sort hints based on current site tag input
-  const filterHints = useCallback((input: string): KeepObj[] => {
-    const allData = getAllData();
-    if (!input || input.trim().length === 0) {
-      return [];
-    }
+   const filterHints = useCallback((input: string): KeepObj[] => {
+     console.log('filterHints called with input:', input);
+     const allData = getAllData();
+     console.log('allData size:', allData.size);
+     if (!input || input.trim().length === 0) {
+       console.log('input empty, returning empty hints');
+       return [];
+     }
 
-    const inputLower = input.toLowerCase();
-    const hints: KeepObj[] = [];
+     const inputLower = input.toLowerCase();
+     const hints: KeepObj[] = [];
 
-    allData.forEach((keepObj) => {
-      const tagLower = keepObj.tag.toLowerCase();
-      // Check if the tag contains the input
-      if (tagLower.includes(inputLower)) {
-        hints.push(keepObj);
-      }
-    });
+     allData.forEach((keepObj) => {
+       const tagLower = keepObj.tag.toLowerCase();
+       // Check if the tag contains the input
+       if (tagLower.includes(inputLower)) {
+         hints.push(keepObj);
+         console.log('matched keepObj:', keepObj);
+       }
+     });
 
-    // Sort by relevance: exact match first, then starts with, then contains
-    hints.sort((a, b) => {
-      const aTagLower = a.tag.toLowerCase();
-      const bTagLower = b.tag.toLowerCase();
+     console.log('filtered hints count:', hints.length);
+     // Sort by relevance: exact match first, then starts with, then contains
+     hints.sort((a, b) => {
+       const aTagLower = a.tag.toLowerCase();
+       const bTagLower = b.tag.toLowerCase();
 
-      // Exact match gets highest priority
-      if (aTagLower === inputLower) return -1;
-      if (bTagLower === inputLower) return 1;
+       // Exact match gets highest priority
+       if (aTagLower === inputLower) return -1;
+       if (bTagLower === inputLower) return 1;
 
-      // Starts with gets second priority
-      if (aTagLower.startsWith(inputLower) && !bTagLower.startsWith(inputLower)) return -1;
-      if (bTagLower.startsWith(inputLower) && !aTagLower.startsWith(inputLower)) return 1;
+       // Starts with gets second priority
+       if (aTagLower.startsWith(inputLower) && !bTagLower.startsWith(inputLower)) return -1;
+       if (bTagLower.startsWith(inputLower) && !aTagLower.startsWith(inputLower)) return 1;
 
-      // Then sort by length (shorter matches are typically more relevant)
-      return aTagLower.length - bTagLower.length;
-    });
+       // Then sort by length (shorter matches are typically more relevant)
+       return aTagLower.length - bTagLower.length;
+     });
 
-    return hints;
-  }, []);
+     return hints;
+   }, []);
 
   const handleGeneratePress = useCallback(() => {
     generateHash();
