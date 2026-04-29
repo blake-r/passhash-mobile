@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Text, TouchableOpacity, View, StyleSheet, Platform, FlatList, type ViewStyle } from "react-native";
+import { Text, Pressable, View, StyleSheet, Platform, FlatList, type ViewStyle } from "react-native";
 
 import type { KeepObj } from "../utils/keeper";
 
@@ -39,10 +39,10 @@ function SiteHintsDropdown({
           const isSelected = tagStr === currentSiteTag;
           console.log('Rendering hint item for:', tagStr, 'selected:', isSelected);
           return (
-            <TouchableOpacity
+            <Pressable
               style={[styles.hintItem, isSelected && styles.hintItemSelected]}
               onPress={() => {
-                console.log('TouchableOpacity pressed for:', tagStr);
+                console.log('Pressable pressed for:', tagStr);
                 try {
                   onSelect(item);
                   console.log('onSelect executed successfully for:', tagStr);
@@ -53,7 +53,6 @@ function SiteHintsDropdown({
               accessibilityRole="button"
               accessibilityLabel={`Select site tag: ${tagStr}`}
               accessibilityState={{ selected: isSelected }}
-              activeOpacity={0.7}
               hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
             >
               <Text style={[styles.hintText, isSelected && styles.hintTextSelected]}>
@@ -64,7 +63,7 @@ function SiteHintsDropdown({
                   {makeSettingsSummary(item.settings)}
                 </Text>
               )}
-            </TouchableOpacity>
+            </Pressable>
           );
         }}
         style={styles.scrollView}
