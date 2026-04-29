@@ -21,7 +21,7 @@ function SiteHintsDropdown({
 }: SiteHintsDropdownProps): React.JSX.Element {
   const { t } = useTranslation();
 
-  console.log('SiteHintsDropdown rendered with hints length:', hints.length, 'onSelect:', typeof onSelect);
+  console.log('SiteHintsDropdown rendered with hints length:', hints.length, 'onSelect:', typeof onSelect, 'currentSiteTag:', currentSiteTag);
 
   const hasHints = hints.length > 0;
 
@@ -41,6 +41,12 @@ function SiteHintsDropdown({
           return (
             <Pressable
               style={[styles.hintItem, isSelected && styles.hintItemSelected]}
+              onPressIn={() => {
+                console.log('Pressable onPressIn for:', tagStr);
+              }}
+              onPressOut={() => {
+                console.log('Pressable onPressOut for:', tagStr);
+              }}
               onPress={() => {
                 console.log('Pressable pressed for:', tagStr);
                 try {
