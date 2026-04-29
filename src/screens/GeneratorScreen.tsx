@@ -496,15 +496,18 @@ function GeneratorScreen({ route }: GeneratorScreenProps): React.JSX.Element {
                 </TouchableOpacity>
               </View>
               {/* Hints dropdown - positioned absolutely within container */}
-              {showHints && filteredHints.length > 0 && (
-                <View style={styles.hintsDropdownWrapper}>
-                  <SiteHintsDropdown
-                    hints={filteredHints}
-                    onSelect={handleHintSelect}
-                    currentSiteTag={siteTag}
-                  />
-                </View>
-              )}
+               {showHints && filteredHints.length > 0 && (
+                 <View style={styles.hintsDropdownWrapper}>
+                   <SiteHintsDropdown
+                     hints={filteredHints}
+                     onSelect={(item) => {
+                       console.log('handleHintSelect called from GeneratorScreen with:', item);
+                       handleHintSelect(item);
+                     }}
+                     currentSiteTag={siteTag}
+                   />
+                 </View>
+               )}
             </View>
           </View>
 
