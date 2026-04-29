@@ -708,6 +708,7 @@ hintsDropdownWrapper: {
   right: 50,
   zIndex: 10000,
   elevation: 20,
+  pointerEvents: "box-none",
 },
   textInput: {
     flex: 1,
