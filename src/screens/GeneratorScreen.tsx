@@ -501,26 +501,7 @@ function GeneratorScreen({ route }: GeneratorScreenProps): React.JSX.Element {
               </View>
               {/* Hints dropdown - positioned absolutely within container */}
                {showHints && filteredHints.length > 0 && (
-                 <View 
-                   style={styles.hintsDropdownWrapper}
-                   onStartShouldSetResponder={() => {
-                     console.log('hintsDropdownWrapper onStartShouldSetResponder');
-                     return true;
-                   }}
-                   onResponderGrant={() => {
-                     console.log('hintsDropdownWrapper onResponderGrant');
-                   }}
-                   onResponderRelease={(e) => {
-                     console.log('hintsDropdownWrapper onResponderRelease:', e);
-                   }}
-                   onResponderTerminate={(e) => {
-                     console.log('hintsDropdownWrapper onResponderTerminate:', e);
-                   }}
-                   onResponderTerminationRequest={(e) => {
-                     console.log('hintsDropdownWrapper onResponderTerminationRequest:', e);
-                     return true;
-                   }}
-                 >
+                 <View style={styles.hintsDropdownWrapper}>
                    <SiteHintsDropdown
                      hints={filteredHints}
                      onSelect={(item) => {
