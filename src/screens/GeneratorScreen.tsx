@@ -712,7 +712,6 @@ hintsDropdownWrapper: {
   right: 50,
   zIndex: 99999,
   elevation: 30,
-  backgroundColor: "rgba(0,0,255,0.2)",  // Blue with 20% opacity for debugging
 },
   textInput: {
     flex: 1,
