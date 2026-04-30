@@ -448,7 +448,12 @@ function GeneratorScreen({ route }: GeneratorScreenProps): React.JSX.Element {
 
   return (
     <View style={styles.container}>
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent} scrollEnabled={!showHints}>
+      <ScrollView
+  style={styles.scrollView}
+  contentContainerStyle={styles.scrollContent}
+  scrollEnabled={!showHints}
+  pointerEvents={showHints ? "box-none" : "box-auto"}
+>
         {/* Card 1: Generation */}
         <Card style={styles.generationCard}>
           {/* Site tag input with version bump */}
@@ -727,6 +732,7 @@ hintsDropdownWrapper: {
   right: 50,
   zIndex: 99999,
   elevation: 30,
+  backgroundColor: "rgba(0,0,255,0.2)",  // Blue with 20% opacity for debugging
 },
   textInput: {
     flex: 1,

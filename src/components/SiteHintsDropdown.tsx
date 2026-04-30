@@ -130,6 +130,8 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     backgroundColor: "#fff",
+    // Debug background color
+    backgroundColor: "rgba(255,0,0,0.1)", // Red with 10% opacity
   },
   hintItemSelected: {
     backgroundColor: "#e3f2fd",
