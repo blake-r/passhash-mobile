@@ -452,7 +452,6 @@ function GeneratorScreen({ route }: GeneratorScreenProps): React.JSX.Element {
   style={styles.scrollView}
   contentContainerStyle={styles.scrollContent}
   scrollEnabled={!showHints}
-  pointerEvents={showHints ? "box-none" : "box-auto"}
 >
         {/* Card 1: Generation */}
         <Card style={styles.generationCard}>
