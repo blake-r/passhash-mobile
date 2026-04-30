@@ -506,6 +506,16 @@ function GeneratorScreen({ route }: GeneratorScreenProps): React.JSX.Element {
                    onResponderGrant={() => {
                      console.log('hintsDropdownWrapper onResponderGrant');
                    }}
+                   onResponderRelease={(e) => {
+                     console.log('hintsDropdownWrapper onResponderRelease:', e);
+                   }}
+                   onResponderTerminate={(e) => {
+                     console.log('hintsDropdownWrapper onResponderTerminate:', e);
+                   }}
+                   onResponderTerminationRequest={(e) => {
+                     console.log('hintsDropdownWrapper onResponderTerminationRequest:', e);
+                     return true;
+                   }}
                  >
                    <SiteHintsDropdown
                      hints={filteredHints}
@@ -717,7 +727,6 @@ hintsDropdownWrapper: {
   right: 50,
   zIndex: 99999,
   elevation: 30,
-  pointerEvents: "box-none",
 },
   textInput: {
     flex: 1,
