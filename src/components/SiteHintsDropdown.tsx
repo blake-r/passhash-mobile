@@ -42,6 +42,45 @@ function SiteHintsDropdown({
               key={`${item.tag}-${index}`}
               style={[styles.hintItem, isSelected && styles.hintItemSelected]}
               onPress={() => {
+                console.log('HintsDropdown Pressable pressed for:', tagStr);
+                onSelect(item);
+              }}
+              accessibilityRole="button"
+              accessibilityLabel={`Select site tag: ${tagStr}`}
+              accessibilityState={{ selected: isSelected }}
+              hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
+            >
+              <Text style={[styles.hintText, isSelected && styles.hintTextSelected]}>
+                {tagStr}
+              </Text>
+              {item.settings && (
+                <Text style={styles.hintSettings}>
+                  {makeSettingsSummary(item.settings)}
+                </Text>
+              )}
+            </Pressable>
+          );
+        })}
+      </ScrollView>
+    </View>
+  );
+}
+
+  return (
+    <View style={[styles.container, style]} accessibilityLabel={t("generator.hints.title")}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollViewContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {hints.map((item, index) => {
+          const tagStr = item.tag;
+          const isSelected = tagStr === currentSiteTag;
+          return (
+            <Pressable
+              key={`${item.tag}-${index}`}
+              style={[styles.hintItem, isSelected && styles.hintItemSelected]}
+              onPress={() => {
                 onSelect(item);
               }}
               accessibilityRole="button"
