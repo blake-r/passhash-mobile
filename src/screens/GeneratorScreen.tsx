@@ -443,7 +443,7 @@ function GeneratorScreen({ route }: GeneratorScreenProps): React.JSX.Element {
   style={styles.scrollView}
   contentContainerStyle={styles.scrollContent}
   scrollEnabled={!showHints}
-  pointerEvents={showHints ? "none" : "auto"}
+  pointerEvents={showHints ? "box-none" : "auto"}
 >
         {/* Card 1: Generation */}
         <Card style={styles.generationCard}>
