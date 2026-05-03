@@ -65,9 +65,9 @@ function SiteHintsDropdown({
       </ScrollView>
     </View>
   );
-   }
- 
- function makeSettingsSummary(settings: KeepObj["settings"]): string {
+}
+
+function makeSettingsSummary(settings: KeepObj["settings"]): string {
   const parts: string[] = [];
   
   // Requirements (in order: digits, punctuation, mixedCase)
