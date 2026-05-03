@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Text, Pressable, View, StyleSheet, Platform, ScrollView, type ViewStyle } from "react-native";
+import { Text, Pressable, View, StyleSheet, Platform, type ViewStyle } from "react-native";
 
 import type { KeepObj } from "../utils/keeper";
 
@@ -11,6 +11,7 @@ export interface SiteHintsDropdownProps {
   onSelect: (keepObj: KeepObj) => void;
   currentSiteTag?: string;
   style?: ViewStyle;
+  onDropdownTouchStart?: () => void;
 }
 
 function SiteHintsDropdown({
@@ -18,6 +19,7 @@ function SiteHintsDropdown({
   onSelect,
   currentSiteTag,
   style,
+  onDropdownTouchStart,
 }: SiteHintsDropdownProps): React.JSX.Element {
   const { t } = useTranslation();
 
@@ -29,40 +31,38 @@ function SiteHintsDropdown({
 
   return (
     <View style={[styles.container, style]} accessibilityLabel={t("generator.hints.title")}>
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollViewContent}
-        showsVerticalScrollIndicator={false}
-        pointerEvents="box-none"
-      >
-        {hints.map((item, index) => {
-          const tagStr = item.tag;
-          const isSelected = tagStr === currentSiteTag;
-          return (
-            <Pressable
-              key={`${item.tag}-${index}`}
-              style={[styles.hintItem, isSelected && styles.hintItemSelected]}
-              onPress={() => {
-                console.log('HintsDropdown Pressable pressed for:', tagStr);
-                onSelect(item);
-              }}
-              accessibilityRole="button"
-              accessibilityLabel={`Select site tag: ${tagStr}`}
-              accessibilityState={{ selected: isSelected }}
-              hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
-            >
-              <Text style={[styles.hintText, isSelected && styles.hintTextSelected]}>
-                {tagStr}
+      {hints.map((item, index) => {
+        const tagStr = item.tag;
+        const isSelected = tagStr === currentSiteTag;
+        return (
+          <Pressable
+            key={`${item.tag}-${index}`}
+            style={[styles.hintItem, isSelected && styles.hintItemSelected]}
+            onPressIn={() => {
+              if (onDropdownTouchStart) {
+                onDropdownTouchStart();
+              }
+            }}
+            onPress={() => {
+              console.log('HintsDropdown Pressable pressed for:', tagStr);
+              onSelect(item);
+            }}
+            accessibilityRole="button"
+            accessibilityLabel={`Select site tag: ${tagStr}`}
+            accessibilityState={{ selected: isSelected }}
+            hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
+          >
+            <Text style={[styles.hintText, isSelected && styles.hintTextSelected]}>
+              {tagStr}
+            </Text>
+            {item.settings && (
+              <Text style={styles.hintSettings}>
+                {makeSettingsSummary(item.settings)}
               </Text>
-              {item.settings && (
-                <Text style={styles.hintSettings}>
-                  {makeSettingsSummary(item.settings)}
-                </Text>
-              )}
-            </Pressable>
-          );
-        })}
-      </ScrollView>
+            )}
+          </Pressable>
+        );
+      })}
     </View>
   );
 }
@@ -99,13 +99,6 @@ const styles = StyleSheet.create({
   emptyContainer: {
     height: 0,
     borderWidth: 0,
-  },
-  scrollView: {
-    maxHeight: 200,
-    backgroundColor: "#fff",
-  },
-  scrollViewContent: {
-    backgroundColor: "#fff",
   },
   hintItem: {
     paddingVertical: 10,
