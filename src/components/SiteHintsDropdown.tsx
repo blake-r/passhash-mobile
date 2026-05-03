@@ -37,18 +37,32 @@ function SiteHintsDropdown({
           <Pressable
             key={`${item.tag}-${index}`}
             style={[styles.hintItem, isSelected && styles.hintItemSelected]}
+            onStartShouldSetResponderCapture={() => {
+              console.log('Pressable onStartShouldSetResponderCapture for:', tagStr);
+              return true;
+            }}
             onTouchStart={(e) => {
-                console.log('Pressable onTouchStart for:', tagStr);
-                if (onDropdownTouchStart) {
-                  onDropdownTouchStart();
-                }
-              }}
+              console.log('Pressable onTouchStart for:', tagStr);
+              if (onDropdownTouchStart) {
+                onDropdownTouchStart();
+              }
+            }}
             onPressIn={() => {
               console.log('Pressable onPressIn for:', tagStr);
+            }}
+            onPressOut={() => {
+              console.log('Pressable onPressOut for:', tagStr);
             }}
             onPress={() => {
               console.log('HintsDropdown Pressable pressed for:', tagStr);
               onSelect(item);
+            }}
+            onResponderTerminate={(e) => {
+              console.log('Pressable onResponderTerminate for:', tagStr, 'event:', e.nativeEvent);
+            }}
+            onResponderTerminationRequest={(e) => {
+              console.log('Pressable onResponderTerminationRequest for:', tagStr);
+              return false;
             }}
             accessibilityRole="button"
             accessibilityLabel={`Select site tag: ${tagStr}`}

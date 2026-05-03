@@ -88,9 +88,10 @@ function GeneratorScreen({ route }: GeneratorScreenProps): React.JSX.Element {
     passwordLength: number;
   } | null>(null);
 
-  const [statusMsg, setStatusMsg] = useState<StatusMessage>({ text: "", color: "gray" });
-  const masterKeyTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const blurTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+   const [statusMsg, setStatusMsg] = useState<StatusMessage>({ text: "", color: "gray" });
+   const masterKeyTimerRef = useRef<NodeJS.Timeout | null>(null);
+   const blurTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+   const isDropdownInteractingRef = useRef(false);
 
   const showStatus = useCallback(
     (text: string, color: string) => {
@@ -329,13 +330,20 @@ function GeneratorScreen({ route }: GeneratorScreenProps): React.JSX.Element {
       
       // Re-filter with normalized text
       const normalizedHints = filterHints(normalizedText);
-      setFilteredHints(normalizedHints);
-      setShowHints(normalizedHints.length > 0);
-    },
-    [showStatus, t, filterHints],
-  );
+       setFilteredHints(normalizedHints);
+       setShowHints(normalizedHints.length > 0);
+     },
+     [showStatus, t, filterHints],
+   );
 
-  const handleMasterKeyChange = useCallback(
+   // Reset dropdown interaction flag when hints hidden
+   useEffect(() => {
+     if (!showHints) {
+       isDropdownInteractingRef.current = false;
+     }
+   }, [showHints]);
+
+   const handleMasterKeyChange = useCallback(
     (text: string) => {
       setMasterKey(text);
       // Clear password to require manual generation
@@ -403,9 +411,10 @@ function GeneratorScreen({ route }: GeneratorScreenProps): React.JSX.Element {
          };
        }
 
-       setShowHints(false);
+        setShowHints(false);
+        isDropdownInteractingRef.current = false;
 
-       if (masterKey.length > 0) {
+        if (masterKey.length > 0) {
          console.log('calling generateHash with overrideSettings:', overrideSettings, 'and siteTag:', tagStr);
          generateHash(overrideSettings, tagStr);
        }
@@ -449,11 +458,12 @@ function GeneratorScreen({ route }: GeneratorScreenProps): React.JSX.Element {
   return (
     <View style={styles.container}>
       <ScrollView
-  style={styles.scrollView}
-  contentContainerStyle={styles.scrollContent}
-  scrollEnabled={!showHints}
-  pointerEvents={showHints ? "box-none" : "auto"}
->
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        scrollEnabled={!showHints}
+        pointerEvents={showHints ? "box-none" : "auto"}
+        keyboardShouldPersistTaps="always"
+      >
         {/* Card 1: Generation */}
         <Card style={styles.generationCard}>
           {/* Site tag input with version bump */}
@@ -472,11 +482,13 @@ function GeneratorScreen({ route }: GeneratorScreenProps): React.JSX.Element {
                     setShowHints(hints.length > 0);
                   }}
                   onBlur={() => {
-                    // Delay hiding to allow hint selection
-                    blurTimeoutRef.current = setTimeout(() => {
-                      setShowHints(false);
-                      blurTimeoutRef.current = null;
-                    }, 200);
+                    // Delay hiding to allow hint selection, but not if user is interacting with dropdown
+                    if (!isDropdownInteractingRef.current) {
+                      blurTimeoutRef.current = setTimeout(() => {
+                        setShowHints(false);
+                        blurTimeoutRef.current = null;
+                      }, 200);
+                    }
                   }}
                   autoCapitalize="none"
                   autoCorrect={false}
@@ -504,6 +516,7 @@ function GeneratorScreen({ route }: GeneratorScreenProps): React.JSX.Element {
                 {showHints && filteredHints.length > 0 && (
                   <View
                     style={styles.hintsDropdownWrapper}
+                    pointerEvents="box-none"
                   >
                     <SiteHintsDropdown
                       hints={filteredHints}
@@ -511,6 +524,7 @@ function GeneratorScreen({ route }: GeneratorScreenProps): React.JSX.Element {
                       currentSiteTag={siteTag}
                       onDropdownTouchStart={() => {
                         console.log('Dropdown touch start - clearing blur timeout');
+                        isDropdownInteractingRef.current = true;
                         if (blurTimeoutRef.current) {
                           clearTimeout(blurTimeoutRef.current);
                           blurTimeoutRef.current = null;
