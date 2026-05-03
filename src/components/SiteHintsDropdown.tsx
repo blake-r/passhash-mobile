@@ -33,6 +33,7 @@ function SiteHintsDropdown({
         style={styles.scrollView}
         contentContainerStyle={styles.scrollViewContent}
         showsVerticalScrollIndicator={false}
+        pointerEvents="box-none"
       >
         {hints.map((item, index) => {
           const tagStr = item.tag;

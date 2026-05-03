@@ -31,6 +31,7 @@ const styles = StyleSheet.create({
     elevation: 3,
     borderWidth: 1,
     borderColor: "#e0e0e0",
+    overflow: "visible",
   },
   cardHeader: {
     paddingHorizontal: 16,
@@ -44,6 +45,7 @@ const styles = StyleSheet.create({
   },
   cardContent: {
     padding: 16,
+    overflow: "visible",
   },
 });
 

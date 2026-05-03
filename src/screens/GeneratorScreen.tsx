@@ -665,21 +665,24 @@ function GeneratorScreen({ route }: GeneratorScreenProps): React.JSX.Element {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#f5f5f5",
-  },
-  scrollView: {
-    flex: 1,
-  },
+   container: {
+     flex: 1,
+     backgroundColor: "#f5f5f5",
+     overflow: "visible",
+   },
+   scrollView: {
+     flex: 1,
+     overflow: "visible",
+   },
   scrollContent: {
     paddingVertical: 12,
     flexGrow: 1,
   },
-  generationCard: {
-    marginHorizontal: 8,
-    marginBottom: 12,
-  },
+   generationCard: {
+     marginHorizontal: 8,
+     marginBottom: 12,
+     overflow: "visible",
+   },
   settingsCard: {
     marginHorizontal: 8,
     marginBottom: 12,
@@ -700,9 +703,11 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#e0e0e0",
   },
-  inputRow: {
-    marginBottom: 16,
-  },
+   inputRow: {
+     marginBottom: 16,
+     position: "relative",
+     overflow: "visible",
+   },
   inputLabel: {
     fontSize: 14,
     color: "#666",
@@ -714,12 +719,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     position: "relative",
   },
-  inputWithButtonContainer: {
-    position: "relative",
-    flex: 1,
-    zIndex: 9999,
-    elevation: 10,
-  },
+   inputWithButtonContainer: {
+     position: "relative",
+     flex: 1,
+     zIndex: 9999,
+     elevation: 10,
+     overflow: "visible",
+   },
 hintsDropdownWrapper: {
   position: "absolute",
   top: 48,
