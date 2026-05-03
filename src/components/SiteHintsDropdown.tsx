@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Text, TouchableOpacity, View, StyleSheet, Platform, FlatList, type ViewStyle } from "react-native";
+import { Text, TouchableOpacity, View, StyleSheet, Platform, ScrollView, type ViewStyle } from "react-native";
 
 import type { KeepObj } from "../utils/keeper";
 
@@ -29,14 +29,17 @@ function SiteHintsDropdown({
 
   return (
     <View style={[styles.container, style]} accessibilityLabel={t("generator.hints.title")}>
-      <FlatList
-        data={hints}
-        keyExtractor={(item, index) => `${item.tag}-${index}`}
-        renderItem={({ item }) => {
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollViewContent}
+        overScrollMode="never"
+      >
+        {hints.map((item, index) => {
           const tagStr = item.tag;
           const isSelected = tagStr === currentSiteTag;
           return (
             <TouchableOpacity
+              key={`${item.tag}-${index}`}
               style={[styles.hintItem, isSelected && styles.hintItemSelected]}
               onPress={() => onSelect(item)}
               accessibilityRole="button"
@@ -53,11 +56,8 @@ function SiteHintsDropdown({
               )}
             </TouchableOpacity>
           );
-        }}
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollViewContent}
-        overScrollMode="never"
-      />
+        })}
+      </ScrollView>
     </View>
   );
 }
