@@ -236,11 +236,8 @@ function GeneratorScreen({ route }: GeneratorScreenProps): React.JSX.Element {
 
   // Filter and sort hints based on current site tag input
    const filterHints = useCallback((input: string): KeepObj[] => {
-     console.log('filterHints called with input:', input);
      const allData = getAllData();
-     console.log('allData size:', allData.size);
      if (!input || input.trim().length === 0) {
-       console.log('input empty, returning empty hints');
        return [];
      }
 
@@ -252,11 +249,9 @@ function GeneratorScreen({ route }: GeneratorScreenProps): React.JSX.Element {
        // Check if the tag contains the input
        if (tagLower.includes(inputLower)) {
          hints.push(keepObj);
-         console.log('matched keepObj:', keepObj);
        }
      });
 
-     console.log('filtered hints count:', hints.length);
      // Sort by relevance: exact match first, then starts with, then contains
      hints.sort((a, b) => {
        const aTagLower = a.tag.toLowerCase();
@@ -362,7 +357,6 @@ function GeneratorScreen({ route }: GeneratorScreenProps): React.JSX.Element {
   // Handle hint selection from dropdown
    const handleHintSelect = useCallback(
      (keepObj: KeepObj) => {
-       console.log('handleHintSelect called with:', keepObj);
        // Clear any pending blur timeout to prevent hints from hiding before selection
        if (blurTimeoutRef.current) {
          clearTimeout(blurTimeoutRef.current);
@@ -370,13 +364,11 @@ function GeneratorScreen({ route }: GeneratorScreenProps): React.JSX.Element {
        }
 
        const tagStr = toString(keepObj);
-       console.log('tagStr:', tagStr);
        setSiteTag(tagStr);
 
        // Apply saved settings
        let overrideSettings = undefined;
        if (keepObj.settings) {
-         console.log('keepObj.settings:', keepObj.settings);
          const newDigits = keepObj.settings.digits ?? digits;
          const newPunctuation = keepObj.settings.punctuation ?? punctuation;
          const newMixedCase = keepObj.settings.mixedCase ?? mixedCase;
@@ -406,7 +398,6 @@ function GeneratorScreen({ route }: GeneratorScreenProps): React.JSX.Element {
        setShowHints(false);
 
        if (masterKey.length > 0) {
-         console.log('calling generateHash with overrideSettings:', overrideSettings, 'and siteTag:', tagStr);
          generateHash(overrideSettings, tagStr);
        }
      },
@@ -504,10 +495,7 @@ function GeneratorScreen({ route }: GeneratorScreenProps): React.JSX.Element {
                  <View style={styles.hintsDropdownWrapper}>
                    <SiteHintsDropdown
                      hints={filteredHints}
-                     onSelect={(item) => {
-                       console.log('handleHintSelect called from GeneratorScreen with:', item);
-                       handleHintSelect(item);
-                     }}
+                     onSelect={handleHintSelect}
                      currentSiteTag={siteTag}
                    />
                  </View>
