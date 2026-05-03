@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Text, Pressable, View, StyleSheet, Platform, FlatList, type ViewStyle } from "react-native";
+import { Text, Pressable, View, StyleSheet, Platform, ScrollView, type ViewStyle } from "react-native";
 
 import type { KeepObj } from "../utils/keeper";
 
@@ -29,14 +29,17 @@ function SiteHintsDropdown({
 
   return (
     <View style={[styles.container, style]} accessibilityLabel={t("generator.hints.title")}>
-      <FlatList
-        data={hints}
-        keyExtractor={(item, index) => `${item.tag}-${index}`}
-        renderItem={({ item }) => {
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollViewContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {hints.map((item, index) => {
           const tagStr = item.tag;
           const isSelected = tagStr === currentSiteTag;
           return (
             <Pressable
+              key={`${item.tag}-${index}`}
               style={[styles.hintItem, isSelected && styles.hintItemSelected]}
               onPress={() => {
                 onSelect(item);
@@ -56,12 +59,8 @@ function SiteHintsDropdown({
               )}
             </Pressable>
           );
-        }}
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollViewContent}
-        overScrollMode="never"
-        paddingBottom={20}
-      />
+        })}
+      </ScrollView>
     </View>
   );
 }
