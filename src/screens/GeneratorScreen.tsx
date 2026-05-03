@@ -507,7 +507,8 @@ function GeneratorScreen({ route }: GeneratorScreenProps): React.JSX.Element {
                     contentContainerStyle={styles.hintsDropdownContent}
                     showsVerticalScrollIndicator={true}
                     keyboardShouldPersistTaps="always"
-                    nestedScrollEnabled={true}
+                    nestedScrollEnabled={false}
+                    scrollEnabled={false}
                     accessibilityLabel={t("generator.hints.title")}
                     onTouchStart={(e) => {
                       console.log('Dropdown ScrollView onTouchStart');
