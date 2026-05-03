@@ -30,7 +30,11 @@ function SiteHintsDropdown({
   }
 
   return (
-    <View style={[styles.container, style]} accessibilityLabel={t("generator.hints.title")}>
+    <View 
+      style={[styles.container, style]} 
+      accessibilityLabel={t("generator.hints.title")}
+      pointerEvents="box-none"
+    >
       {hints.map((item, index) => {
         const tagStr = item.tag;
         const isSelected = tagStr === currentSiteTag;
@@ -50,7 +54,8 @@ function SiteHintsDropdown({
             accessibilityRole="button"
             accessibilityLabel={`Select site tag: ${tagStr}`}
             accessibilityState={{ selected: isSelected }}
-            hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
+            hitSlop={{top: 5, bottom: 5, left: 5, right: 5}}
+            pointerEvents="auto"
           >
             <Text style={[styles.hintText, isSelected && styles.hintTextSelected]}>
               {tagStr}
@@ -61,11 +66,11 @@ function SiteHintsDropdown({
               </Text>
             )}
           </Pressable>
-        );
-      })}
-    </View>
-  );
-}
+         );
+       })}
+     </View>
+   );
+ }
 
 function makeSettingsSummary(settings: KeepObj["settings"]): string {
   const parts: string[] = [];
