@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Text, Pressable, View, StyleSheet, Platform, type ViewStyle } from "react-native";
+import { Text, Pressable, StyleSheet, Platform, type ViewStyle } from "react-native";
 
 import type { KeepObj } from "../utils/keeper";
 
@@ -26,20 +26,16 @@ function SiteHintsDropdown({
   const hasHints = hints.length > 0;
 
   if (!hasHints) {
-    return <View style={[styles.container, styles.emptyContainer, style]} />;
+    return null;
   }
 
   return (
-      <View 
-        style={[styles.container, style]} 
-        accessibilityLabel={t("generator.hints.title")}
-        pointerEvents="box-none"
-      >
-        {hints.map((item, index) => {
-          const tagStr = item.tag;
-          const isSelected = tagStr === currentSiteTag;
-          console.log('Rendering Pressable for:', tagStr, 'isSelected:', isSelected);
-          return (
+    <>
+      {hints.map((item, index) => {
+        const tagStr = item.tag;
+        const isSelected = tagStr === currentSiteTag;
+        console.log('Rendering Pressable for:', tagStr, 'isSelected:', isSelected);
+        return (
           <Pressable
             key={`${item.tag}-${index}`}
             style={[styles.hintItem, isSelected && styles.hintItemSelected]}
@@ -60,10 +56,6 @@ function SiteHintsDropdown({
             accessibilityLabel={`Select site tag: ${tagStr}`}
             accessibilityState={{ selected: isSelected }}
             hitSlop={{top: 5, bottom: 5, left: 5, right: 5}}
-            pointerEvents="auto"
-            onTouchEnd={(e) => {
-              console.log('Pressable onTouchEnd for:', tagStr, 'event:', e.nativeEvent);
-            }}
           >
             <Text style={[styles.hintText, isSelected && styles.hintTextSelected]}>
               {tagStr}
@@ -74,11 +66,11 @@ function SiteHintsDropdown({
               </Text>
             )}
           </Pressable>
-         );
-       })}
-     </View>
-   );
- }
+        );
+      })}
+    </>
+  );
+}
 
 function makeSettingsSummary(settings: KeepObj["settings"]): string {
   const parts: string[] = [];
@@ -97,22 +89,6 @@ function makeSettingsSummary(settings: KeepObj["settings"]): string {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 4,
-    backgroundColor: "#fff",
-    maxHeight: 200,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 3,
-    elevation: 10,
-  },
-  emptyContainer: {
-    height: 0,
-    borderWidth: 0,
-  },
   hintItem: {
     paddingVertical: 10,
     paddingHorizontal: 12,

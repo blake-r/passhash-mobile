@@ -500,23 +500,29 @@ function GeneratorScreen({ route }: GeneratorScreenProps): React.JSX.Element {
                   </View>
                 </TouchableOpacity>
               </View>
-              {/* Hints dropdown - positioned absolutely within container */}
-               {showHints && filteredHints.length > 0 && (
-                 <View style={styles.hintsDropdownWrapper}>
-                   <SiteHintsDropdown
-                     hints={filteredHints}
-                     onSelect={handleHintSelect}
-                     currentSiteTag={siteTag}
-                     onDropdownTouchStart={() => {
-                       console.log('Dropdown touch start - clearing blur timeout');
-                       if (blurTimeoutRef.current) {
-                         clearTimeout(blurTimeoutRef.current);
-                         blurTimeoutRef.current = null;
-                       }
-                     }}
-                   />
-                 </View>
-               )}
+               {/* Hints dropdown - positioned absolutely within container */}
+                {showHints && filteredHints.length > 0 && (
+                  <ScrollView
+                    style={styles.hintsDropdownWrapper}
+                    contentContainerStyle={styles.hintsDropdownContent}
+                    showsVerticalScrollIndicator={true}
+                    keyboardShouldPersistTaps="always"
+                    nestedScrollEnabled={true}
+                  >
+                    <SiteHintsDropdown
+                      hints={filteredHints}
+                      onSelect={handleHintSelect}
+                      currentSiteTag={siteTag}
+                      onDropdownTouchStart={() => {
+                        console.log('Dropdown touch start - clearing blur timeout');
+                        if (blurTimeoutRef.current) {
+                          clearTimeout(blurTimeoutRef.current);
+                          blurTimeoutRef.current = null;
+                        }
+                      }}
+                    />
+                  </ScrollView>
+                )}
             </View>
           </View>
 
@@ -716,15 +722,24 @@ const styles = StyleSheet.create({
      elevation: 10,
      overflow: "visible",
    },
-hintsDropdownWrapper: {
-  position: "absolute",
-  top: 48,
-  left: 0,
-  right: 50,
-  zIndex: 99999,
-  elevation: 30,
-  pointerEvents: "box-none",
-},
+  hintsDropdownWrapper: {
+    position: "absolute",
+    top: 48,
+    left: 0,
+    right: 50,
+    zIndex: 99999,
+    elevation: 30,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 4,
+    backgroundColor: "#fff",
+    maxHeight: 200,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 3,
+    overflow: "hidden",
+  },
   textInput: {
     flex: 1,
     borderWidth: 1,
