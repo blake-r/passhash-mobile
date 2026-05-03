@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Text, TouchableOpacity, View, StyleSheet, Platform, ScrollView, type ViewStyle } from "react-native";
+import { Text, TouchableOpacity, View, StyleSheet, Platform } from "react-native";
 
 import type { KeepObj } from "../utils/keeper";
 
@@ -10,30 +10,24 @@ export interface SiteHintsDropdownProps {
   hints: KeepObj[];
   onSelect: (keepObj: KeepObj) => void;
   currentSiteTag?: string;
-  style?: ViewStyle;
 }
 
 function SiteHintsDropdown({
   hints,
   onSelect,
   currentSiteTag,
-  style,
 }: SiteHintsDropdownProps): React.JSX.Element {
   const { t } = useTranslation();
 
   const hasHints = hints.length > 0;
 
   if (!hasHints) {
-    return <View style={[styles.container, styles.emptyContainer, style]} />;
+    return <View style={[styles.container, styles.emptyContainer]} />;
   }
 
   return (
-    <View style={[styles.container, style]} accessibilityLabel={t("generator.hints.title")}>
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollViewContent}
-        overScrollMode="never"
-      >
+    <View style={styles.container} accessibilityLabel={t("generator.hints.title")}>
+      <View style={[styles.scrollView, styles.scrollViewContent]}>
         {hints.map((item, index) => {
           const tagStr = item.tag;
           const isSelected = tagStr === currentSiteTag;
@@ -45,6 +39,7 @@ function SiteHintsDropdown({
               accessibilityRole="button"
               accessibilityLabel={`Select site tag: ${tagStr}`}
               accessibilityState={{ selected: isSelected }}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
               <Text style={[styles.hintText, isSelected && styles.hintTextSelected]}>
                 {tagStr}
@@ -57,7 +52,7 @@ function SiteHintsDropdown({
             </TouchableOpacity>
           );
         })}
-      </ScrollView>
+      </View>
     </View>
   );
 }

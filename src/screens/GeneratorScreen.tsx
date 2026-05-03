@@ -59,6 +59,8 @@ function GeneratorScreen({ route }: GeneratorScreenProps): React.JSX.Element {
   const onSaveSettings = route.params?.onSaveSettings;
   const onStatusMessage = route.params?.onStatusMessage;
 
+  const siteTagInputRef = useRef<TextInput | null>(null);
+
   const [siteTag, setSiteTag] = useState("");
   const [masterKey, setMasterKey] = useState("");
   const [hashWord, setHashWord] = useState("");
@@ -367,7 +369,7 @@ function GeneratorScreen({ route }: GeneratorScreenProps): React.JSX.Element {
       setSiteTag(tagStr);
       setShowHints(false);
 
-      // Apply saved settings
+      // Apply saved settings if available
       if (keepObj.settings) {
         const newDigits = keepObj.settings.digits ?? digits;
         const newPunctuation = keepObj.settings.punctuation ?? punctuation;
@@ -401,7 +403,7 @@ function GeneratorScreen({ route }: GeneratorScreenProps): React.JSX.Element {
         }
       }
     },
-    [masterKey, digits, punctuation, mixedCase, noSpecial, digitsOnly, passwordLength, generateHash],
+    [masterKey, generateHash, digits, punctuation, mixedCase, noSpecial, digitsOnly, passwordLength],
   );
 
   const handleSaveSettings = useCallback((): void => {
@@ -439,7 +441,13 @@ function GeneratorScreen({ route }: GeneratorScreenProps): React.JSX.Element {
 
   return (
     <View style={styles.container}>
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        scrollEnabled={!showHints}
+        pointerEvents={showHints ? "box-none" : "auto"}
+        keyboardShouldPersistTaps="always"
+      >
         {/* Card 1: Generation */}
         <Card style={styles.generationCard}>
           {/* Site tag input with version bump */}
@@ -448,6 +456,7 @@ function GeneratorScreen({ route }: GeneratorScreenProps): React.JSX.Element {
             <View style={styles.inputWithButtonContainer}>
               <View style={styles.inputWithButton}>
                 <TextInput
+                  ref={siteTagInputRef}
                   style={styles.textInput}
                   placeholder={t("generator.siteTag.placeholder")}
                   placeholderTextColor="#999"
