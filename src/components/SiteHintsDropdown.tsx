@@ -30,19 +30,24 @@ function SiteHintsDropdown({
   }
 
   return (
-    <View 
-      style={[styles.container, style]} 
-      accessibilityLabel={t("generator.hints.title")}
-      pointerEvents="box-none"
-    >
-      {hints.map((item, index) => {
-        const tagStr = item.tag;
-        const isSelected = tagStr === currentSiteTag;
-        return (
+      <View 
+        style={[styles.container, style]} 
+        accessibilityLabel={t("generator.hints.title")}
+        pointerEvents="box-none"
+      >
+        {hints.map((item, index) => {
+          const tagStr = item.tag;
+          const isSelected = tagStr === currentSiteTag;
+          console.log('Rendering Pressable for:', tagStr, 'isSelected:', isSelected);
+          return (
           <Pressable
             key={`${item.tag}-${index}`}
             style={[styles.hintItem, isSelected && styles.hintItemSelected]}
+            onTouchStart={(e) => {
+              console.log('Pressable onTouchStart for:', tagStr, 'event:', e.nativeEvent);
+            }}
             onPressIn={() => {
+              console.log('Pressable onPressIn for:', tagStr);
               if (onDropdownTouchStart) {
                 onDropdownTouchStart();
               }
@@ -56,6 +61,9 @@ function SiteHintsDropdown({
             accessibilityState={{ selected: isSelected }}
             hitSlop={{top: 5, bottom: 5, left: 5, right: 5}}
             pointerEvents="auto"
+            onTouchEnd={(e) => {
+              console.log('Pressable onTouchEnd for:', tagStr, 'event:', e.nativeEvent);
+            }}
           >
             <Text style={[styles.hintText, isSelected && styles.hintTextSelected]}>
               {tagStr}
