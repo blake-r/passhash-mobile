@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Text, Pressable, StyleSheet, Platform, type ViewStyle } from "react-native";
+import { Text, Pressable, StyleSheet, Platform } from "react-native";
 
 import type { KeepObj } from "../utils/keeper";
 
@@ -10,16 +10,12 @@ export interface SiteHintsDropdownProps {
   hints: KeepObj[];
   onSelect: (keepObj: KeepObj) => void;
   currentSiteTag?: string;
-  style?: ViewStyle;
-  onDropdownTouchStart?: () => void;
 }
 
 function SiteHintsDropdown({
   hints,
   onSelect,
   currentSiteTag,
-  style,
-  onDropdownTouchStart,
 }: SiteHintsDropdownProps): React.JSX.Element {
   const { t } = useTranslation();
 
@@ -44,9 +40,6 @@ function SiteHintsDropdown({
             }}
             onPressIn={() => {
               console.log('Pressable onPressIn for:', tagStr);
-              if (onDropdownTouchStart) {
-                onDropdownTouchStart();
-              }
             }}
             onPress={() => {
               console.log('HintsDropdown Pressable pressed for:', tagStr);

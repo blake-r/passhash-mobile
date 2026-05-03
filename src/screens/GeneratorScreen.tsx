@@ -509,18 +509,19 @@ function GeneratorScreen({ route }: GeneratorScreenProps): React.JSX.Element {
                     keyboardShouldPersistTaps="always"
                     nestedScrollEnabled={true}
                     accessibilityLabel={t("generator.hints.title")}
+                    onTouchStart={(e) => {
+                      console.log('Dropdown ScrollView onTouchStart');
+                      if (blurTimeoutRef.current) {
+                        clearTimeout(blurTimeoutRef.current);
+                        blurTimeoutRef.current = null;
+                        console.log('Cleared blurTimeoutRef from ScrollView onTouchStart');
+                      }
+                    }}
                   >
                     <SiteHintsDropdown
                       hints={filteredHints}
                       onSelect={handleHintSelect}
                       currentSiteTag={siteTag}
-                      onDropdownTouchStart={() => {
-                        console.log('Dropdown touch start - clearing blur timeout');
-                        if (blurTimeoutRef.current) {
-                          clearTimeout(blurTimeoutRef.current);
-                          blurTimeoutRef.current = null;
-                        }
-                      }}
                     />
                   </ScrollView>
                 )}
