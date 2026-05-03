@@ -523,6 +523,13 @@ function GeneratorScreen({ route }: GeneratorScreenProps): React.JSX.Element {
                       hints={filteredHints}
                       onSelect={handleHintSelect}
                       currentSiteTag={siteTag}
+                      onDropdownTouchStart={() => {
+                        console.log('Dropdown touch start - clearing blur timeout');
+                        if (blurTimeoutRef.current) {
+                          clearTimeout(blurTimeoutRef.current);
+                          blurTimeoutRef.current = null;
+                        }
+                      }}
                     />
                   </ScrollView>
                 )}

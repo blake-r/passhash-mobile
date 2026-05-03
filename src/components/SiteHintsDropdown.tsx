@@ -10,12 +10,14 @@ export interface SiteHintsDropdownProps {
   hints: KeepObj[];
   onSelect: (keepObj: KeepObj) => void;
   currentSiteTag?: string;
+  onDropdownTouchStart?: () => void;
 }
 
 function SiteHintsDropdown({
   hints,
   onSelect,
   currentSiteTag,
+  onDropdownTouchStart,
 }: SiteHintsDropdownProps): React.JSX.Element {
   const { t } = useTranslation();
 
@@ -36,8 +38,11 @@ function SiteHintsDropdown({
             key={`${item.tag}-${index}`}
             style={[styles.hintItem, isSelected && styles.hintItemSelected]}
             onTouchStart={(e) => {
-              console.log('Pressable onTouchStart for:', tagStr, 'event:', e.nativeEvent);
-            }}
+                console.log('Pressable onTouchStart for:', tagStr);
+                if (onDropdownTouchStart) {
+                  onDropdownTouchStart();
+                }
+              }}
             onPressIn={() => {
               console.log('Pressable onPressIn for:', tagStr);
             }}
