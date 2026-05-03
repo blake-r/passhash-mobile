@@ -502,22 +502,8 @@ function GeneratorScreen({ route }: GeneratorScreenProps): React.JSX.Element {
               </View>
                {/* Hints dropdown - positioned absolutely within container */}
                 {showHints && filteredHints.length > 0 && (
-                  <ScrollView
+                  <View
                     style={styles.hintsDropdownWrapper}
-                    contentContainerStyle={styles.hintsDropdownContent}
-                    showsVerticalScrollIndicator={true}
-                    keyboardShouldPersistTaps="always"
-                    nestedScrollEnabled={false}
-                    scrollEnabled={false}
-                    accessibilityLabel={t("generator.hints.title")}
-                    onTouchStart={(e) => {
-                      console.log('Dropdown ScrollView onTouchStart');
-                      if (blurTimeoutRef.current) {
-                        clearTimeout(blurTimeoutRef.current);
-                        blurTimeoutRef.current = null;
-                        console.log('Cleared blurTimeoutRef from ScrollView onTouchStart');
-                      }
-                    }}
                   >
                     <SiteHintsDropdown
                       hints={filteredHints}
@@ -531,7 +517,7 @@ function GeneratorScreen({ route }: GeneratorScreenProps): React.JSX.Element {
                         }
                       }}
                     />
-                  </ScrollView>
+                  </View>
                 )}
             </View>
           </View>
@@ -749,9 +735,6 @@ const styles = StyleSheet.create({
      shadowOpacity: 0.15,
      shadowRadius: 3,
      overflow: "hidden",
-   },
-   hintsDropdownContent: {
-     // Additional padding if needed
    },
   textInput: {
     flex: 1,
