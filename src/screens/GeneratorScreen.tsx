@@ -508,6 +508,7 @@ function GeneratorScreen({ route }: GeneratorScreenProps): React.JSX.Element {
                     showsVerticalScrollIndicator={true}
                     keyboardShouldPersistTaps="always"
                     nestedScrollEnabled={true}
+                    accessibilityLabel={t("generator.hints.title")}
                   >
                     <SiteHintsDropdown
                       hints={filteredHints}
@@ -722,24 +723,27 @@ const styles = StyleSheet.create({
      elevation: 10,
      overflow: "visible",
    },
-  hintsDropdownWrapper: {
-    position: "absolute",
-    top: 48,
-    left: 0,
-    right: 50,
-    zIndex: 99999,
-    elevation: 30,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 4,
-    backgroundColor: "#fff",
-    maxHeight: 200,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 3,
-    overflow: "hidden",
-  },
+   hintsDropdownWrapper: {
+     position: "absolute",
+     top: 48,
+     left: 0,
+     right: 50,
+     zIndex: 99999,
+     elevation: 30,
+     borderWidth: 1,
+     borderColor: "#ccc",
+     borderRadius: 4,
+     backgroundColor: "#fff",
+     maxHeight: 200,
+     shadowColor: "#000",
+     shadowOffset: { width: 0, height: 2 },
+     shadowOpacity: 0.15,
+     shadowRadius: 3,
+     overflow: "hidden",
+   },
+   hintsDropdownContent: {
+     // Additional padding if needed
+   },
   textInput: {
     flex: 1,
     borderWidth: 1,
