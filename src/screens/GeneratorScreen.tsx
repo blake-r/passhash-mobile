@@ -493,7 +493,16 @@ function GeneratorScreen({ route }: GeneratorScreenProps): React.JSX.Element {
               </View>
               {/* Hints dropdown - positioned absolutely within container */}
                {showHints && filteredHints.length > 0 && (
-                 <View style={styles.hintsDropdownWrapper}>
+                 <View 
+                   style={styles.hintsDropdownWrapper}
+                   onTouchStart={() => {
+                     // Clear blur timeout when user interacts with dropdown to prevent it from hiding prematurely
+                     if (blurTimeoutRef.current) {
+                       clearTimeout(blurTimeoutRef.current);
+                       blurTimeoutRef.current = null;
+                     }
+                   }}
+                 >
                    <SiteHintsDropdown
                      hints={filteredHints}
                      onSelect={handleHintSelect}
