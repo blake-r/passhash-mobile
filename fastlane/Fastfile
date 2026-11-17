@@ -1,0 +1,32 @@
+default_platform(:android)
+
+platform :android do
+  desc "Upload a signed AAB to Google Play as a draft release on the production track"
+  lane :release do |options|
+    version_code = options[:version_code].to_i
+    UI.user_error!("Pass version_code: (from scripts/compute-version.sh)") if version_code.zero?
+
+    aab = options[:aab] || Dir["android/app/build/outputs/bundle/release/*.aab"].first
+    UI.user_error!("AAB not found") unless aab && File.exist?(aab)
+
+    existing = %w[production beta alpha internal].flat_map do |track|
+      begin
+        google_play_track_version_codes(track: track)
+      rescue StandardError
+        []
+      end
+    end
+    if existing.any? && version_code <= existing.max
+      UI.user_error!("versionCode #{version_code} must be greater than the highest uploaded one (#{existing.max})")
+    end
+
+    upload_to_play_store(
+      track: "production",
+      release_status: "draft",
+      aab: aab,
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+  end
+end

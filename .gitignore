@@ -55,3 +55,8 @@ e2e/screenshot.spec.ts-snapshots/
 # Qt migration native sources (keep these!)
 !/plugins/native
 
+
+# fastlane / Ruby
+fastlane/report.xml
+fastlane/README.md
+Gemfile.lock
