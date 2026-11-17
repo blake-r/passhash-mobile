@@ -3,7 +3,9 @@
 
 import * as path from "path";
 
-import { test, expect } from "./fixtures";
+import { test } from "./fixtures";
+
+import type { Page } from "@playwright/test";
 
 // Supported languages for screenshot testing
 const LANGUAGES = [
@@ -13,7 +15,7 @@ const LANGUAGES = [
 ] as const;
 
 // Helper function to change language via picker
-async function changeLanguage(page: any, languageCode: string): Promise<void> {
+async function changeLanguage(page: Page, languageCode: string): Promise<void> {
   // Go to Keeper tab where language selector is located
   await page.getByRole("tab", { name: /Keeper|Verwalter|Хранитель/ }).click();
   await page.waitForTimeout(300);
@@ -39,7 +41,7 @@ test.describe("Screenshot Tests - All Languages", () => {
         await page.goto("/");
         // Wait for app to load
         await page.waitForSelector("text=Password Hasher", { timeout: 15000 });
-        
+
         // Change to the target language
         await changeLanguage(page, lang.code);
       });

@@ -15,7 +15,9 @@ The most secure way to manage a password is to transform it into data that canno
 - **Deterministic Password Generation**: Generate the same password for the same site tag and master key combination
 - **Site Tag Hints**: Quick access to previously used site tags with their settings
 - **Keeper**: Export/import saved site settings for backup or transfer
-- **Auto-clear Master Key**: Master key is automatically cleared after 30 seconds when app is backgrounded
+- **Auto-clear Master Key**: Master key is automatically cleared after 30 seconds of inactivity and immediately when the app is backgrounded
+- **Encrypted Keeper Storage**: Keeper data (site tags and their settings) is stored encrypted with AES-256-GCM; the device key lives in the platform secure storage (Android Keystore)
+- **Clipboard Hygiene**: The clipboard is automatically cleared 30 seconds after a password or keeper data is copied
 - **Cross-platform**: Works on Android and iOS
 
 ## Algorithm Compatibility
@@ -38,11 +40,12 @@ Settings are stored using the same format as the QtQuick application:
 
 This ensures seamless migration - when users update from the QtQuick version to this React Native version, all their settings will be preserved.
 
+On first launch, legacy plaintext keeper data is migrated transparently into the encrypted storage format (a versioned envelope: the first byte distinguishes legacy JSON/text from AES-GCM v1 ciphertext).
+
 ## Project Structure
 
 ```
 passhash-mobile/
-├── App.tsx                         # Main application entry point
 ├── app.json                        # Expo configuration
 ├── tsconfig.json                   # TypeScript configuration
 ├── package.json                    # Dependencies and scripts
@@ -58,7 +61,7 @@ passhash-mobile/
 │   ├── utils/
 │   │   ├── site-tag.ts             # Site tag parsing utilities
 │   │   ├── keeper.ts               # Keeper data management
-│   │   ├── hinter.ts               # Site tag hint finder
+│   │   ├── status-colors.ts        # Shared status message colors
 │   │   └── storage.ts              # AsyncStorage wrapper
 │   └── screens/
 │       ├── GeneratorScreen.tsx     # Main password generator screen
@@ -92,6 +95,7 @@ The `./bin/npm` script automatically loads nvm and runs npm with the correct Nod
 **Option 2: Configure fish to auto-load nvm**
 
 Add to `~/.config/fish/config.fish`:
+
 ```fish
 # Auto-load nvm when entering directory with .nvmrc
 function _nvm_auto_load --on-variable PWD
@@ -104,6 +108,7 @@ end
 ```
 
 Then simply run:
+
 ```bash
 npm install
 npm start
@@ -176,9 +181,18 @@ TypeScript declaration files (`.d.ts`) are already created and do not require up
 
 After updating algorithms, it is recommended to:
 
-1. Run tests (if available)
-2. Verify password generation for known combinations
-3. Build and test the application on a device
+1. Run `npm test` — the golden-vector tests verify password generation for known combinations against the upstream algorithm
+2. Build and test the application on a device
+
+## Testing & Quality
+
+```bash
+npm run typecheck   # TypeScript strict check
+npm run lint        # ESLint
+npm run format:check # Prettier
+npm test            # Unit tests (jest), including golden vectors for the algorithm
+npm run test:e2e    # Playwright e2e against the web build (requires `npm run web` on :8081)
+```
 
 ## License
 

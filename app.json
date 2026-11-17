@@ -32,7 +32,8 @@
       "./plugins/withVersion.js",
       "./plugins/withQtMigration.js",
       "./plugins/withReleaseSigning.js",
-      "./plugins/withAndroidIcon.js"
+      "./plugins/withAndroidIcon.js",
+      "expo-secure-store"
     ]
   }
 }

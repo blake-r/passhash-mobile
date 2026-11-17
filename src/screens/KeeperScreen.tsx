@@ -1,78 +1,42 @@
 // KeeperScreen.tsx - Keeper data management screen
 // Based on QtQuick KeeperPage.qml from the original project
 
-import { useFocusEffect } from "@react-navigation/native";
 import * as Clipboard from "expo-clipboard";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { View, TextInput, StyleSheet, Platform, Alert, Text } from "react-native";
 
 import { Button, StatusMessage, LanguageSelector } from "../components";
-import { updateKeeperData } from "../utils/keeper";
-import { loadSettings, saveSettings } from "../utils/storage";
-
-// Vibrant status colors for better contrast
-const STATUS_COLORS = {
-  error: "#D32F2F",    // Red for errors
-  warning: "#F57C00",  // Orange for warnings
-  success: "#388E3C",  // Green for success
-  info: "#1976D2",     // Blue for info
-};
-
-interface KeeperScreenProps {
-  onStatusMessage?: (text: string, color: string) => void;
-}
+import { useAppStore } from "../state/app-store";
+import { copyWithAutoClear } from "../utils/clipboard";
+import { serializeKeeperData, isValidKeeperText } from "../utils/keeper";
+import { STATUS_COLORS } from "../utils/status-colors";
 
 interface StatusMessage {
   text: string;
   color: string;
 }
 
-function KeeperScreen({ onStatusMessage }: KeeperScreenProps): React.JSX.Element {
+function KeeperScreen(): React.JSX.Element {
   const { t } = useTranslation();
-  const [keeperData, setKeeperData] = useState("");
+  const keeperData = useAppStore((state) => state.keeperData);
+  const setKeeperText = useAppStore((state) => state.setKeeperText);
   const [statusMsg, setStatusMsg] = useState<StatusMessage>({ text: "", color: "gray" });
 
-  const showStatus = useCallback(
-    (text: string, color: string): void => {
-      setStatusMsg({ text, color });
-      if (onStatusMessage) {
-        onStatusMessage(text, color);
-      }
-    },
-    [onStatusMessage],
-  );
+  const keeperText = useMemo(() => serializeKeeperData(keeperData), [keeperData]);
 
-  // Load keeper data on mount
-  useEffect((): void => {
-    loadSettings().then((settings) => {
-      if (settings.keeperData) {
-        setKeeperData(settings.keeperData);
-        updateKeeperData(settings.keeperData);
-      }
-    });
+  const showStatus = useCallback((text: string, color: string): void => {
+    setStatusMsg({ text, color });
   }, []);
-
-  // Reload keeper data when screen comes into focus
-  useFocusEffect(
-    useCallback((): void => {
-      loadSettings().then((settings) => {
-        if (settings.keeperData) {
-          setKeeperData(settings.keeperData);
-          updateKeeperData(settings.keeperData);
-        }
-      });
-    }, []),
-  );
 
   const handleExport = useCallback(async (): Promise<void> => {
     try {
-      await Clipboard.setStringAsync(keeperData);
+      await copyWithAutoClear(keeperText);
       showStatus(t("keeper.exportSuccess"), STATUS_COLORS.success);
     } catch {
       showStatus(t("keeper.exportFailed"), STATUS_COLORS.error);
     }
-  }, [keeperData, showStatus, t]);
+  }, [keeperText, showStatus, t]);
 
   const handleImport = useCallback(async (): Promise<void> => {
     try {
@@ -83,32 +47,31 @@ function KeeperScreen({ onStatusMessage }: KeeperScreenProps): React.JSX.Element
         return;
       }
 
-      Alert.alert(
-        t("keeper.importConfirmation.title"),
-        t("keeper.importConfirmation.message"),
-        [
-          {
-            text: t("keeper.importConfirmation.cancel"),
-            style: "cancel",
-            onPress: (): void => {
-              showStatus(t("keeper.importConfirmation.unchanged"), STATUS_COLORS.info);
-            },
+      if (!isValidKeeperText(clipboardContent)) {
+        showStatus(t("keeper.invalidClipboard"), STATUS_COLORS.error);
+        return;
+      }
+
+      Alert.alert(t("keeper.importConfirmation.title"), t("keeper.importConfirmation.message"), [
+        {
+          text: t("keeper.importConfirmation.cancel"),
+          style: "cancel",
+          onPress: (): void => {
+            showStatus(t("keeper.importConfirmation.unchanged"), STATUS_COLORS.info);
           },
-          {
-            text: t("keeper.importConfirmation.ok"),
-            onPress: async (): Promise<void> => {
-              setKeeperData(clipboardContent);
-              updateKeeperData(clipboardContent);
-              await saveSettings({ keeperData: clipboardContent });
-              showStatus(t("keeper.importSuccess"), STATUS_COLORS.warning);
-            },
+        },
+        {
+          text: t("keeper.importConfirmation.ok"),
+          onPress: async (): Promise<void> => {
+            await setKeeperText(clipboardContent);
+            showStatus(t("keeper.importSuccess"), STATUS_COLORS.warning);
           },
-        ],
-      );
+        },
+      ]);
     } catch {
       showStatus(t("keeper.importFailed"), STATUS_COLORS.error);
     }
-  }, [showStatus, t]);
+  }, [setKeeperText, showStatus, t]);
 
   return (
     <View style={styles.container}>
@@ -122,7 +85,7 @@ function KeeperScreen({ onStatusMessage }: KeeperScreenProps): React.JSX.Element
       <View style={styles.textAreaContainer} accessibilityLabel={t("tabs.keeper")}>
         <TextInput
           style={styles.textArea}
-          value={keeperData}
+          value={keeperText}
           multiline={true}
           editable={false}
           selectTextOnFocus
@@ -143,11 +106,9 @@ function KeeperScreen({ onStatusMessage }: KeeperScreenProps): React.JSX.Element
       </View>
 
       {/* Empty state hint */}
-      {!keeperData || keeperData.trim().length === 0 ? (
+      {!keeperText || keeperText.trim().length === 0 ? (
         <View style={styles.emptyStateContainer} accessibilityRole="summary">
-          <Text style={styles.emptyStateText}>
-            {t("keeper.emptyState")}
-          </Text>
+          <Text style={styles.emptyStateText}>{t("keeper.emptyState")}</Text>
         </View>
       ) : null}
     </View>

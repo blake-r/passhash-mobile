@@ -1,4 +1,4 @@
-// utils-keeper.ts - Keeper data utilities
+// keeper.ts - Keeper data utilities (pure functions, no module state)
 // Based on QtQuick utils-keeper.js from the original project
 // This module maintains compatibility with the QtQuick storage format
 
@@ -19,8 +19,6 @@ export interface KeeperSettings {
   [key: string]: boolean | number | null;
 }
 
-const DATA = new Map<string, KeepObj>();
-
 const SETTING_CODES = new Map<string, keyof KeeperSettings>([
   ["D", "digits"],
   ["P", "punctuation"],
@@ -29,8 +27,6 @@ const SETTING_CODES = new Map<string, keyof KeeperSettings>([
   ["O", "digitsOnly"],
 ]);
 
-let changeDataCallback: ((data: string) => void) | null = null;
-
 function createKeepObj(siteTag: string, settings: KeeperSettings): KeepObj {
   const keepObj = createSiteObj(siteTag) as KeepObj;
   keepObj.path = keepObj.tag.split(".");
@@ -38,34 +34,32 @@ function createKeepObj(siteTag: string, settings: KeeperSettings): KeepObj {
   return keepObj;
 }
 
-export function setChangeDataCallback(callback: (data: string) => void): void {
-  changeDataCallback = callback;
-}
-
-export function updateKeeperData(keeperTxt: string): void {
-  DATA.clear();
+export function parseKeeperText(keeperTxt: string): Map<string, KeepObj> {
+  const data = new Map<string, KeepObj>();
   keeperTxt.split("\n").forEach(function (line) {
     line = line.trim();
     if (!line.length) {
       return;
     }
     const keepObj = parseKeeperRecord(line);
-    DATA.set(keepObj.tag, keepObj);
+    data.set(keepObj.tag, keepObj);
   });
+  return data;
 }
 
-export function storeSiteTag(siteTag: string, settings: KeeperSettings): string {
+export function upsertSiteTag(
+  data: Map<string, KeepObj>,
+  siteTag: string,
+  settings: KeeperSettings,
+): Map<string, KeepObj> {
+  const next = new Map(data);
   const keepObj = createKeepObj(siteTag, settings);
-  DATA.set(keepObj.tag, keepObj);
-  const keeperText = makeKeeperText();
-  if (changeDataCallback) {
-    changeDataCallback(keeperText);
-  }
-  return keeperText;
+  next.set(keepObj.tag, keepObj);
+  return next;
 }
 
 function parseKeeperRecord(record: string): KeepObj {
-  // Example: "google DpMso8"
+  // Example: "google=DpMso8"
   const array = record.split("=");
   const settingsString = array.length > 1 ? array.pop()! : "";
   const settings = parseKeeperSettings(settingsString);
@@ -101,9 +95,9 @@ export function parseKeeperSettings(str: string): KeeperSettings {
   return result;
 }
 
-function makeKeeperText(): string {
+export function serializeKeeperData(data: Map<string, KeepObj>): string {
   const result: string[] = [];
-  DATA.forEach(function (keepObj) {
+  data.forEach(function (keepObj) {
     const siteTag = toString(keepObj);
     const settingsString = makeSettingsText(keepObj.settings);
     const record = [siteTag, settingsString].join("=");
@@ -127,17 +121,21 @@ function makeSettingsText(settings: KeeperSettings): string {
   return result.join("");
 }
 
+/**
+ * Validates that a text looks like keeper data: every non-empty line is
+ * "<site tag>=<setting codes>" where codes are D/P/M/S/O letters and digits.
+ */
+export function isValidKeeperText(keeperTxt: string): boolean {
+  const lines = keeperTxt
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0);
+  return lines.length > 0 && lines.every((line) => /^[^=]+=[dDpPmMsSoO0-9]*$/.test(line));
+}
+
 export function ifnull<T>(value: T | null | undefined, defval: T): T {
   if (value === null || value === undefined) {
     return defval;
   }
   return value;
-}
-
-export function getAllData(): Map<string, KeepObj> {
-  return new Map(DATA);
-}
-
-export function getData(): Map<string, KeepObj> {
-  return DATA;
 }

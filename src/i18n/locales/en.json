@@ -21,6 +21,7 @@
       "empty": "Master key should not be empty",
       "hasSpaces": "Master key has spaces around",
       "unmask": "Unmask",
+      "mask": "Mask",
       "autoClearWarning": "Application was invisible too long, clear master key value."
     },
     "password": {
@@ -70,6 +71,7 @@
       "unchanged": "Keeper data is left unchanged"
     },
     "emptyClipboard": "Clipboard is empty",
+    "invalidClipboard": "Clipboard does not contain keeper data",
     "emptyState": "Press 'Export' to save data or 'Import' to load data"
   },
   "settings": {

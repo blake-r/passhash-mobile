@@ -31,7 +31,9 @@ function StatusMessage({ text, color, style }: StatusMessageProps): React.JSX.El
         }).start();
       }, STATUS_DURATION);
 
-      return (): void => { clearTimeout(fadeTimer); };
+      return (): void => {
+        clearTimeout(fadeTimer);
+      };
     } else {
       // Reset fade animation when text is cleared
       fadeAnim.setValue(0);

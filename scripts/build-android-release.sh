@@ -29,6 +29,18 @@ export PATH="$JAVA_HOME/bin:$PATH"
 KEYSTORE_PASSWORD="${ANDROID_KEYSTORE_PASSWORD:-}"
 KEYSTORE_KEY_PASSWORD="${ANDROID_KEYSTORE_KEY_PASSWORD:-$KEYSTORE_PASSWORD}"
 
+if [ -z "$KEYSTORE_PASSWORD" ]; then
+    echo "Error: ANDROID_KEYSTORE_PASSWORD is not set (add it to .env or the environment)"
+    exit 1
+fi
+
+# Pass signing configuration to Gradle via environment, not -P flags
+# (project properties are visible in the process list; env vars are not).
+export KEYSTORE_STORE_PASSWORD="$KEYSTORE_PASSWORD"
+export KEYSTORE_KEY_PASSWORD="$KEYSTORE_KEY_PASSWORD"
+export KEYSTORE_PATH
+export KEYSTORE_ALIAS
+
 echo "=== Building Android Release AAB (multi-ABI, 16k aligned) ==="
 echo "JAVA_HOME: $JAVA_HOME"
 echo "ANDROID_SDK_ROOT: $ANDROID_SDK_ROOT"
@@ -73,11 +85,7 @@ echo "Building release AAB..."
 cd android
 ./gradlew bundleRelease \
     -PreactNativeArchitectures=armeabi-v7a,arm64-v8a \
-    -Pandroid.useAndroidX=true \
-    -Pkeystore.path="$KEYSTORE_PATH" \
-    -Pkeystore.alias="$KEYSTORE_ALIAS" \
-    -Pkeystore.storePassword="$KEYSTORE_PASSWORD" \
-    -Pkeystore.keyPassword="${KEYSTORE_KEY_PASSWORD:-$KEYSTORE_PASSWORD}"
+    -Pandroid.useAndroidX=true
 
 cd ..
 

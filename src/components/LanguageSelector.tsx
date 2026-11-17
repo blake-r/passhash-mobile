@@ -2,9 +2,9 @@
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Picker } from "@react-native-picker/picker";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { View, StyleSheet, Platform, ActivityIndicator } from "react-native";
+import { View, StyleSheet, Platform } from "react-native";
 
 import { supportedLanguages, LanguageCode, LANGUAGE_STORAGE_KEY } from "../i18n";
 
@@ -15,26 +15,6 @@ export interface LanguageSelectorProps {
 function LanguageSelector({ onLanguageChange }: LanguageSelectorProps): React.JSX.Element {
   const { i18n } = useTranslation();
   const [currentLanguage, setCurrentLanguage] = useState<LanguageCode>(i18n.language as LanguageCode);
-  const [isLoading, setIsLoading] = useState(true);
-
-  // Load saved language on mount
-  useEffect(() => {
-    const loadSavedLanguage = async (): Promise<void> => {
-      try {
-        const savedLanguage = await AsyncStorage.getItem(LANGUAGE_STORAGE_KEY);
-        if (savedLanguage && supportedLanguages.some(lang => lang.code === savedLanguage)) {
-          await i18n.changeLanguage(savedLanguage);
-          setCurrentLanguage(savedLanguage as LanguageCode);
-        }
-      } catch (error) {
-        console.error("Error loading language:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadSavedLanguage();
-  }, [i18n]);
 
   const handleValueChange = async (value: LanguageCode): Promise<void> => {
     try {
@@ -49,14 +29,6 @@ function LanguageSelector({ onLanguageChange }: LanguageSelectorProps): React.JS
     }
   };
 
-  if (isLoading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="small" color="#007AFF" />
-      </View>
-    );
-  }
-
   return (
     <View style={styles.container}>
       <Picker
@@ -69,12 +41,7 @@ function LanguageSelector({ onLanguageChange }: LanguageSelectorProps): React.JS
         accessibilityHint="Select application language"
       >
         {supportedLanguages.map((lang) => (
-          <Picker.Item
-            key={lang.code}
-            label={`${lang.nativeName} (${lang.name})`}
-            value={lang.code}
-            color="#333"
-          />
+          <Picker.Item key={lang.code} label={`${lang.nativeName} (${lang.name})`} value={lang.code} color="#333" />
         ))}
       </Picker>
     </View>
@@ -86,10 +53,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginVertical: 8,
-  },
-  loadingContainer: {
-    padding: 8,
-    alignItems: "center",
   },
   picker: {
     flex: 1,

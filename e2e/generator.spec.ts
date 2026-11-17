@@ -104,8 +104,8 @@ test.describe("Generator Screen", () => {
     const unmaskButton = page.getByRole("button", { name: "Unmask" });
     await unmaskButton.click();
 
-    // Master key should be visible - check by aria-label or testid
-    await expect(unmaskButton).toBeVisible();
+    // After unmasking the button offers to mask the key again
+    await expect(page.getByRole("button", { name: "Mask" })).toBeVisible();
   });
 
   test("should toggle requirements settings", async ({ page }) => {
