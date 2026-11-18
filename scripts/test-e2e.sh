@@ -121,11 +121,9 @@ fi
 "$ADB" shell settings put secure stylus_handwriting_enabled 0 2>/dev/null || true
 
 echo "Installing $APK..."
-if [[ "$MODE" == "release" ]]; then
-  # Release (upload key) and debug signatures differ — replace the package
-  "$ADB" uninstall "$APP_ID" >/dev/null 2>&1 || true
-fi
-"$ADB" install -r "$APK"
+# Debug and release (upload key) signatures differ — always start fresh
+"$ADB" uninstall "$APP_ID" >/dev/null 2>&1 || true
+"$ADB" install "$APK"
 
 # --- Metro (debug builds load the JS bundle from the dev server) -----------------
 METRO_PID=""
