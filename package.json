@@ -16,10 +16,9 @@
     "lint:fix": "eslint . --ext .ts,.tsx,.js --fix",
     "format": "prettier --write \"**/*.{ts,tsx,json,yaml,yml,md}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,json,yaml,yml,md}\"",
-    "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui",
-    "test:e2e:debug": "playwright test --debug",
-    "screenshots": "playwright test e2e/screenshots.spec.ts"
+    "test:e2e": "./scripts/test-e2e.sh",
+    "test:e2e:release": "./scripts/test-e2e.sh --release",
+    "install-maestro": "./scripts/install-maestro.sh"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
@@ -50,13 +49,11 @@
   "jest": {
     "preset": "jest-expo",
     "testPathIgnorePatterns": [
-      "/node_modules/",
-      "/e2e/"
+      "/node_modules/"
     ]
   },
   "devDependencies": {
     "@expo/image-utils": "^0.8.8",
-    "@playwright/test": "^1.58.2",
     "@types/jest": "29.5.14",
     "@types/node": "^25.2.3",
     "@types/react": "~19.1.10",
@@ -76,5 +73,6 @@
     "sharp": "^0.34.5",
     "typescript": "~5.9.2",
     "typescript-eslint": "^8.55.0"
-  }
+  },
+  "license": "MIT"
 }

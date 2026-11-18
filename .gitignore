@@ -11,7 +11,6 @@ expo-env.d.ts
 
 # Native
 .kotlin/
-*.orig.*
 *.jks
 *.p8
 *.p12
@@ -23,8 +22,6 @@ expo-env.d.ts
 
 # debug
 npm-debug.*
-yarn-debug.*
-yarn-error.*
 
 # macOS
 .DS_Store
@@ -37,21 +34,13 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
-# Playwright
-playwright-report/
-playwright/.cache/
-test-results/
-
-# Screenshots (keep directory, ignore files)
-e2e/screenshots/*.png
-!e2e/screenshots/.gitkeep
-
 # generated native folders
 /ios
 /android
-!/.android
-e2e/screenshot.spec.ts-snapshots/
 
 # Qt migration native sources (keep these!)
 !/plugins/native
 
+# Maestro CLI binaries (downloaded locally by scripts/install-maestro.sh)
+maestro/bin/
+maestro/lib/

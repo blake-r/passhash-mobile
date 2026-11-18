@@ -1,0 +1,25 @@
+appId: ru.co_dev.passhash
+tags:
+  - core
+---
+# Persistence: generated site tag survives a full app restart
+# (AsyncStorage + SecureStore round-trip).
+- clearState
+- launchApp
+- tapOn:
+    id: "site-tag-input"
+- inputText: "relaunch-check"
+- tapOn:
+    id: "master-key-input"
+- inputText: "test"
+- tapOn:
+    id: "generate-button"
+- assertVisible:
+    id: "password-output"
+- stopApp
+- launchApp
+- tapOn:
+    id: "tab-keeper"
+- assertVisible:
+    id: "keeper-data-textarea"
+    text: ".*relaunch-check.*"

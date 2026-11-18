@@ -15,8 +15,8 @@ if [ -f "$PROJECT_ROOT/.env" ]; then
 fi
 
 # Configuration
-JAVA_HOME="${JAVA_HOME:-$HOME/projects/tools/jdk-17.0.13+11/Contents/Home}"
-ANDROID_SDK_ROOT="${ANDROID_SDK_ROOT:-$HOME/projects/tools/android-sdk}"
+JAVA_HOME="${JAVA_HOME:-$HOME/Projects/sdks/jdk-17.0.21+9/Contents/Home}"
+ANDROID_SDK_ROOT="${ANDROID_SDK_ROOT:-$HOME/Projects/sdks/android-sdk}"
 KEYSTORE_PATH="${KEYSTORE_PATH:-$HOME/projects/QtProjects/android_release.keystore}"
 KEYSTORE_ALIAS="${KEYSTORE_ALIAS:-oleg blednov}"
 

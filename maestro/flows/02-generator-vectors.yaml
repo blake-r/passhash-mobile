@@ -1,0 +1,40 @@
+appId: ru.co_dev.passhash
+tags:
+  - core
+---
+# Reference-vector checks against wijjo Password Hasher.
+# Vectors computed from src/algorithms/passhash.js (the vendored wijjo source).
+- clearState
+- launchApp
+# Vector 1: noSpecial restriction on
+#   tag "bank", key "correct horse battery staple", length 8, noSpecial
+- tapOn:
+    id: "switch-generator.restrictions.noSpecial"
+- tapOn:
+    id: "site-tag-input"
+- inputText: "bank"
+- tapOn:
+    id: "master-key-input"
+- inputText: "correct horse battery staple"
+- tapOn:
+    id: "generate-button"
+- assertVisible:
+    id: "password-output"
+    text: "DhzmzW2Y"
+# Vector 2: defaults, versioned site tag
+#   tag "github.com:2", key "hunter2", length 8
+- tapOn:
+    id: "switch-generator.restrictions.noSpecial"
+- tapOn:
+    id: "site-tag-input"
+- eraseText: 50
+- inputText: "github.com:2"
+- tapOn:
+    id: "master-key-input"
+- eraseText: 50
+- inputText: "hunter2"
+- tapOn:
+    id: "generate-button"
+- assertVisible:
+    id: "password-output"
+    text: 'aGBCP1\(A'

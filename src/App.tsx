@@ -120,6 +120,7 @@ function App(): React.JSX.Element {
           options={{
             title: t("tabs.generator"),
             tabBarAccessibilityLabel: t("tabs.generator"),
+            tabBarButtonTestID: "tab-generator",
           }}
         />
         <Tab.Screen
@@ -128,6 +129,7 @@ function App(): React.JSX.Element {
           options={{
             title: t("tabs.keeper"),
             tabBarAccessibilityLabel: t("tabs.keeper"),
+            tabBarButtonTestID: "tab-keeper",
           }}
         />
       </Tab.Navigator>

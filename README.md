@@ -191,10 +191,13 @@ npm run typecheck   # TypeScript strict check
 npm run lint        # ESLint
 npm run format:check # Prettier
 npm test            # Unit tests (jest), including golden vectors for the algorithm
-npm run test:e2e    # Playwright e2e against the web build (requires `npm run web` on :8081)
+npm run test:e2e    # Maestro e2e on Android emulator/device (happy path, vectors, relaunch, Qt migration)
+npm run test:e2e:release # smoke flow against the release APK
 ```
 
 ## License
+
+The application's own code is released under the MIT License (see `LICENSE`).
 
 The password hashing algorithm is based on the original Password Hasher extension by Steve Cooper:
 

@@ -1,0 +1,20 @@
+appId: ru.co_dev.passhash
+tags:
+  - migration
+---
+# Qt settings migration. Requires the fixture pushed by scripts/test-e2e.sh
+# (maestro/fixtures/qt-settings.conf -> files/.config/Oleg Blednov/Password Hasher.conf)
+# onto a freshly cleared app. Do NOT clearState here — it would wipe the fixture.
+- launchApp
+- tapOn:
+    id: "tab-keeper"
+# Migrated keeper entries: latin tags and a Cyrillic one decoded from \xNN escapes
+- assertVisible:
+    id: "keeper-data-textarea"
+    text: ".*example\\.com.*"
+- assertVisible:
+    id: "keeper-data-textarea"
+    text: ".*github\\.com.*"
+- assertVisible:
+    id: "keeper-data-textarea"
+    text: ".*кошелек.*"
