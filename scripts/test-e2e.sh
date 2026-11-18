@@ -75,7 +75,22 @@ if [[ ! -x "$MAESTRO" ]]; then
   scripts/install-maestro.sh
 fi
 
-# --- Device ----------------------------------------------------------------------
+# --- Build (no device needed) ------------------------------------------------------
+APK=""
+if [[ "$MODE" == "release" ]]; then
+  scripts/build-android-release.sh
+  APK="$(ls -t android/app/build/outputs/apk/release/*.apk | head -1)"
+else
+  APK_PATH="android/app/build/outputs/apk/debug/app-debug.apk"
+  if [[ "$FORCE_BUILD" == "1" || ! -d android || ! -f "$APK_PATH" ]]; then
+    echo "Prebuilding native project and assembling debug APK..."
+    npx expo prebuild --platform android
+    (cd android && ./gradlew app:assembleDebug -x lint -x test --configure-on-demand --build-cache)
+  fi
+  APK="$APK_PATH"
+fi
+
+# --- Device (boot the emulator only after the build) --------------------------------
 if [[ -z "$("$ADB" devices | awk 'NR>1 && $2=="device" {print $1}')" ]]; then
   if [[ ! -x "$EMULATOR" ]]; then
     echo "Error: no device connected and emulator binary not found at $EMULATOR" >&2
@@ -91,16 +106,25 @@ if [[ -z "$("$ADB" devices | awk 'NR>1 && $2=="device" {print $1}')" ]]; then
 fi
 "$ADB" devices
 
-# --- Build / install -------------------------------------------------------------
-if [[ "$MODE" == "release" ]]; then
-  scripts/build-android-release.sh
-  APK="$(ls -t android/app/build/outputs/apk/release/*.apk | head -1)"
-  "$ADB" install -r "$APK"
-else
-  if [[ "$FORCE_BUILD" == "1" || ! -d android ]] || ! "$ADB" shell pm list packages | grep -q "$APP_ID"; then
-    echo "Building and installing debug app..."
-    npx expo run:android --device
+# Quiet down emulator first-run intrusions that steal taps/input during flows
+"$ADB" shell settings put secure stylus_handwriting_enabled 0 2>/dev/null || true
+
+echo "Installing $APK..."
+"$ADB" install -r "$APK"
+
+# --- Metro (debug builds load the JS bundle from the dev server) -----------------
+METRO_PID=""
+if [[ "$MODE" == "debug" ]]; then
+  if ! curl -sf "http://localhost:8081/status" >/dev/null 2>&1; then
+    echo "Starting Metro dev server..."
+    EXPO_PUBLIC_DISABLE_LOGBOX=1 npx expo start --port 8081 >/tmp/passhash-metro.log 2>&1 &
+    METRO_PID=$!
+    trap '[[ -n "$METRO_PID" ]] && kill "$METRO_PID" 2>/dev/null || true' EXIT
+    until curl -sf "http://localhost:8081/status" >/dev/null 2>&1; do
+      sleep 1
+    done
   fi
+  echo "Metro is up."
 fi
 
 # --- Flows ------------------------------------------------------------------------

@@ -10,6 +10,10 @@ tags:
     id: "site-tag-input"
 - tapOn:
     id: "site-tag-input"
+# Dismiss Gboard stylus promo if it pops when the keyboard opens
+- tapOn:
+    text: "Cancel"
+    optional: true
 - inputText: "example.com"
 - tapOn:
     id: "master-key-input"

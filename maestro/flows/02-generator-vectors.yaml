@@ -12,6 +12,10 @@ tags:
     id: "switch-generator.restrictions.noSpecial"
 - tapOn:
     id: "site-tag-input"
+# Dismiss Gboard stylus promo if it pops when the keyboard opens
+- tapOn:
+    text: "Cancel"
+    optional: true
 - inputText: "bank"
 - tapOn:
     id: "master-key-input"

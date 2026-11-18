@@ -33,7 +33,15 @@
       "./plugins/withQtMigration.js",
       "./plugins/withReleaseSigning.js",
       "./plugins/withAndroidIcon.js",
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "minSdkVersion": 26
+          }
+        }
+      ]
     ]
   }
 }
