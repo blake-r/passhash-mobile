@@ -44,3 +44,8 @@ npm-debug.*
 # Maestro CLI binaries (downloaded locally by scripts/install-maestro.sh)
 maestro/bin/
 maestro/lib/
+
+# fastlane / Ruby
+fastlane/report.xml
+fastlane/README.md
+Gemfile.lock

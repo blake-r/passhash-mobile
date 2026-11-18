@@ -140,13 +140,31 @@ npm run web
 
 ### Android
 
-```bash
-# Build APK
-npx expo export:build --platform android --type apk
+Local signed AAB build (requires `.env` with `ANDROID_KEYSTORE_PASSWORD`, see
+`scripts/build-android-release.sh`):
 
-# Or build AAB for Google Play
-npx expo export:build --platform android --type app-bundle
+```bash
+npm run android:release
 ```
+
+### Google Play upload
+
+The `release-android` GitHub Actions workflow (manual `workflow_dispatch` trigger)
+builds the signed AAB, validates it with bundletool and uploads it via fastlane as a
+**draft** release on the production track. Publishing is done manually in Play Console.
+
+Release notes come from `fastlane/metadata/android/<locale>/changelogs/default.txt`
+(locales: en-US, ru-RU, de-DE) — edit them before triggering the workflow; the workflow
+copies them to `<versionCode>.txt` for the build being uploaded.
+
+Required GitHub secrets:
+
+| Secret                            | Content                                                           |
+| --------------------------------- | ----------------------------------------------------------------- |
+| `PLAY_STORE_SERVICE_ACCOUNT_JSON` | JSON key of a Google Play service account with release permission |
+| `KEYSTORE_BASE64`                 | `base64 -i upload.keystore` of the registered upload keystore     |
+| `KEYSTORE_ALIAS`                  | key alias inside the keystore                                     |
+| `ANDROID_KEYSTORE_PASSWORD`       | keystore/key password                                             |
 
 ### iOS
 
