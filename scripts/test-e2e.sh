@@ -78,8 +78,19 @@ fi
 # --- Build (no device needed) ------------------------------------------------------
 APK=""
 if [[ "$MODE" == "release" ]]; then
-  scripts/build-android-release.sh
-  APK="$(ls -t android/app/build/outputs/apk/release/*.apk | head -1)"
+  if [[ -f .env ]]; then
+    set -a; source .env; set +a
+  fi
+  # Signing via environment (see plugins/withReleaseSigning.js)
+  export KEYSTORE_STORE_PASSWORD="${KEYSTORE_STORE_PASSWORD:-${ANDROID_KEYSTORE_PASSWORD:-}}"
+  export KEYSTORE_KEY_PASSWORD="${KEYSTORE_KEY_PASSWORD:-$KEYSTORE_STORE_PASSWORD}"
+  export KEYSTORE_PATH KEYSTORE_ALIAS
+  echo "Prebuilding native project and assembling release APK..."
+  npx expo prebuild --platform android
+  # Signing env must reach the JVM: a reused Gradle daemon keeps its original
+  # environment, so restart it before building with signing credentials.
+  (cd android && ./gradlew --stop >/dev/null 2>&1; ./gradlew app:assembleRelease -x lint -x test)
+  APK="android/app/build/outputs/apk/release/app-release.apk"
 else
   APK_PATH="android/app/build/outputs/apk/debug/app-debug.apk"
   if [[ "$FORCE_BUILD" == "1" || ! -d android || ! -f "$APK_PATH" ]]; then
@@ -110,6 +121,10 @@ fi
 "$ADB" shell settings put secure stylus_handwriting_enabled 0 2>/dev/null || true
 
 echo "Installing $APK..."
+if [[ "$MODE" == "release" ]]; then
+  # Release (upload key) and debug signatures differ — replace the package
+  "$ADB" uninstall "$APP_ID" >/dev/null 2>&1 || true
+fi
 "$ADB" install -r "$APK"
 
 # --- Metro (debug builds load the JS bundle from the dev server) -----------------
