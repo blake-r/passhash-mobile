@@ -18,10 +18,14 @@ module.exports = function withReleaseSigning(config) {
                 storePassword storePasswordVal
                 keyAlias aliasVal
                 keyPassword keyPasswordVal ?: storePasswordVal
-            } else if (System.getenv('DEBUG') == 'true') {
-                println "DEBUG: Release signing not configured, skipping for debug build"
             } else {
-                throw new GradleException("Release signing password is missing! Set KEYSTORE_STORE_PASSWORD, KEYSTORE_PATH, KEYSTORE_ALIAS in .env or pass -Pkeystore.storePassword=...")
+                // signingConfigs are evaluated for every build, so fail only when a
+                // release task is actually in the graph — debug builds must not break
+                gradle.taskGraph.whenReady { graph ->
+                    if (graph.allTasks.any { it.name.toLowerCase().contains('release') }) {
+                        throw new GradleException("Release signing password is missing! Set KEYSTORE_STORE_PASSWORD, KEYSTORE_PATH, KEYSTORE_ALIAS in .env or pass -Pkeystore.storePassword=...")
+                    }
+                }
             }
         }`;
 

@@ -14,7 +14,15 @@ export interface ButtonProps {
   testID?: string;
 }
 
-function Button({ onPress, title, disabled = false, small = false, style, textStyle, testID }: ButtonProps): React.JSX.Element {
+function Button({
+  onPress,
+  title,
+  disabled = false,
+  small = false,
+  style,
+  textStyle,
+  testID,
+}: ButtonProps): React.JSX.Element {
   const { t } = useTranslation();
 
   return (

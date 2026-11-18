@@ -1,0 +1,33 @@
+appId: ru.co_dev.passhash
+tags:
+  - core
+---
+# Happy path: generate a password from site tag + master key,
+# verify it against the reference Password Hasher vector (default settings:
+# length 8, digits+punctuation+mixedCase on), then check the site tag
+# landed in the Keeper.
+- clearState
+- launchApp
+- assertVisible:
+    id: "site-tag-input"
+- tapOn:
+    id: "site-tag-input"
+# Dismiss Gboard stylus promo if it pops when the keyboard opens
+- tapOn:
+    text: "Cancel"
+    optional: true
+- inputText: "example.com"
+- tapOn:
+    id: "master-key-input"
+- inputText: "test"
+- tapOn:
+    id: "generate-button"
+- assertVisible:
+    id: "password-output"
+    text: 'Tx2Gst\)k'
+- hideKeyboard
+- tapOn:
+    id: "tab-keeper"
+- assertVisible:
+    id: "keeper-data-textarea"
+    text: ".*example\\.com.*"

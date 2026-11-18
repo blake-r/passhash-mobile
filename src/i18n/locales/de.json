@@ -20,7 +20,8 @@
       "placeholder": "Ihre geheime Phrase",
       "empty": "Hauptschlüssel darf nicht leer sein",
       "hasSpaces": "Hauptschlüssel hat Leerzeichen",
-      "unmask": "Unmask",
+      "unmask": "Anzeigen",
+      "mask": "Verbergen",
       "autoClearWarning": "Anwendung war zu lange unsichtbar, Hauptschlüssel wird gelöscht."
     },
     "password": {
@@ -70,6 +71,7 @@
       "unchanged": "Verwalter-Daten bleiben unverändert"
     },
     "emptyClipboard": "Zwischenablage ist leer",
+    "invalidClipboard": "Zwischenablage enthält keine Keeper-Daten",
     "emptyState": "Drücken Sie 'Exportieren', um Daten zu speichern, oder 'Importieren', um Daten zu laden"
   },
   "settings": {

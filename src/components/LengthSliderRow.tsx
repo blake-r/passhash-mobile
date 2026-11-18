@@ -11,12 +11,7 @@ export interface LengthSliderRowProps {
   maxLength?: number;
 }
 
-function LengthSliderRow({
-  value,
-  onChange,
-  minLength = 4,
-  maxLength = 26,
-}: LengthSliderRowProps): React.JSX.Element {
+function LengthSliderRow({ value, onChange, minLength = 4, maxLength = 26 }: LengthSliderRowProps): React.JSX.Element {
   if (Platform.OS === "web") {
     return (
       <View style={styles.container}>
@@ -26,7 +21,7 @@ function LengthSliderRow({
             min={minLength}
             max={maxLength}
             value={value}
-            onChange={(e) => onChange(parseInt((e.target as any).value, 10))}
+            onChange={(e) => onChange(parseInt((e.target as unknown as { value: string }).value, 10))}
             style={styles.webSlider}
             data-testid="password-length-slider"
           />

@@ -6,6 +6,15 @@ Collection of information
 
 Our top priority is customer data security and, as such, we exercise the no logs policy. We may process only minimal user data, only as much as it is absolutely necessary to maintain the Mobile Application and Services. Information collected automatically is used only to identify potential cases of abuse and establish statistical information regarding the usage of the Mobile Application and Services. This statistical information is not otherwise aggregated in such a way that would identify any particular user of the system.
 
+Data stored on your device
+
+The Mobile Application works entirely offline and does not transmit any of your data to us or to third parties:
+
+- The master key and generated passwords are never stored. The master key is cleared from memory after 30 seconds of inactivity and immediately when the Mobile Application is backgrounded.
+- Copied passwords and exported keeper data are automatically removed from the system clipboard 30 seconds after copying.
+- Keeper data (site tags and their generation settings) is stored only on your device, encrypted with AES-256-GCM. The encryption key is generated on first launch and kept in the platform secure storage (Android Keystore), never leaving the device.
+- When you explicitly export keeper data, it is copied to the clipboard in plaintext at your request so you can transfer it between devices; the clipboard copy is auto-cleared after 30 seconds.
+
 Use and processing of collected information
 
 In order to make the Mobile Application and Services available to you, or to meet a legal obligation, we may need to collect and use certain Personal Information. If you do not provide the information that we request, we may not be able to provide you with the requested products or services. Any of the information we collect from you may be used for the following purposes:

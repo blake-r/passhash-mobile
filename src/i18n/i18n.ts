@@ -29,7 +29,7 @@ export const LANGUAGE_STORAGE_KEY = "@PasswordHasher:language";
 const getInitialLanguage = async (): Promise<LanguageCode> => {
   try {
     const savedLanguage = await AsyncStorage.getItem(LANGUAGE_STORAGE_KEY);
-    if (savedLanguage && supportedLanguages.some(lang => lang.code === savedLanguage)) {
+    if (savedLanguage && supportedLanguages.some((lang) => lang.code === savedLanguage)) {
       return savedLanguage as LanguageCode;
     }
   } catch (error) {
@@ -38,17 +38,15 @@ const getInitialLanguage = async (): Promise<LanguageCode> => {
   return "en";
 };
 
-i18n
-  .use(initReactI18next)
-  .init({
-    resources,
-    lng: "en", // Default language, will be overridden by LanguageSelector
-    fallbackLng: "en",
-    interpolation: {
-      escapeValue: false, // React already escapes values
-    },
-    compatibilityJSON: "v3",
-  });
+i18n.use(initReactI18next).init({
+  resources,
+  lng: "en", // Default language, will be overridden by LanguageSelector
+  fallbackLng: "en",
+  interpolation: {
+    escapeValue: false, // React already escapes values
+  },
+  compatibilityJSON: "v4",
+});
 
 export { getInitialLanguage };
 export default i18n;

@@ -4,33 +4,36 @@
 import { Ionicons } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
-import React, { useCallback, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import "./i18n/i18n";
+import i18n, { getInitialLanguage } from "./i18n/i18n";
 import GeneratorScreen from "./screens/GeneratorScreen";
 import KeeperScreen from "./screens/KeeperScreen";
-import { setChangeDataCallback } from "./utils/keeper";
+import { useAppStore } from "./state/app-store";
 import { checkQtMigrationAvailable, performQtMigration } from "./utils/QtSettingsMigration";
-import { loadSettings, saveSettings, applyMigratedSettings, isFirstLaunch } from "./utils/storage";
+import { applyMigratedSettings, isFirstLaunch } from "./utils/storage";
 
 const Tab = createBottomTabNavigator();
 
 function App(): React.JSX.Element {
   const { t } = useTranslation();
+  const [languageReady, setLanguageReady] = useState(false);
 
-  // Set up global keeper data callback to persist changes
+  // Apply the persisted language before the first render to avoid a flash of the default language
   useEffect((): void => {
-    setChangeDataCallback((newData: string): void => {
-      saveSettings({ keeperData: newData });
-    });
+    getInitialLanguage()
+      .then((language) => i18n.changeLanguage(language))
+      .catch((error) => console.error("Error applying saved language:", error))
+      .finally(() => setLanguageReady(true));
+  }, []);
 
-    // Load initial keeper data
-    loadSettings().then((settings) => {
-      if (settings.keeperData) {
-        // KeeperScreen will load this data when mounted
-      }
-    });
+  // Load settings and keeper data into the store
+  useEffect((): void => {
+    useAppStore
+      .getState()
+      .initialize()
+      .catch((error) => console.error("Error initializing app store:", error));
   }, []);
 
   // Perform automatic migration from Qt settings on first launch
@@ -54,13 +57,10 @@ function App(): React.JSX.Element {
         // Perform migration
         const result = await performQtMigration();
         if (result.success && result.migratedSettings) {
-          // Apply migrated settings to AsyncStorage
+          // Apply migrated settings to AsyncStorage and reload the store
           await applyMigratedSettings(result.migratedSettings);
+          await useAppStore.getState().initialize();
           console.log("Qt settings migrated successfully");
-          
-          // Optionally clear Qt settings after successful migration
-          // import { clearQtSettingsAfterMigration } from "./utils/QtSettingsMigration";
-          // await clearQtSettingsAfterMigration();
         } else {
           console.warn("Qt migration failed or no settings to migrate:", result.error);
         }
@@ -72,13 +72,9 @@ function App(): React.JSX.Element {
     migrateSettings();
   }, []);
 
-  const handleSaveSettings = useCallback((): void => {
-    console.log("Settings saved");
-  }, []);
-
-  const handleStatusMessage = useCallback((text: string, color: string): void => {
-    console.log(`Status: ${text} (${color})`);
-  }, []);
+  if (!languageReady) {
+    return <></>;
+  }
 
   return (
     <NavigationContainer>
@@ -121,10 +117,10 @@ function App(): React.JSX.Element {
         <Tab.Screen
           name="Generator"
           component={GeneratorScreen}
-          initialParams={{ onSaveSettings: handleSaveSettings, onStatusMessage: handleStatusMessage }}
           options={{
             title: t("tabs.generator"),
             tabBarAccessibilityLabel: t("tabs.generator"),
+            tabBarButtonTestID: "tab-generator",
           }}
         />
         <Tab.Screen
@@ -133,6 +129,7 @@ function App(): React.JSX.Element {
           options={{
             title: t("tabs.keeper"),
             tabBarAccessibilityLabel: t("tabs.keeper"),
+            tabBarButtonTestID: "tab-keeper",
           }}
         />
       </Tab.Navigator>

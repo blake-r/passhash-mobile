@@ -3,6 +3,8 @@
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+import { decryptKeeperData, encryptKeeperData } from "./secure-storage";
+
 const SETTINGS_KEYS = {
   // Requirements category
   DIGITS: "Requirements.digits",
@@ -36,30 +38,62 @@ const DEFAULT_SETTINGS: AppSettings = {
   keeperData: "",
 };
 
+const FIELD_TO_STORAGE_KEY: Record<keyof AppSettings, string> = {
+  digits: SETTINGS_KEYS.DIGITS,
+  punctuation: SETTINGS_KEYS.PUNCTUATION,
+  mixedCase: SETTINGS_KEYS.MIXED_CASE,
+  noSpecial: SETTINGS_KEYS.NO_SPECIAL,
+  digitsOnly: SETTINGS_KEYS.DIGITS_ONLY,
+  passwordLength: SETTINGS_KEYS.PASSWORD_LENGTH,
+  keeperData: SETTINGS_KEYS.KEEPER_DATA,
+};
+
+// Qt settings keys back to AppSettings fields (used by Qt migration)
+const QT_KEY_TO_FIELD: Record<string, keyof AppSettings> = Object.fromEntries(
+  (Object.entries(FIELD_TO_STORAGE_KEY) as [keyof AppSettings, string][]).map(([field, qtKey]) => [qtKey, field]),
+);
+
+function serializeSetting(value: boolean | number | string): string {
+  return typeof value === "string" ? value : value.toString();
+}
+
+function deserializeSetting(field: keyof AppSettings, value: string): AppSettings[keyof AppSettings] {
+  if (field === "passwordLength") {
+    return parseInt(value, 10);
+  }
+  if (field === "keeperData") {
+    return value;
+  }
+  return value === "true";
+}
+
 export async function loadSettings(): Promise<AppSettings> {
   try {
     const values = await AsyncStorage.multiGet(Object.values(SETTINGS_KEYS));
     const settings: AppSettings = { ...DEFAULT_SETTINGS };
 
     values.forEach(([key, value]): void => {
-      if (value !== null) {
-        switch (key) {
-          case SETTINGS_KEYS.DIGITS:
-          case SETTINGS_KEYS.PUNCTUATION:
-          case SETTINGS_KEYS.MIXED_CASE:
-          case SETTINGS_KEYS.NO_SPECIAL:
-          case SETTINGS_KEYS.DIGITS_ONLY:
-            (settings as unknown as Record<string, boolean>)[key.split(".")[1]] = value === "true";
-            break;
-          case SETTINGS_KEYS.PASSWORD_LENGTH:
-            settings.passwordLength = parseInt(value, 10);
-            break;
-          case SETTINGS_KEYS.KEEPER_DATA:
-            settings.keeperData = value;
-            break;
-        }
+      if (value === null) {
+        return;
+      }
+      const field = QT_KEY_TO_FIELD[key];
+      if (field !== undefined) {
+        (settings as Record<keyof AppSettings, AppSettings[keyof AppSettings]>)[field] = deserializeSetting(
+          field,
+          value,
+        );
       }
     });
+
+    // Decrypt the keeper envelope; legacy plaintext passes through unchanged
+    if (settings.keeperData) {
+      try {
+        settings.keeperData = await decryptKeeperData(settings.keeperData);
+      } catch (error) {
+        console.error("Error decrypting keeper data:", error);
+        settings.keeperData = "";
+      }
+    }
 
     return settings;
   } catch (error) {
@@ -68,49 +102,10 @@ export async function loadSettings(): Promise<AppSettings> {
   }
 }
 
-export async function saveSetting(key: string, value: boolean | number | string): Promise<void> {
+export async function saveSetting(key: keyof AppSettings, value: boolean | number | string): Promise<void> {
   try {
-    let storageKey: string | undefined;
-    let storageValue: string;
-
-    if (typeof value === "boolean") {
-      storageValue = value.toString();
-    } else if (typeof value === "number") {
-      storageValue = value.toString();
-    } else {
-      storageValue = value;
-    }
-
-    switch (key) {
-      case "digits":
-        storageKey = SETTINGS_KEYS.DIGITS;
-        break;
-      case "punctuation":
-        storageKey = SETTINGS_KEYS.PUNCTUATION;
-        break;
-      case "mixedCase":
-        storageKey = SETTINGS_KEYS.MIXED_CASE;
-        break;
-      case "noSpecial":
-        storageKey = SETTINGS_KEYS.NO_SPECIAL;
-        break;
-      case "digitsOnly":
-        storageKey = SETTINGS_KEYS.DIGITS_ONLY;
-        break;
-      case "passwordLength":
-        storageKey = SETTINGS_KEYS.PASSWORD_LENGTH;
-        break;
-      case "keeperData":
-        storageKey = SETTINGS_KEYS.KEEPER_DATA;
-        break;
-      default:
-        console.warn("Unknown setting key:", key);
-        return;
-    }
-
-    if (storageKey) {
-      await AsyncStorage.setItem(storageKey, storageValue);
-    }
+    const serialized = key === "keeperData" ? await encryptKeeperData(String(value)) : serializeSetting(value);
+    await AsyncStorage.setItem(FIELD_TO_STORAGE_KEY[key], serialized);
   } catch (error: unknown) {
     console.error("Error saving setting:", error);
   }
@@ -118,29 +113,14 @@ export async function saveSetting(key: string, value: boolean | number | string)
 
 export async function saveSettings(settings: Partial<AppSettings>): Promise<void> {
   try {
-    const items: [string, string][] = [];
-
-    if (settings.digits !== undefined) {
-      items.push([SETTINGS_KEYS.DIGITS, settings.digits.toString()]);
-    }
-    if (settings.punctuation !== undefined) {
-      items.push([SETTINGS_KEYS.PUNCTUATION, settings.punctuation.toString()]);
-    }
-    if (settings.mixedCase !== undefined) {
-      items.push([SETTINGS_KEYS.MIXED_CASE, settings.mixedCase.toString()]);
-    }
-    if (settings.noSpecial !== undefined) {
-      items.push([SETTINGS_KEYS.NO_SPECIAL, settings.noSpecial.toString()]);
-    }
-    if (settings.digitsOnly !== undefined) {
-      items.push([SETTINGS_KEYS.DIGITS_ONLY, settings.digitsOnly.toString()]);
-    }
-    if (settings.passwordLength !== undefined) {
-      items.push([SETTINGS_KEYS.PASSWORD_LENGTH, settings.passwordLength.toString()]);
-    }
-    if (settings.keeperData !== undefined) {
-      items.push([SETTINGS_KEYS.KEEPER_DATA, settings.keeperData]);
-    }
+    const items: [string, string][] = await Promise.all(
+      (Object.entries(settings) as [keyof AppSettings, AppSettings[keyof AppSettings]][]).map(
+        async ([field, value]): Promise<[string, string]> => [
+          FIELD_TO_STORAGE_KEY[field],
+          field === "keeperData" ? await encryptKeeperData(String(value)) : serializeSetting(value),
+        ],
+      ),
+    );
 
     await AsyncStorage.multiSet(items);
   } catch (error: unknown) {
@@ -172,26 +152,16 @@ export async function applyMigratedSettings(migratedSettings: {
   try {
     const items: [string, string][] = [];
 
-    if (migratedSettings["Requirements.digits"] !== undefined) {
-      items.push([SETTINGS_KEYS.DIGITS, migratedSettings["Requirements.digits"]!.toString()]);
-    }
-    if (migratedSettings["Requirements.punctuation"] !== undefined) {
-      items.push([SETTINGS_KEYS.PUNCTUATION, migratedSettings["Requirements.punctuation"]!.toString()]);
-    }
-    if (migratedSettings["Requirements.mixedCase"] !== undefined) {
-      items.push([SETTINGS_KEYS.MIXED_CASE, migratedSettings["Requirements.mixedCase"]!.toString()]);
-    }
-    if (migratedSettings["Restrictions.noSpecial"] !== undefined) {
-      items.push([SETTINGS_KEYS.NO_SPECIAL, migratedSettings["Restrictions.noSpecial"]!.toString()]);
-    }
-    if (migratedSettings["Restrictions.digitsOnly"] !== undefined) {
-      items.push([SETTINGS_KEYS.DIGITS_ONLY, migratedSettings["Restrictions.digitsOnly"]!.toString()]);
-    }
-    if (migratedSettings["Restrictions.passwordLength"] !== undefined) {
-      items.push([SETTINGS_KEYS.PASSWORD_LENGTH, migratedSettings["Restrictions.passwordLength"]!.toString()]);
-    }
-    if (migratedSettings["Keeper.data"] !== undefined && migratedSettings["Keeper.data"] !== "") {
-      items.push([SETTINGS_KEYS.KEEPER_DATA, migratedSettings["Keeper.data"]!]);
+    for (const [qtKey, value] of Object.entries(migratedSettings) as [string, boolean | number | string][]) {
+      const field = QT_KEY_TO_FIELD[qtKey];
+      if (field === undefined) {
+        continue;
+      }
+      if (field === "keeperData" && value === "") {
+        continue;
+      }
+      const serialized = field === "keeperData" ? await encryptKeeperData(String(value)) : serializeSetting(value);
+      items.push([qtKey, serialized]);
     }
 
     if (items.length > 0) {

@@ -35,6 +35,21 @@ for FILE in "${FILES[@]}"; do
     fi
 done
 
+# Verify checksums of the downloaded (unpatched) files
+CHECKSUM_FILE="$SCRIPT_DIR/algorithm-checksums.txt"
+if [ -f "$CHECKSUM_FILE" ]; then
+    echo "Verifying checksums..."
+    cd "$PROJECT_ROOT/src/algorithms"
+    if command -v shasum >/dev/null 2>&1; then
+        shasum -a 256 -c "$CHECKSUM_FILE" || { echo "Error: checksum mismatch — refusing to apply patches"; exit 1; }
+    else
+        sha256sum -c "$CHECKSUM_FILE" || { echo "Error: checksum mismatch — refusing to apply patches"; exit 1; }
+    fi
+    cd "$PROJECT_ROOT"
+else
+    echo "Warning: no checksum file at $CHECKSUM_FILE — skipping integrity verification"
+fi
+
 # Apply patches for ES module imports
 echo "Applying patches for ES module imports..."
 cd "$PROJECT_ROOT/src/algorithms"
@@ -42,3 +57,12 @@ patch -p1 < "$SCRIPT_DIR/patches/sha1.patch"
 patch -p1 < "$SCRIPT_DIR/patches/passhash.patch"
 
 echo "Algorithm files updated from GitHub ($VERSION)"
+
+# Verify behavior against the pinned golden vectors
+if [ -d "$PROJECT_ROOT/node_modules" ]; then
+    echo "Running golden-vector tests..."
+    cd "$PROJECT_ROOT"
+    npx jest src/algorithms --silent || { echo "Error: golden-vector tests failed after algorithm update"; exit 1; }
+else
+    echo "Warning: node_modules not installed — run 'npm test' to verify the golden vectors"
+fi

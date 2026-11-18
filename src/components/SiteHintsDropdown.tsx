@@ -12,11 +12,7 @@ export interface SiteHintsDropdownProps {
   currentSiteTag?: string;
 }
 
-function SiteHintsDropdown({
-  hints,
-  onSelect,
-  currentSiteTag,
-}: SiteHintsDropdownProps): React.JSX.Element {
+function SiteHintsDropdown({ hints, onSelect, currentSiteTag }: SiteHintsDropdownProps): React.JSX.Element {
   const { t } = useTranslation();
 
   const hasHints = hints.length > 0;
@@ -41,14 +37,8 @@ function SiteHintsDropdown({
               accessibilityState={{ selected: isSelected }}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
-              <Text style={[styles.hintText, isSelected && styles.hintTextSelected]}>
-                {tagStr}
-              </Text>
-              {item.settings && (
-                <Text style={styles.hintSettings}>
-                  {makeSettingsSummary(item.settings)}
-                </Text>
-              )}
+              <Text style={[styles.hintText, isSelected && styles.hintTextSelected]}>{tagStr}</Text>
+              {item.settings && <Text style={styles.hintSettings}>{makeSettingsSummary(item.settings)}</Text>}
             </TouchableOpacity>
           );
         })}
@@ -59,17 +49,17 @@ function SiteHintsDropdown({
 
 function makeSettingsSummary(settings: KeepObj["settings"]): string {
   const parts: string[] = [];
-  
+
   // Requirements (in order: digits, punctuation, mixedCase)
   if (settings.digits === true) parts.push("0-9");
   if (settings.punctuation === true) parts.push("!@#");
   if (settings.mixedCase === true) parts.push("Aa");
-  
+
   // Restrictions (in order: noSpecial, digitsOnly, length)
   if (settings.special === false) parts.push("A-Za-z");
   if (settings.digitsOnly === true) parts.push("0-9");
   if (settings.length !== null) parts.push(`${settings.length}`);
-  
+
   return parts.join(" • ");
 }
 

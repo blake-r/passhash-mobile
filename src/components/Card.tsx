@@ -12,7 +12,11 @@ export interface CardProps {
 function Card({ children, style, title }: CardProps): React.JSX.Element {
   return (
     <View style={[styles.card, style]}>
-      {title && <View style={styles.cardHeader}><View style={styles.cardTitleLine} /></View>}
+      {title && (
+        <View style={styles.cardHeader}>
+          <View style={styles.cardTitleLine} />
+        </View>
+      )}
       <View style={styles.cardContent}>{children}</View>
     </View>
   );
