@@ -6,11 +6,11 @@ import { useState, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { View, TextInput, StyleSheet, Platform, Alert, Text } from "react-native";
 
-import { Button, StatusMessage, LanguageSelector } from "../components";
+import { Button, StatusMessage, LanguageSelector, ThemeSelector } from "../components";
 import { useAppStore } from "../state/app-store";
+import { useTheme, Theme } from "../theme";
 import { copyWithAutoClear } from "../utils/clipboard";
 import { serializeKeeperData, isValidKeeperText } from "../utils/keeper";
-import { STATUS_COLORS } from "../utils/status-colors";
 
 interface StatusMessage {
   text: string;
@@ -19,9 +19,11 @@ interface StatusMessage {
 
 function KeeperScreen(): React.JSX.Element {
   const { t } = useTranslation();
+  const theme = useTheme();
+  const styles = useMemo(() => makeStyles(theme), [theme]);
   const keeperData = useAppStore((state) => state.keeperData);
   const setKeeperText = useAppStore((state) => state.setKeeperText);
-  const [statusMsg, setStatusMsg] = useState<StatusMessage>({ text: "", color: "gray" });
+  const [statusMsg, setStatusMsg] = useState<StatusMessage>({ text: "", color: theme.textMuted });
 
   const keeperText = useMemo(() => serializeKeeperData(keeperData), [keeperData]);
 
@@ -32,23 +34,23 @@ function KeeperScreen(): React.JSX.Element {
   const handleExport = useCallback(async (): Promise<void> => {
     try {
       await copyWithAutoClear(keeperText);
-      showStatus(t("keeper.exportSuccess"), STATUS_COLORS.success);
+      showStatus(t("keeper.exportSuccess"), theme.status.success);
     } catch {
-      showStatus(t("keeper.exportFailed"), STATUS_COLORS.error);
+      showStatus(t("keeper.exportFailed"), theme.status.error);
     }
-  }, [keeperText, showStatus, t]);
+  }, [keeperText, showStatus, t, theme]);
 
   const handleImport = useCallback(async (): Promise<void> => {
     try {
       const clipboardContent = await Clipboard.getStringAsync();
 
       if (!clipboardContent || clipboardContent.trim().length === 0) {
-        showStatus(t("keeper.emptyClipboard"), STATUS_COLORS.warning);
+        showStatus(t("keeper.emptyClipboard"), theme.status.warning);
         return;
       }
 
       if (!isValidKeeperText(clipboardContent)) {
-        showStatus(t("keeper.invalidClipboard"), STATUS_COLORS.error);
+        showStatus(t("keeper.invalidClipboard"), theme.status.error);
         return;
       }
 
@@ -57,28 +59,30 @@ function KeeperScreen(): React.JSX.Element {
           text: t("keeper.importConfirmation.cancel"),
           style: "cancel",
           onPress: (): void => {
-            showStatus(t("keeper.importConfirmation.unchanged"), STATUS_COLORS.info);
+            showStatus(t("keeper.importConfirmation.unchanged"), theme.status.info);
           },
         },
         {
           text: t("keeper.importConfirmation.ok"),
           onPress: async (): Promise<void> => {
             await setKeeperText(clipboardContent);
-            showStatus(t("keeper.importSuccess"), STATUS_COLORS.warning);
+            showStatus(t("keeper.importSuccess"), theme.status.warning);
           },
         },
       ]);
     } catch {
-      showStatus(t("keeper.importFailed"), STATUS_COLORS.error);
+      showStatus(t("keeper.importFailed"), theme.status.error);
     }
-  }, [setKeeperText, showStatus, t]);
+  }, [setKeeperText, showStatus, t, theme]);
 
   return (
     <View style={styles.container}>
       {/* Language selector */}
-      <View style={styles.languageContainer}>
-        <Text style={styles.languageLabel}>{t("settings.language.label")}</Text>
+      <View style={styles.settingsContainer}>
+        <Text style={styles.settingsLabel}>{t("settings.language.label")}</Text>
         <LanguageSelector />
+        <Text style={styles.settingsLabel}>{t("settings.theme.label")}</Text>
+        <ThemeSelector />
       </View>
 
       {/* Keeper data text area */}
@@ -115,68 +119,72 @@ function KeeperScreen(): React.JSX.Element {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 6,
-    backgroundColor: "#fff",
-  },
-  languageContainer: {
-    marginBottom: 12,
-    padding: 8,
-    backgroundColor: "#f5f5f5",
-    borderRadius: 8,
-  },
-  languageLabel: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginBottom: 4,
-  },
-  textAreaContainer: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    marginBottom: 8,
-    overflow: "hidden",
-  },
-  textArea: {
-    flex: 1,
-    padding: 8,
-    fontSize: 16,
-    fontFamily: Platform.OS === "ios" ? "Menlo" : "monospace",
-    textAlignVertical: "top",
-  },
-  statusMessage: {
-    textAlign: "center",
-    fontSize: 14,
-    marginBottom: 8,
-  },
-  buttonRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    gap: 10,
-    marginBottom: 8,
-  },
-  button: {
-    width: "45%",
-    backgroundColor: "#007AFF",
-    borderRadius: 4,
-    padding: 12,
-    alignItems: "center",
-  },
-  emptyStateContainer: {
-    padding: 16,
-    backgroundColor: "#f5f5f5",
-    borderRadius: 8,
-    marginTop: 8,
-  },
-  emptyStateText: {
-    fontSize: 14,
-    color: "#666",
-    textAlign: "center",
-    fontStyle: "italic",
-  },
-});
+function makeStyles(theme: Theme): ReturnType<typeof StyleSheet.create> {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      padding: 6,
+      backgroundColor: theme.bg,
+    },
+    settingsContainer: {
+      marginBottom: 12,
+      padding: 8,
+      backgroundColor: theme.card,
+      borderRadius: theme.radii.card,
+      borderWidth: 1,
+      borderColor: theme.cardBorder,
+    },
+    settingsLabel: {
+      fontSize: 16,
+      fontWeight: "bold",
+      marginBottom: 4,
+      color: theme.text,
+    },
+    textAreaContainer: {
+      flex: 1,
+      borderWidth: 1,
+      borderColor: theme.inputBorder,
+      borderRadius: theme.radii.control,
+      marginBottom: 8,
+      overflow: "hidden",
+    },
+    textArea: {
+      flex: 1,
+      padding: 8,
+      fontSize: 16,
+      fontFamily: Platform.OS === "ios" ? "Menlo" : "monospace",
+      textAlignVertical: "top",
+      backgroundColor: theme.input,
+      color: theme.text,
+    },
+    buttonRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      gap: 10,
+      marginBottom: 8,
+      marginTop: 8,
+    },
+    button: {
+      width: "45%",
+      borderRadius: theme.radii.control,
+      padding: 12,
+      alignItems: "center",
+    },
+    emptyStateContainer: {
+      padding: 16,
+      backgroundColor: theme.card,
+      borderRadius: theme.radii.card,
+      marginTop: 8,
+      borderWidth: 1,
+      borderColor: theme.cardBorder,
+    },
+    emptyStateText: {
+      fontSize: 14,
+      color: theme.textSecondary,
+      textAlign: "center",
+      fontStyle: "italic",
+    },
+  });
+}
 
 export default KeeperScreen;

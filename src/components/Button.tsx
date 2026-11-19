@@ -1,8 +1,11 @@
-// Button.tsx - Reusable button component
+// Button.tsx - Reusable themed button component with accent gradient
 
-import React from "react";
+import { LinearGradient } from "expo-linear-gradient";
+import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { TouchableOpacity, Text, StyleSheet, ViewStyle, TextStyle } from "react-native";
+
+import { useTheme } from "../theme";
 
 export interface ButtonProps {
   onPress: () => void;
@@ -24,6 +27,40 @@ function Button({
   testID,
 }: ButtonProps): React.JSX.Element {
   const { t } = useTranslation();
+  const theme = useTheme();
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        button: {
+          borderRadius: theme.radii.control,
+          justifyContent: "center",
+          alignItems: "center",
+          height: 44,
+          overflow: "hidden",
+        },
+        smallButton: {
+          minWidth: 80,
+          maxWidth: 90,
+          height: 44,
+        },
+        buttonDisabled: {
+          backgroundColor: theme.accentDisabled,
+        },
+        gradient: {
+          ...StyleSheet.absoluteFillObject,
+          justifyContent: "center",
+          alignItems: "center",
+        },
+        buttonText: {
+          color: theme.accentText,
+          fontSize: 14,
+        },
+        buttonTextDisabled: {
+          color: theme.textMuted,
+        },
+      }),
+    [theme],
+  );
 
   return (
     <TouchableOpacity
@@ -36,31 +73,17 @@ function Button({
       accessible={true}
       testID={testID}
     >
-      <Text style={[styles.buttonText, textStyle]}>{t(title)}</Text>
+      {!disabled && (
+        <LinearGradient
+          colors={theme.accentGradient}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.gradient}
+        />
+      )}
+      <Text style={[styles.buttonText, disabled && styles.buttonTextDisabled, textStyle]}>{t(title)}</Text>
     </TouchableOpacity>
   );
 }
-
-const styles = StyleSheet.create({
-  button: {
-    backgroundColor: "#007AFF",
-    borderRadius: 4,
-    justifyContent: "center",
-    alignItems: "center",
-    height: 44,
-  },
-  smallButton: {
-    minWidth: 80,
-    maxWidth: 90,
-    height: 44,
-  },
-  buttonDisabled: {
-    backgroundColor: "#ccc",
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 14,
-  },
-});
 
 export default Button;

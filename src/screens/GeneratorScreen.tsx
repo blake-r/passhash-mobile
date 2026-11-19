@@ -1,19 +1,20 @@
 // GeneratorScreen.tsx - Main password generator screen with Material Design
 // Redesigned with three cards: Generation, Character Settings, Restrictions
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { LinearGradient } from "expo-linear-gradient";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { View, Text, ScrollView, TextInput, TouchableOpacity, AppState } from "react-native";
 
 import { PassHashCommon } from "../algorithms/passhash";
 import { Button, StatusMessage, Card, CompactSettingRow, LengthSliderRow, SiteHintsDropdown } from "../components";
 import { useAppStore, GeneratorSettings } from "../state/app-store";
+import { useTheme } from "../theme";
 import { copyWithAutoClear } from "../utils/clipboard";
 import { filterHints } from "../utils/hints";
 import { createSiteObj, toString } from "../utils/site-tag";
-import { STATUS_COLORS } from "../utils/status-colors";
 
-import { styles } from "./GeneratorScreen.styles";
+import { makeStyles } from "./GeneratorScreen.styles";
 
 import type { KeepObj } from "../utils/keeper";
 
@@ -27,6 +28,8 @@ interface StatusMessage {
 
 function GeneratorScreen(): React.JSX.Element {
   const { t } = useTranslation();
+  const theme = useTheme();
+  const styles = useMemo(() => makeStyles(theme), [theme]);
 
   const siteTagInputRef = useRef<TextInput | null>(null);
 
@@ -48,7 +51,7 @@ function GeneratorScreen(): React.JSX.Element {
 
   const { digits, punctuation, mixedCase, noSpecial, digitsOnly, passwordLength } = settings;
 
-  const [statusMsg, setStatusMsg] = useState<StatusMessage>({ text: "", color: "gray" });
+  const [statusMsg, setStatusMsg] = useState<StatusMessage>({ text: "", color: theme.textMuted });
   const masterKeyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const blurTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -70,9 +73,9 @@ function GeneratorScreen(): React.JSX.Element {
     masterKeyTimerRef.current = setTimeout(() => {
       setMasterKey("");
       setHashWord("");
-      showStatus(t("generator.masterKey.autoClearWarning"), STATUS_COLORS.warning);
+      showStatus(t("generator.masterKey.autoClearWarning"), theme.status.warning);
     }, MASTER_KEY_CLEAR_TIMEOUT);
-  }, [clearMasterKeyTimer, showStatus, t]);
+  }, [clearMasterKeyTimer, showStatus, t, theme]);
 
   // Cleanup timer on unmount
   useEffect(() => {
@@ -85,9 +88,9 @@ function GeneratorScreen(): React.JSX.Element {
   useEffect(() => {
     if (hashWord.length > 0) {
       copyWithAutoClear(hashWord);
-      showStatus(t("generator.password.copied"), STATUS_COLORS.success);
+      showStatus(t("generator.password.copied"), theme.status.success);
     }
-  }, [hashWord, showStatus, t]);
+  }, [hashWord, showStatus, t, theme]);
 
   // Clear secrets immediately when the app is backgrounded
   useEffect(() => {
@@ -107,11 +110,11 @@ function GeneratorScreen(): React.JSX.Element {
       const useSiteTag = overrideSiteTag ?? siteTag;
 
       if (!useSiteTag.trim()) {
-        showStatus(t("generator.siteTag.empty"), STATUS_COLORS.info);
+        showStatus(t("generator.siteTag.empty"), theme.status.info);
         return;
       }
       if (!masterKey.trim()) {
-        showStatus(t("generator.masterKey.empty"), STATUS_COLORS.warning);
+        showStatus(t("generator.masterKey.empty"), theme.status.warning);
         return;
       }
 
@@ -161,6 +164,7 @@ function GeneratorScreen(): React.JSX.Element {
       scheduleMasterKeyClear,
       storeSiteTag,
       t,
+      theme,
     ],
   );
 
@@ -222,7 +226,7 @@ function GeneratorScreen(): React.JSX.Element {
             if (startIdx < endIdx) {
               const extracted = hostParts.slice(startIdx, endIdx).join(".").toLowerCase();
               siteObj.tag = extracted;
-              showStatus(t("generator.siteTag.extractedFromUrl"), STATUS_COLORS.success);
+              showStatus(t("generator.siteTag.extractedFromUrl"), theme.status.success);
             }
           } catch {
             // Invalid URL, ignore
@@ -232,12 +236,12 @@ function GeneratorScreen(): React.JSX.Element {
 
       const normalizedText = toString(siteObj);
       if (normalizedText.trim() !== text) {
-        showStatus(t("generator.siteTag.hasSpaces"), STATUS_COLORS.warning);
+        showStatus(t("generator.siteTag.hasSpaces"), theme.status.warning);
       }
       setSiteTag(normalizedText);
       updateHints(normalizedText);
     },
-    [showStatus, t, updateHints],
+    [showStatus, t, updateHints, theme],
   );
 
   const handleMasterKeyChange = useCallback(
@@ -247,10 +251,10 @@ function GeneratorScreen(): React.JSX.Element {
       setHashWord("");
       scheduleMasterKeyClear();
       if (text.trim() !== text) {
-        showStatus(t("generator.masterKey.hasSpaces"), STATUS_COLORS.warning);
+        showStatus(t("generator.masterKey.hasSpaces"), theme.status.warning);
       }
     },
-    [showStatus, scheduleMasterKeyClear, t],
+    [showStatus, scheduleMasterKeyClear, t, theme],
   );
 
   const handleBump = useCallback(() => {
@@ -320,8 +324,8 @@ function GeneratorScreen(): React.JSX.Element {
 
   const handleSaveSettings = useCallback((): void => {
     persistSettings();
-    showStatus(t("generator.buttons.settingsSaved"), STATUS_COLORS.success);
-  }, [persistSettings, showStatus, t]);
+    showStatus(t("generator.buttons.settingsSaved"), theme.status.success);
+  }, [persistSettings, showStatus, t, theme]);
 
   const hasChanges =
     savedSettings.digits !== digits ||
@@ -351,7 +355,7 @@ function GeneratorScreen(): React.JSX.Element {
                   ref={siteTagInputRef}
                   style={styles.textInput}
                   placeholder={t("generator.siteTag.placeholder")}
-                  placeholderTextColor="#999"
+                  placeholderTextColor={theme.textMuted}
                   value={siteTag}
                   onChangeText={handleSiteTagChange}
                   onFocus={() => {
@@ -382,6 +386,12 @@ function GeneratorScreen(): React.JSX.Element {
                   accessibilityHint="Increase site tag version number"
                   hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 >
+                  <LinearGradient
+                    colors={theme.accentGradient}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={styles.bumpButtonGradient}
+                  />
                   <View style={styles.bumpButtonInner}>
                     <Text style={styles.bumpButtonText}>+1</Text>
                   </View>
@@ -403,7 +413,7 @@ function GeneratorScreen(): React.JSX.Element {
               <TextInput
                 style={styles.textInput}
                 placeholder={t("generator.masterKey.placeholder")}
-                placeholderTextColor="#999"
+                placeholderTextColor={theme.textMuted}
                 value={masterKey}
                 onChangeText={handleMasterKeyChange}
                 autoCapitalize="none"

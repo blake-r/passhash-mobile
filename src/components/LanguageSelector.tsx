@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import { View, StyleSheet, Platform } from "react-native";
 
 import { supportedLanguages, LanguageCode, LANGUAGE_STORAGE_KEY } from "../i18n";
+import { useTheme } from "../theme";
 
 export interface LanguageSelectorProps {
   onLanguageChange?: (language: LanguageCode) => void;
@@ -14,6 +15,7 @@ export interface LanguageSelectorProps {
 
 function LanguageSelector({ onLanguageChange }: LanguageSelectorProps): React.JSX.Element {
   const { i18n } = useTranslation();
+  const theme = useTheme();
   const [currentLanguage, setCurrentLanguage] = useState<LanguageCode>(i18n.language as LanguageCode);
 
   const handleValueChange = async (value: LanguageCode): Promise<void> => {
@@ -41,7 +43,12 @@ function LanguageSelector({ onLanguageChange }: LanguageSelectorProps): React.JS
         accessibilityHint="Select application language"
       >
         {supportedLanguages.map((lang) => (
-          <Picker.Item key={lang.code} label={`${lang.nativeName} (${lang.name})`} value={lang.code} color="#333" />
+          <Picker.Item
+            key={lang.code}
+            label={`${lang.nativeName} (${lang.name})`}
+            value={lang.code}
+            color={theme.text}
+          />
         ))}
       </Picker>
     </View>

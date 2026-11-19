@@ -3,6 +3,7 @@
 ## 2026-11-19
 
 - Design: new app icon — «hash becomes password» mark (square `#` + Monaco `*` outline + shackle arc arrow), amber on dark indigo, text-free; single SVG source (`assets/icon-source.svg`, glyphs extracted via `scripts/glyph2path.swift`), all PNG assets rendered from it by `scripts/generate-icons.js`; adaptive-icon and splash backgrounds switched to `#141833`
+- Design: app-wide theming — brand dark theme (indigo/amber) plus adapted light theme, design tokens in `src/theme.ts`; theme follows the system with a manual override (System/Dark/Light selector on the Keeper screen, persisted); accent buttons use an amber gradient (expo-linear-gradient); status colors are per-theme; larger control radii; `userInterfaceStyle: automatic`
 
 ## 2026-11-18
 

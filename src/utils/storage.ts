@@ -189,3 +189,28 @@ export async function isFirstLaunch(): Promise<boolean> {
 }
 
 export { SETTINGS_KEYS, DEFAULT_SETTINGS };
+
+// UI theme preference (not part of the Qt-compatible settings map)
+const THEME_PREFERENCE_KEY = "UI.themePreference";
+export type StoredThemePreference = "system" | "dark" | "light";
+
+export async function loadThemePreference(): Promise<StoredThemePreference> {
+  try {
+    const value = await AsyncStorage.getItem(THEME_PREFERENCE_KEY);
+    if (value === "dark" || value === "light" || value === "system") {
+      return value;
+    }
+    return "system";
+  } catch (error) {
+    console.error("Error loading theme preference:", error);
+    return "system";
+  }
+}
+
+export async function saveThemePreference(value: StoredThemePreference): Promise<void> {
+  try {
+    await AsyncStorage.setItem(THEME_PREFERENCE_KEY, value);
+  } catch (error) {
+    console.error("Error saving theme preference:", error);
+  }
+}

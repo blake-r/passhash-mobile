@@ -77,6 +77,12 @@
   "settings": {
     "language": {
       "label": "Language"
+    },
+    "theme": {
+      "label": "Theme",
+      "system": "System",
+      "dark": "Dark",
+      "light": "Light"
     }
   },
   "common": {

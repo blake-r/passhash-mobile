@@ -1,8 +1,10 @@
 // LengthSliderRow.tsx - Row container for password length slider
 
 import Slider from "@react-native-community/slider";
-import React from "react";
+import React, { useMemo } from "react";
 import { View, StyleSheet, Text, Platform } from "react-native";
+
+import { useTheme } from "../theme";
 
 export interface LengthSliderRowProps {
   value: number;
@@ -12,6 +14,50 @@ export interface LengthSliderRowProps {
 }
 
 function LengthSliderRow({ value, onChange, minLength = 4, maxLength = 26 }: LengthSliderRowProps): React.JSX.Element {
+  const theme = useTheme();
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        container: {
+          flexDirection: "row",
+          justifyContent: "flex-end",
+          alignItems: "center",
+          paddingVertical: 8,
+          paddingHorizontal: 4,
+          minHeight: 44,
+        },
+        sliderWrapper: {
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "flex-end",
+          minHeight: 44,
+        },
+        slider: {
+          width: 100,
+          height: 40,
+        },
+        webSlider: {
+          width: 100,
+          height: 40,
+        },
+        valueContainer: {
+          width: 28,
+          height: 28,
+          borderRadius: 14,
+          backgroundColor: theme.accent,
+          justifyContent: "center",
+          alignItems: "center",
+          marginLeft: 4,
+        },
+        valueText: {
+          color: theme.accentText,
+          fontSize: 11,
+          fontWeight: "600",
+        },
+      }),
+    [theme],
+  );
+
   if (Platform.OS === "web") {
     return (
       <View style={styles.container}>
@@ -43,9 +89,9 @@ function LengthSliderRow({ value, onChange, minLength = 4, maxLength = 26 }: Len
           step={1}
           value={value}
           onValueChange={onChange}
-          minimumTrackTintColor="#007AFF"
-          maximumTrackTintColor="#ccc"
-          thumbTintColor="#007AFF"
+          minimumTrackTintColor={theme.accent}
+          maximumTrackTintColor={theme.switchTrackOff}
+          thumbTintColor={theme.accent}
           testID="password-length-slider"
         />
         <View style={styles.valueContainer}>
@@ -55,44 +101,5 @@ function LengthSliderRow({ value, onChange, minLength = 4, maxLength = 26 }: Len
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    alignItems: "center",
-    paddingVertical: 8,
-    paddingHorizontal: 4,
-    minHeight: 44,
-  },
-  sliderWrapper: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "flex-end",
-    minHeight: 44,
-  },
-  slider: {
-    width: 100,
-    height: 40,
-  },
-  webSlider: {
-    width: 100,
-    height: 40,
-  },
-  valueContainer: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: "#007AFF",
-    justifyContent: "center",
-    alignItems: "center",
-    marginLeft: 4,
-  },
-  valueText: {
-    color: "#fff",
-    fontSize: 11,
-    fontWeight: "600",
-  },
-});
 
 export default LengthSliderRow;

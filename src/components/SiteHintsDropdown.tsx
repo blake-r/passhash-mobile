@@ -1,8 +1,10 @@
 // SiteHintsDropdown.tsx - Dropdown component for site tag hints
 
-import React from "react";
+import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Text, TouchableOpacity, View, StyleSheet, Platform } from "react-native";
+
+import { useTheme } from "../theme";
 
 import type { KeepObj } from "../utils/keeper";
 
@@ -14,6 +16,58 @@ export interface SiteHintsDropdownProps {
 
 function SiteHintsDropdown({ hints, onSelect, currentSiteTag }: SiteHintsDropdownProps): React.JSX.Element {
   const { t } = useTranslation();
+  const theme = useTheme();
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        container: {
+          borderWidth: 1,
+          borderColor: theme.inputBorder,
+          borderRadius: theme.radii.control,
+          backgroundColor: theme.card,
+          maxHeight: 200,
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: theme.name === "dark" ? 0.4 : 0.15,
+          shadowRadius: 3,
+          elevation: 10,
+          overflow: "hidden",
+        },
+        emptyContainer: {
+          height: 0,
+          borderWidth: 0,
+        },
+        hintItem: {
+          paddingVertical: 10,
+          paddingHorizontal: 12,
+          borderBottomWidth: 1,
+          borderBottomColor: theme.border,
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+          backgroundColor: theme.card,
+        },
+        hintItemSelected: {
+          backgroundColor: theme.hintSelected,
+        },
+        hintText: {
+          fontSize: 16,
+          fontFamily: Platform.OS === "ios" ? "Menlo" : "monospace",
+          color: theme.text,
+          flex: 1,
+        },
+        hintTextSelected: {
+          fontWeight: "bold",
+          color: theme.accent,
+        },
+        hintSettings: {
+          fontSize: 12,
+          color: theme.textSecondary,
+          marginLeft: 8,
+        },
+      }),
+    [theme],
+  );
 
   const hasHints = hints.length > 0;
 
@@ -23,7 +77,7 @@ function SiteHintsDropdown({ hints, onSelect, currentSiteTag }: SiteHintsDropdow
 
   return (
     <View style={styles.container} accessibilityLabel={t("generator.hints.title")}>
-      <View style={[styles.scrollView, styles.scrollViewContent]}>
+      <View>
         {hints.map((item, index) => {
           const tagStr = item.tag;
           const isSelected = tagStr === currentSiteTag;
@@ -62,59 +116,5 @@ function makeSettingsSummary(settings: KeepObj["settings"]): string {
 
   return parts.join(" • ");
 }
-
-const styles = StyleSheet.create({
-  container: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 4,
-    backgroundColor: "#fff",
-    maxHeight: 200,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 3,
-    elevation: 10,
-  },
-  emptyContainer: {
-    height: 0,
-    borderWidth: 0,
-  },
-  scrollView: {
-    maxHeight: 200,
-    backgroundColor: "#fff",
-  },
-  scrollViewContent: {
-    backgroundColor: "#fff",
-  },
-  hintItem: {
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    backgroundColor: "#fff",
-  },
-  hintItemSelected: {
-    backgroundColor: "#e3f2fd",
-  },
-  hintText: {
-    fontSize: 16,
-    fontFamily: Platform.OS === "ios" ? "Menlo" : "monospace",
-    color: "#333",
-    flex: 1,
-  },
-  hintTextSelected: {
-    fontWeight: "bold",
-    color: "#1976D2",
-  },
-  hintSettings: {
-    fontSize: 12,
-    color: "#666",
-    marginLeft: 8,
-  },
-});
 
 export default SiteHintsDropdown;

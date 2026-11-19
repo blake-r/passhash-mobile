@@ -3,7 +3,15 @@
 import { create } from "zustand";
 
 import { parseKeeperText, serializeKeeperData, upsertSiteTag, KeepObj, KeeperSettings } from "../utils/keeper";
-import { AppSettings, loadSettings, saveSetting, saveSettings } from "../utils/storage";
+import {
+  AppSettings,
+  loadSettings,
+  loadThemePreference,
+  saveSetting,
+  saveSettings,
+  saveThemePreference,
+  StoredThemePreference,
+} from "../utils/storage";
 
 export type GeneratorSettings = Omit<AppSettings, "keeperData">;
 export type SettingField = keyof GeneratorSettings;
@@ -14,12 +22,14 @@ interface AppState {
   // Snapshot of the persisted settings, used by the UI to detect unsaved changes
   savedSettings: GeneratorSettings;
   keeperData: Map<string, KeepObj>;
+  themePreference: StoredThemePreference;
 
   initialize: () => Promise<void>;
   setSetting: <K extends SettingField>(field: K, value: GeneratorSettings[K]) => void;
   persistSettings: () => Promise<void>;
   storeSiteTag: (siteTag: string, settings: KeeperSettings) => void;
   setKeeperText: (keeperText: string) => Promise<void>;
+  setThemePreference: (preference: StoredThemePreference) => void;
 }
 
 const DEFAULT_GENERATOR_SETTINGS: GeneratorSettings = {
@@ -36,9 +46,11 @@ export const useAppStore = create<AppState>((set, get) => ({
   settings: { ...DEFAULT_GENERATOR_SETTINGS },
   savedSettings: { ...DEFAULT_GENERATOR_SETTINGS },
   keeperData: new Map<string, KeepObj>(),
+  themePreference: "system",
 
   initialize: async (): Promise<void> => {
     const stored = await loadSettings();
+    const themePreference = await loadThemePreference();
     const settings: GeneratorSettings = {
       digits: stored.digits,
       punctuation: stored.punctuation,
@@ -52,7 +64,13 @@ export const useAppStore = create<AppState>((set, get) => ({
       settings,
       savedSettings: { ...settings },
       keeperData: parseKeeperText(stored.keeperData),
+      themePreference,
     });
+  },
+
+  setThemePreference: (preference): void => {
+    set({ themePreference: preference });
+    saveThemePreference(preference);
   },
 
   setSetting: (field, value): void => {

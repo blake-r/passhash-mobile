@@ -18,5 +18,7 @@ export type { LengthSliderRowProps } from "./LengthSliderRow";
 export { default as LanguageSelector } from "./LanguageSelector";
 export type { LanguageSelectorProps } from "./LanguageSelector";
 
+export { default as ThemeSelector } from "./ThemeSelector";
+
 export { default as SiteHintsDropdown } from "./SiteHintsDropdown";
 export type { SiteHintsDropdownProps } from "./SiteHintsDropdown";

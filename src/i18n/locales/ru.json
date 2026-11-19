@@ -77,6 +77,12 @@
   "settings": {
     "language": {
       "label": "Язык"
+    },
+    "theme": {
+      "label": "Тема",
+      "system": "Системная",
+      "dark": "Тёмная",
+      "light": "Светлая"
     }
   },
   "common": {
