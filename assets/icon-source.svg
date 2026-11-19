@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#232A52"/>
+      <stop offset="1" stop-color="#0E1120"/>
+    </linearGradient>
+    <linearGradient id="amber" gradientUnits="userSpaceOnUse" x1="256" y1="60" x2="256" y2="440">
+      <stop offset="0" stop-color="#FFC53D"/>
+      <stop offset="1" stop-color="#FF7A1A"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.45" r="0.55">
+      <stop offset="0" stop-color="#FF9E2C" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#FF9E2C" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect x="0" y="0" width="512" height="512" rx="116" fill="url(#bg)"/>
+  <rect x="0" y="0" width="512" height="512" rx="116" fill="url(#glow)"/>
+
+  <!-- Glyph: hash (#) -> padlock-shackle arc arrow -> password (*).
+       * is a genuine Monaco glyph outline, extracted once via CoreText;
+       # is drawn geometrically: square and fully symmetric. -->
+  <g id="glyph" fill="url(#amber)" stroke="none">
+    <!-- square symmetric #: box 95..245 x 285..435, bars 32, counters 27/29.5 -->
+    <g>
+      <rect x="124.5" y="285" width="32" height="150"/>
+      <rect x="183.5" y="285" width="32" height="150"/>
+      <rect x="95" y="314.5" width="150" height="32"/>
+      <rect x="95" y="373.5" width="150" height="32"/>
+    </g>
+
+    <!-- * glyph scaled to the hash's size (150px tall) -->
+    <path transform="translate(251.9 540.2) scale(0.3272)"
+      d="M253.4 -321.8 L263.7 -491.2 L125.5 -398.4 L80.1 -477.5 L230.0 -550.8 L80.1 -625.0 L125.5 -702.6 L263.7 -610.4 L253.4 -780.3 L345.2 -780.3 L332.5 -610.4 L473.6 -702.6 L519.5 -625.0 L369.1 -550.8 L519.5 -477.5 L473.6 -398.4 L332.5 -491.2 L345.2 -321.8 Z"/>
+
+    <!-- shackle arc: raised above the symbols, arrowhead into the asterisk -->
+    <path d="M170 230 A90 108 0 0 1 350 230" fill="none"
+      stroke="url(#amber)" stroke-width="30" stroke-linecap="butt"/>
+    <polygon points="350,252 324,230 376,230"/>
+  </g>
+</svg>

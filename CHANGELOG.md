@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-19
+
+- Design: new app icon — «hash becomes password» mark (square `#` + Monaco `*` outline + shackle arc arrow), amber on dark indigo, text-free; single SVG source (`assets/icon-source.svg`, glyphs extracted via `scripts/glyph2path.swift`), all PNG assets rendered from it by `scripts/generate-icons.js`; adaptive-icon and splash backgrounds switched to `#141833`
+
 ## 2026-11-18
 
 - Security: keeper data is now stored encrypted (AES-256-GCM envelope, device key in Android Keystore); legacy plaintext migrates transparently
