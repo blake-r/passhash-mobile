@@ -153,42 +153,40 @@ Change history lives in `fastlane/release-notes/<locale>.md` (locales: en-US, ru
 de-DE) instead of a single `CHANGELOG.md`. Every user-visible change appends one bullet to
 each locale file; there is no dated-section bookkeeping and nothing to prune by hand.
 
-The `release-android` GitHub Actions workflow (manual `workflow_dispatch` trigger) builds
-the signed AAB, validates it with bundletool and uploads it via fastlane as a **draft**
-release on the production track.
-
-On every run `scripts/release-notes.js`:
-
-1. finds the base tag — the latest published GitHub release reachable from `HEAD`;
-2. collects the bullets added to each locale file since that tag (`git diff`);
-3. writes them to `fastlane/metadata/android/<locale>/changelogs/<versionCode>.txt`, which
-   fastlane uploads as the Play changelog (at most 500 characters per locale — the script
-   fails the build when a locale exceeds it or has no new lines);
-4. writes the body of the GitHub release (en-US notes plus a `<details>` block per other
-   locale, a compare link against the base tag and a hidden `play-version-code` marker).
-
-After a successful Play upload the workflow tags the commit with `VERSION_NAME`
-(`YYYY.MM.DD`) and creates a **draft** GitHub release with that body.
-
 ### Publishing
 
-Publishing that draft GitHub release is what publishes the app: the `publish-play`
-workflow runs on `release: published`, reads the `play-version-code` marker from the
-release body and promotes exactly that versionCode from `draft` to `completed` on the
-production track through the Play Developer API. The same workflow can be started by hand
-with a tag (`workflow_dispatch`); releases created without the marker fall back to
-recomputing the versionCode from the tag commit.
+Publishing a GitHub release is the only release action. The `release-android` workflow runs
+on `release: published`, builds the commit the tag points at and publishes it on Google
+Play in one go:
 
-So one manual step remains — publishing the GitHub release — and it drives both GitHub and
-Google Play. If Play review rejects the build, fix it, run `release-android` again and
-publish the new draft; the old draft stays unpublished.
+1. `scripts/release-notes.js` collects the bullets added to each locale file since the
+   previous published release (`git diff <baseTag>..HEAD`) and writes them to
+   `fastlane/metadata/android/<locale>/changelogs/<versionCode>.txt` — the Play changelog
+   (at most 500 characters per locale; the script fails when a locale exceeds it or has no
+   new lines);
+2. the signed AAB is built and validated with bundletool;
+3. fastlane uploads it to the production track with `release_status: completed`, so the
+   build goes live without a second step.
+
+The version comes from the tag: `versionName` is the tag itself and `versionCode` is
+`commitDate × 1000 + commitCount % 1000`, computed from the tagged commit. If that
+versionCode was already uploaded as a draft by an earlier run, fastlane promotes it instead
+of uploading again.
+
+So the flow is: create a draft release in the GitHub UI, generate its notes with GitHub's
+own button (or write them by hand), publish it — and the app ships to Play. Drafts fire no
+events, so nothing happens until you publish.
+
+A manual `workflow_dispatch` run builds without publishing unless you pass a tag; it is
+meant for checking that a build works. If Play review rejects the build, fix it, publish a
+new release and let the workflow ship it.
 
 To preview locally:
 
 ```bash
 npm run release-notes -- --dry-run                # print what would be written
 npm run release-notes -- --version-code 261124057 # write default.txt + <versionCode>.txt
-npm run release-notes -- --base-tag 2025.07.04 --tag 2026.11.24 --body-out /tmp/body.md
+npm run release-notes -- --base-tag 2025.07.04 --version-code 261124057
 ```
 
 Required GitHub secrets:
