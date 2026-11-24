@@ -1,9 +1,10 @@
 # Release notes (en-US)
 
-Newest section on top. `scripts/release-notes.js` takes the first section and writes it
-to `fastlane/metadata/android/en-US/changelogs/`. Keep each section under 500 characters.
+Add one line per user-visible change under the list below. On release the workflow takes
+every line added since the last published GitHub release and sends it to Google Play as the
+changelog of this versionCode (500 characters per locale at most).
 
-## 2026-11-24
+Keep lines short and written for users — no file names or internal refactors.
 
 - Keeper stores your site tags and settings encrypted (AES-256-GCM, key in Android Keystore).
 - New look: fresh app icon plus dark and light themes, system or manual.

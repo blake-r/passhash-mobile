@@ -6,6 +6,8 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # tag the release and create the GitHub release
     steps:
       - uses: actions/checkout@v7
         with:
@@ -83,10 +85,31 @@ jobs:
             https://github.com/google/bundletool/releases/download/1.18.1/bundletool-all-1.18.1.jar
           java -jar "$RUNNER_TEMP/bundletool.jar" validate --bundle="$AAB"
 
+      - name: Resolve base release tag
+        id: base
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BASE_TAG=""
+          for tag in $(gh release list --exclude-drafts --limit 100 --json tagName --jq '.[].tagName'); do
+            if git merge-base --is-ancestor "refs/tags/$tag" HEAD; then
+              BASE_TAG="$tag"
+              break
+            fi
+          done
+          echo "base_tag=$BASE_TAG" >> "$GITHUB_OUTPUT"
+          echo "Base tag: ${BASE_TAG:-none (first release)}"
+
       - name: Generate release notes for this versionCode
         env:
           VERSION_CODE: ${{ steps.version.outputs.version_code }}
-        run: node scripts/release-notes.js --version-code "$VERSION_CODE"
+          VERSION_NAME: ${{ steps.version.outputs.version_name }}
+          BASE_TAG: ${{ steps.base.outputs.base_tag }}
+        run: |
+          node scripts/release-notes.js \
+            --version-code "$VERSION_CODE" \
+            --tag "$VERSION_NAME" \
+            --body-out "$RUNNER_TEMP/release-body.md"
 
       - name: Set up Ruby and fastlane
         uses: ruby/setup-ruby@v1
@@ -100,3 +123,14 @@ jobs:
           bundle exec fastlane release \
             version_code:${{ steps.version.outputs.version_code }} \
             aab:android/app/build/outputs/bundle/release/app-release.aab
+
+      - name: Create draft GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION_NAME: ${{ steps.version.outputs.version_name }}
+        run: |
+          gh release create "$VERSION_NAME" \
+            --draft \
+            --title "$VERSION_NAME" \
+            --notes-file "$RUNNER_TEMP/release-body.md" \
+            --target "$GITHUB_SHA"
