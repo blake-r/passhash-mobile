@@ -33,6 +33,7 @@
       "./plugins/withQtMigration.js",
       "./plugins/withReleaseSigning.js",
       "./plugins/withAndroidIcon.js",
+      "./plugins/withOptionalPortraitFeature.js",
       "expo-secure-store",
       [
         "expo-build-properties",
