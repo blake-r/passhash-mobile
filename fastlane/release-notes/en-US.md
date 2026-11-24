@@ -5,10 +5,5 @@ to `fastlane/metadata/android/en-US/changelogs/`. Keep each section under 500 ch
 
 ## 2026-11-24
 
-First release.
-
-- One master key, a unique password for every site: the same input always yields the same password, compatible with PawHash and Firefox Password Hasher.
 - Keeper stores your site tags and settings encrypted (AES-256-GCM, key in Android Keystore).
-- The master key is wiped when the app goes to the background; the clipboard clears after 30 seconds.
 - New look: fresh app icon plus dark and light themes, system or manual.
-- English, Russian and German.
