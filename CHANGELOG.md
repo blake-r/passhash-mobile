@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-24
+
+- Build: Play release notes are generated from accumulating per-locale files (`fastlane/release-notes/<locale>.md`) by `scripts/release-notes.js`, which writes `<versionCode>.txt` and fails the release when a section exceeds the 500-character Play limit
+
 ## 2026-11-19
 
 - Design: new app icon — «hash becomes password» mark (square `#` + Monaco `*` outline + shackle arc arrow), amber on dark indigo, text-free; single SVG source (`assets/icon-source.svg`, glyphs extracted via `scripts/glyph2path.swift`), all PNG assets rendered from it by `scripts/generate-icons.js`; adaptive-icon and splash backgrounds switched to `#141833`

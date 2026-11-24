@@ -83,14 +83,10 @@ jobs:
             https://github.com/google/bundletool/releases/download/1.18.1/bundletool-all-1.18.1.jar
           java -jar "$RUNNER_TEMP/bundletool.jar" validate --bundle="$AAB"
 
-      - name: Prepare release notes for this versionCode
+      - name: Generate release notes for this versionCode
         env:
           VERSION_CODE: ${{ steps.version.outputs.version_code }}
-        run: |
-          for locale in en-US ru-RU de-DE; do
-            dir="fastlane/metadata/android/$locale/changelogs"
-            cp "$dir/default.txt" "$dir/$VERSION_CODE.txt"
-          done
+        run: node scripts/release-notes.js --version-code "$VERSION_CODE"
 
       - name: Set up Ruby and fastlane
         uses: ruby/setup-ruby@v1
