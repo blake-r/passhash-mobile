@@ -100,15 +100,30 @@ jobs:
           echo "base_tag=$BASE_TAG" >> "$GITHUB_OUTPUT"
           echo "Base tag: ${BASE_TAG:-none (first release)}"
 
+      - name: Resolve release tag
+        id: tag
+        env:
+          VERSION_NAME: ${{ steps.version.outputs.version_name }}
+        run: |
+          # Two releases on the same day would share VERSION_NAME, so fall back to
+          # a numeric suffix instead of failing on an existing tag.
+          TAG="$VERSION_NAME"
+          SUFFIX=2
+          while git rev-parse -q --verify "refs/tags/$TAG" > /dev/null; do
+            TAG="$VERSION_NAME-$SUFFIX"
+            SUFFIX=$((SUFFIX + 1))
+          done
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "Release tag: $TAG"
+
       - name: Generate release notes for this versionCode
         env:
           VERSION_CODE: ${{ steps.version.outputs.version_code }}
-          VERSION_NAME: ${{ steps.version.outputs.version_name }}
           BASE_TAG: ${{ steps.base.outputs.base_tag }}
         run: |
           node scripts/release-notes.js \
             --version-code "$VERSION_CODE" \
-            --tag "$VERSION_NAME" \
+            --tag "${{ steps.tag.outputs.tag }}" \
             --body-out "$RUNNER_TEMP/release-body.md"
 
       - name: Set up Ruby and fastlane
@@ -127,10 +142,10 @@ jobs:
       - name: Create draft GitHub release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION_NAME: ${{ steps.version.outputs.version_name }}
+          TAG: ${{ steps.tag.outputs.tag }}
         run: |
-          gh release create "$VERSION_NAME" \
+          gh release create "$TAG" \
             --draft \
-            --title "$VERSION_NAME" \
+            --title "$TAG" \
             --notes-file "$RUNNER_TEMP/release-body.md" \
             --target "$GITHUB_SHA"
