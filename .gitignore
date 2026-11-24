@@ -49,3 +49,6 @@ maestro/lib/
 fastlane/report.xml
 fastlane/README.md
 Gemfile.lock
+
+# Play release notes are generated from fastlane/release-notes/<locale>.md
+fastlane/metadata/android/*/changelogs/

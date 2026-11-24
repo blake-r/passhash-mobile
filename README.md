@@ -153,10 +153,19 @@ The `release-android` GitHub Actions workflow (manual `workflow_dispatch` trigge
 builds the signed AAB, validates it with bundletool and uploads it via fastlane as a
 **draft** release on the production track. Publishing is done manually in Play Console.
 
-Release notes come from `fastlane/metadata/android/<locale>/changelogs/default.txt`
-(locales: en-US, ru-RU, de-DE) — edit them before triggering the workflow; the workflow
-copies them to `<versionCode>.txt` for the build being uploaded. Google Play accepts at
-most 500 characters per locale, so keep each file under that limit.
+Release notes live in `fastlane/release-notes/<locale>.md` (locales: en-US, ru-RU, de-DE).
+Each file keeps a history of dated sections, newest on top; the workflow runs
+`scripts/release-notes.js`, which takes the first section and writes it to
+`fastlane/metadata/android/<locale>/changelogs/<versionCode>.txt` for the build being
+uploaded. Google Play accepts at most 500 characters per locale — the script fails the
+build if a section is longer.
+
+To preview or regenerate the notes locally:
+
+```bash
+npm run release-notes -- --dry-run                     # print what would be written
+npm run release-notes -- --version-code 261124057      # write default.txt + <versionCode>.txt
+```
 
 Required GitHub secrets:
 
