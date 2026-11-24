@@ -11,6 +11,7 @@ import { useTranslation } from "react-i18next";
 import i18n, { getInitialLanguage } from "./i18n/i18n";
 import GeneratorScreen from "./screens/GeneratorScreen";
 import KeeperScreen from "./screens/KeeperScreen";
+import SettingsScreen from "./screens/SettingsScreen";
 import { useAppStore } from "./state/app-store";
 import { useTheme } from "./theme";
 import { checkQtMigrationAvailable, performQtMigration } from "./utils/QtSettingsMigration";
@@ -112,6 +113,8 @@ function App(): React.JSX.Element {
               iconName = focused ? "key" : "key-outline";
             } else if (route.name === "Keeper") {
               iconName = focused ? "folder" : "folder-outline";
+            } else if (route.name === "Settings") {
+              iconName = focused ? "settings" : "settings-outline";
             } else {
               iconName = "help-circle-outline";
             }
@@ -158,6 +161,15 @@ function App(): React.JSX.Element {
             title: t("tabs.keeper"),
             tabBarAccessibilityLabel: t("tabs.keeper"),
             tabBarButtonTestID: "tab-keeper",
+          }}
+        />
+        <Tab.Screen
+          name="Settings"
+          component={SettingsScreen}
+          options={{
+            title: t("tabs.settings"),
+            tabBarAccessibilityLabel: t("tabs.settings"),
+            tabBarButtonTestID: "tab-settings",
           }}
         />
       </Tab.Navigator>

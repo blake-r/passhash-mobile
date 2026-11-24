@@ -6,7 +6,7 @@ import { useState, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { View, TextInput, StyleSheet, Platform, Alert, Text } from "react-native";
 
-import { Button, StatusMessage, LanguageSelector, ThemeSelector } from "../components";
+import { Button, StatusMessage } from "../components";
 import { useAppStore } from "../state/app-store";
 import { useTheme, Theme } from "../theme";
 import { copyWithAutoClear } from "../utils/clipboard";
@@ -77,14 +77,6 @@ function KeeperScreen(): React.JSX.Element {
 
   return (
     <View style={styles.container}>
-      {/* Language selector */}
-      <View style={styles.settingsContainer}>
-        <Text style={styles.settingsLabel}>{t("settings.language.label")}</Text>
-        <LanguageSelector />
-        <Text style={styles.settingsLabel}>{t("settings.theme.label")}</Text>
-        <ThemeSelector />
-      </View>
-
       {/* Keeper data text area */}
       <View style={styles.textAreaContainer} accessibilityLabel={t("tabs.keeper")}>
         <TextInput
@@ -125,20 +117,6 @@ function makeStyles(theme: Theme): ReturnType<typeof StyleSheet.create> {
       flex: 1,
       padding: 6,
       backgroundColor: theme.bg,
-    },
-    settingsContainer: {
-      marginBottom: 12,
-      padding: 8,
-      backgroundColor: theme.card,
-      borderRadius: theme.radii.card,
-      borderWidth: 1,
-      borderColor: theme.cardBorder,
-    },
-    settingsLabel: {
-      fontSize: 16,
-      fontWeight: "bold",
-      marginBottom: 4,
-      color: theme.text,
     },
     textAreaContainer: {
       flex: 1,
