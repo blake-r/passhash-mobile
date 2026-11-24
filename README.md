@@ -155,7 +155,8 @@ builds the signed AAB, validates it with bundletool and uploads it via fastlane 
 
 Release notes come from `fastlane/metadata/android/<locale>/changelogs/default.txt`
 (locales: en-US, ru-RU, de-DE) — edit them before triggering the workflow; the workflow
-copies them to `<versionCode>.txt` for the build being uploaded.
+copies them to `<versionCode>.txt` for the build being uploaded. Google Play accepts at
+most 500 characters per locale, so keep each file under that limit.
 
 Required GitHub secrets:
 
