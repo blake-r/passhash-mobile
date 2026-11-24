@@ -44,6 +44,13 @@ export function makeStyles(theme: Theme): ReturnType<typeof StyleSheet.create> {
     inputRow: {
       marginBottom: 16,
     },
+    // The hints dropdown is absolutely positioned inside this row, so the row itself has to
+    // be raised: zIndex only reorders children within their own parent and cannot lift a
+    // subtree above a later sibling row.
+    inputRowRaised: {
+      zIndex: 10,
+      elevation: 10,
+    },
     inputLabel: {
       fontSize: 14,
       color: theme.textSecondary,
@@ -58,8 +65,6 @@ export function makeStyles(theme: Theme): ReturnType<typeof StyleSheet.create> {
     inputWithButtonContainer: {
       position: "relative",
       flex: 1,
-      zIndex: 9999,
-      elevation: 10,
     },
     hintsDropdownWrapper: {
       position: "absolute",
