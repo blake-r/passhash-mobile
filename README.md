@@ -198,6 +198,20 @@ Required GitHub secrets:
 | `KEYSTORE_ALIAS`                  | key alias inside the keystore                                     |
 | `ANDROID_KEYSTORE_PASSWORD`       | keystore/key password                                             |
 
+### Contributing
+
+`main` is protected by the `main-protection` ruleset: no direct pushes, no force-pushes and
+no branch deletion. Every change goes through a pull request that passes the `quality`
+check (`typecheck`, `lint`, `format:check`, `test`), then merges with a merge commit:
+
+```bash
+git switch -c my-change
+# ... commit ...
+git push -u origin my-change
+gh pr create --fill
+gh pr merge --merge --delete-branch
+```
+
 ### iOS
 
 ```bash
