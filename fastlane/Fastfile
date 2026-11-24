@@ -6,8 +6,12 @@ platform :android do
     version_code = options[:version_code].to_i
     UI.user_error!("Pass version_code: (from scripts/compute-version.sh)") if version_code.zero?
 
-    aab = options[:aab] || Dir["android/app/build/outputs/bundle/release/*.aab"].first
-    UI.user_error!("AAB not found") unless aab && File.exist?(aab)
+    # Lanes run with the working directory set to the fastlane folder, so every
+    # path has to be resolved against the project root explicitly.
+    project_root = File.expand_path("..", Dir.pwd)
+    default_aab = File.join(project_root, "android/app/build/outputs/bundle/release/*.aab")
+    aab = options[:aab] ? File.expand_path(options[:aab], project_root) : Dir[default_aab].first
+    UI.user_error!("AAB not found (looked in #{default_aab})") unless aab && File.exist?(aab)
 
     existing = %w[production beta alpha internal].flat_map do |track|
       begin
