@@ -111,7 +111,8 @@ function repoSlug() {
 
 function buildBody({ tag, baseTag, versionCode, results }) {
   const primary = results.find((result) => result.locale === "en-US") || results[0];
-  const parts = [`# ${tag}`, "", "## What's new", "", primary.text, ""];
+  // The release title already carries the tag, so the body starts with the notes.
+  const parts = ["## What's new", "", primary.text, ""];
   for (const result of results) {
     if (result === primary) continue;
     parts.push(`<details><summary>${result.locale}</summary>`, "", result.text, "", "</details>", "");
