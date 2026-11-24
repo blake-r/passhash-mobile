@@ -15,6 +15,7 @@ The most secure way to manage a password is to transform it into data that canno
 - **Deterministic Password Generation**: Generate the same password for the same site tag and master key combination
 - **Site Tag Hints**: Quick access to previously used site tags with their settings
 - **Keeper**: Export/import saved site settings for backup or transfer
+- **Settings Tab**: Interface language (English, German, Russian) and theme (system, dark, light)
 - **Auto-clear Master Key**: Master key is automatically cleared after 30 seconds of inactivity and immediately when the app is backgrounded
 - **Encrypted Keeper Storage**: Keeper data (site tags and their settings) is stored encrypted with AES-256-GCM; the device key lives in the platform secure storage (Android Keystore)
 - **Clipboard Hygiene**: The clipboard is automatically cleared 30 seconds after a password or keeper data is copied
@@ -65,7 +66,8 @@ passhash-mobile/
 │   │   └── storage.ts              # AsyncStorage wrapper
 │   └── screens/
 │       ├── GeneratorScreen.tsx     # Main password generator screen
-│       └── KeeperScreen.tsx        # Keeper data management screen
+│       ├── KeeperScreen.tsx        # Keeper data management screen
+│       └── SettingsScreen.tsx      # Language and theme settings
 └── README.md
 ```
 

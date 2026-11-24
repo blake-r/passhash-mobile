@@ -5,7 +5,8 @@
   },
   "tabs": {
     "generator": "Generator",
-    "keeper": "Keeper"
+    "keeper": "Keeper",
+    "settings": "Settings"
   },
   "generator": {
     "siteTag": {
