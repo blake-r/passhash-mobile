@@ -147,24 +147,36 @@ Local signed AAB build (requires `.env` with `ANDROID_KEYSTORE_PASSWORD`, see
 npm run android:release
 ```
 
-### Google Play upload
+### Release notes
 
-The `release-android` GitHub Actions workflow (manual `workflow_dispatch` trigger)
-builds the signed AAB, validates it with bundletool and uploads it via fastlane as a
-**draft** release on the production track. Publishing is done manually in Play Console.
+Change history lives in `fastlane/release-notes/<locale>.md` (locales: en-US, ru-RU,
+de-DE) instead of a single `CHANGELOG.md`. Every user-visible change appends one bullet to
+each locale file; there is no dated-section bookkeeping and nothing to prune by hand.
 
-Release notes live in `fastlane/release-notes/<locale>.md` (locales: en-US, ru-RU, de-DE).
-Each file keeps a history of dated sections, newest on top; the workflow runs
-`scripts/release-notes.js`, which takes the first section and writes it to
-`fastlane/metadata/android/<locale>/changelogs/<versionCode>.txt` for the build being
-uploaded. Google Play accepts at most 500 characters per locale — the script fails the
-build if a section is longer.
+The `release-android` GitHub Actions workflow (manual `workflow_dispatch` trigger) builds
+the signed AAB, validates it with bundletool and uploads it via fastlane as a **draft**
+release on the production track. Publishing is done manually in Play Console.
 
-To preview or regenerate the notes locally:
+On every run `scripts/release-notes.js`:
+
+1. finds the base tag — the latest published GitHub release reachable from `HEAD`;
+2. collects the bullets added to each locale file since that tag (`git diff`);
+3. writes them to `fastlane/metadata/android/<locale>/changelogs/<versionCode>.txt`, which
+   fastlane uploads as the Play changelog (at most 500 characters per locale — the script
+   fails the build when a locale exceeds it or has no new lines);
+4. writes the body of the GitHub release (en-US notes plus a `<details>` block per other
+   locale, and a compare link against the base tag).
+
+After a successful Play upload the workflow tags the commit with `VERSION_NAME`
+(`YYYY.MM.DD`) and creates a **draft** GitHub release with that body. Publishing the draft
+makes its tag the base for the next run.
+
+To preview locally:
 
 ```bash
-npm run release-notes -- --dry-run                     # print what would be written
-npm run release-notes -- --version-code 261124057      # write default.txt + <versionCode>.txt
+npm run release-notes -- --dry-run                # print what would be written
+npm run release-notes -- --version-code 261124057 # write default.txt + <versionCode>.txt
+npm run release-notes -- --base-tag 2025.07.04 --tag 2026.11.24 --body-out /tmp/body.md
 ```
 
 Required GitHub secrets:
