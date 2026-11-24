@@ -119,7 +119,7 @@ function App(): React.JSX.Element {
               iconName = "help-circle-outline";
             }
 
-            return <Ionicons name={iconName} size={32} color={color} />;
+            return <Ionicons name={iconName} size={24} color={color} />;
           },
           tabBarActiveTintColor: theme.accent,
           tabBarInactiveTintColor: theme.tabInactive,
