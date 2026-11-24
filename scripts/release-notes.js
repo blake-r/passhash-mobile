@@ -109,7 +109,7 @@ function repoSlug() {
   }
 }
 
-function buildBody({ tag, baseTag, results }) {
+function buildBody({ tag, baseTag, versionCode, results }) {
   const primary = results.find((result) => result.locale === "en-US") || results[0];
   const parts = [`# ${tag}`, "", "## What's new", "", primary.text, ""];
   for (const result of results) {
@@ -119,6 +119,11 @@ function buildBody({ tag, baseTag, results }) {
   const slug = repoSlug();
   if (baseTag && slug) {
     parts.push(`**Full Changelog**: https://github.com/${slug}/compare/${baseTag}...${tag}`, "");
+  }
+  if (versionCode) {
+    // Publishing this GitHub release triggers publish-play.yml, which reads the
+    // versionCode from here instead of guessing it from the tag.
+    parts.push(`<!-- play-version-code: ${versionCode} -->`, "");
   }
   return parts.join("\n");
 }
@@ -205,7 +210,7 @@ function main() {
   console.log(`base tag: ${baseTag || "(none)"}`);
 
   if (args.bodyOut && args.tag) {
-    const body = buildBody({ tag: args.tag, baseTag, results });
+    const body = buildBody({ tag: args.tag, baseTag, versionCode: args.versionCode, results });
     if (!args.dryRun) fs.writeFileSync(args.bodyOut, body);
     console.log(`${args.dryRun ? "would write" : "wrote"} ${args.bodyOut}`);
   }

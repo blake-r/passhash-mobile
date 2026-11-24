@@ -144,6 +144,8 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ steps.tag.outputs.tag }}
         run: |
+          # Publishing this draft is what publishes the app: publish-play.yml reacts
+          # to release: published and promotes the versionCode from the body marker.
           gh release create "$TAG" \
             --draft \
             --title "$TAG" \

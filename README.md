@@ -155,7 +155,7 @@ each locale file; there is no dated-section bookkeeping and nothing to prune by 
 
 The `release-android` GitHub Actions workflow (manual `workflow_dispatch` trigger) builds
 the signed AAB, validates it with bundletool and uploads it via fastlane as a **draft**
-release on the production track. Publishing is done manually in Play Console.
+release on the production track.
 
 On every run `scripts/release-notes.js`:
 
@@ -165,11 +165,23 @@ On every run `scripts/release-notes.js`:
    fastlane uploads as the Play changelog (at most 500 characters per locale — the script
    fails the build when a locale exceeds it or has no new lines);
 4. writes the body of the GitHub release (en-US notes plus a `<details>` block per other
-   locale, and a compare link against the base tag).
+   locale, a compare link against the base tag and a hidden `play-version-code` marker).
 
 After a successful Play upload the workflow tags the commit with `VERSION_NAME`
-(`YYYY.MM.DD`) and creates a **draft** GitHub release with that body. Publishing the draft
-makes its tag the base for the next run.
+(`YYYY.MM.DD`) and creates a **draft** GitHub release with that body.
+
+### Publishing
+
+Publishing that draft GitHub release is what publishes the app: the `publish-play`
+workflow runs on `release: published`, reads the `play-version-code` marker from the
+release body and promotes exactly that versionCode from `draft` to `completed` on the
+production track through the Play Developer API. The same workflow can be started by hand
+with a tag (`workflow_dispatch`); releases created without the marker fall back to
+recomputing the versionCode from the tag commit.
+
+So one manual step remains — publishing the GitHub release — and it drives both GitHub and
+Google Play. If Play review rejects the build, fix it, run `release-android` again and
+publish the new draft; the old draft stays unpublished.
 
 To preview locally:
 
