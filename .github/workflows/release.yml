@@ -1,16 +1,27 @@
 name: release-android
 
 on:
+  # Publishing a GitHub release is the only trigger: its tag names the version,
+  # and the build uploads that version to Google Play already published.
+  # Drafts fire no events here, so creating one does nothing until it is published.
+  release:
+    types: [published]
   workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to build and publish (empty builds without publishing)
+        required: false
 
 jobs:
   release:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # tag the release and create the GitHub release
+      contents: read # the tag already exists; nothing is written back to GitHub
+
     steps:
       - uses: actions/checkout@v7
         with:
+          ref: ${{ github.event.release.tag_name || inputs.tag || github.ref }}
           fetch-depth: 0 # versionCode derives from the total commit count
 
       - uses: actions/setup-node@v7
@@ -57,9 +68,14 @@ jobs:
 
       - name: Stamp version into build.gradle
         id: version
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name || inputs.tag }}
         run: |
-          VERSION_CODE=$(bash scripts/compute-version.sh | awk '/VERSION_CODE:/ {print $2}')
-          VERSION_NAME=$(bash scripts/compute-version.sh | awk '/VERSION_NAME:/ {print $2}')
+          # The tag names the version; a manual run without one falls back to today.
+          VERSION_NAME="${RELEASE_TAG:-$(bash scripts/compute-version.sh | awk '/VERSION_NAME:/ {print $2}')}"
+          COMMIT_DATE=$(git log -1 --format=%cd --date=format:%y%m%d)
+          COMMIT_COUNT=$(git rev-list --count HEAD)
+          VERSION_CODE=$((10#$COMMIT_DATE * 1000 + COMMIT_COUNT % 1000))
           echo "version_code=$VERSION_CODE" >> "$GITHUB_OUTPUT"
           echo "version_name=$VERSION_NAME" >> "$GITHUB_OUTPUT"
           sed -i -E "s/versionCode[[:space:]]+[0-9]+/versionCode ${VERSION_CODE}/" android/app/build.gradle
@@ -89,9 +105,11 @@ jobs:
         id: base
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CURRENT_TAG: ${{ github.event.release.tag_name || inputs.tag }}
         run: |
           BASE_TAG=""
           for tag in $(gh release list --exclude-drafts --limit 100 --json tagName --jq '.[].tagName'); do
+            [ "$tag" = "$CURRENT_TAG" ] && continue
             if git merge-base --is-ancestor "refs/tags/$tag" HEAD; then
               BASE_TAG="$tag"
               break
@@ -100,38 +118,26 @@ jobs:
           echo "base_tag=$BASE_TAG" >> "$GITHUB_OUTPUT"
           echo "Base tag: ${BASE_TAG:-none (first release)}"
 
-      - name: Resolve release tag
-        id: tag
-        env:
-          VERSION_NAME: ${{ steps.version.outputs.version_name }}
-        run: |
-          # Two releases on the same day would share VERSION_NAME, so fall back to
-          # a numeric suffix instead of failing on an existing tag.
-          TAG="$VERSION_NAME"
-          SUFFIX=2
-          while git rev-parse -q --verify "refs/tags/$TAG" > /dev/null; do
-            TAG="$VERSION_NAME-$SUFFIX"
-            SUFFIX=$((SUFFIX + 1))
-          done
-          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-          echo "Release tag: $TAG"
-
-      - name: Generate release notes for this versionCode
+      - name: Generate Play changelogs for this versionCode
         env:
           VERSION_CODE: ${{ steps.version.outputs.version_code }}
           BASE_TAG: ${{ steps.base.outputs.base_tag }}
         run: |
-          node scripts/release-notes.js \
-            --version-code "$VERSION_CODE" \
-            --tag "${{ steps.tag.outputs.tag }}" \
-            --body-out "$RUNNER_TEMP/release-body.md"
+          # The current tag is already published and reachable from HEAD, so the base
+          # tag has to be passed explicitly instead of letting the script pick one.
+          if [ -n "$BASE_TAG" ]; then
+            node scripts/release-notes.js --version-code "$VERSION_CODE" --base-tag "$BASE_TAG"
+          else
+            node scripts/release-notes.js --version-code "$VERSION_CODE" --no-base
+          fi
 
       - name: Set up Ruby and fastlane
         uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
 
-      - name: Upload draft release to Google Play
+      - name: Upload and publish on Google Play
+        if: ${{ github.event_name == 'release' || inputs.tag != '' }}
         env:
           PLAY_STORE_SERVICE_ACCOUNT_JSON_PATH: ${{ runner.temp }}/play-store-service-account.json
         run: |
@@ -139,15 +145,6 @@ jobs:
             version_code:${{ steps.version.outputs.version_code }} \
             aab:android/app/build/outputs/bundle/release/app-release.aab
 
-      - name: Create draft GitHub release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG: ${{ steps.tag.outputs.tag }}
-        run: |
-          # Publishing this draft is what publishes the app: publish-play.yml reacts
-          # to release: published and promotes the versionCode from the body marker.
-          gh release create "$TAG" \
-            --draft \
-            --title "$TAG" \
-            --notes-file "$RUNNER_TEMP/release-body.md" \
-            --target "$GITHUB_SHA"
+      - name: Skip publishing notice
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.tag == '' }}
+        run: echo "::notice::Manual run without a tag built versionCode ${{ steps.version.outputs.version_code }} but did not publish it."
