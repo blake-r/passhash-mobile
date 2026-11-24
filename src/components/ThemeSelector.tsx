@@ -1,38 +1,40 @@
 // ThemeSelector.tsx - Theme preference selection component (system / dark / light)
 
-import { Picker } from "@react-native-picker/picker";
-import React from "react";
+import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { View, StyleSheet, Platform } from "react-native";
+import { View, StyleSheet } from "react-native";
 
 import { useAppStore } from "../state/app-store";
-import { useTheme, ThemePreference } from "../theme";
+import { ThemePreference } from "../theme";
+
+import ThemedSelect, { ThemedSelectOption } from "./ThemedSelect";
 
 const THEME_OPTIONS: ThemePreference[] = ["system", "dark", "light"];
 
 function ThemeSelector(): React.JSX.Element {
   const { t } = useTranslation();
-  const theme = useTheme();
   const themePreference = useAppStore((state) => state.themePreference);
   const setThemePreference = useAppStore((state) => state.setThemePreference);
 
+  const options = useMemo<ThemedSelectOption<ThemePreference>[]>(
+    () =>
+      THEME_OPTIONS.map((option) => ({
+        value: option,
+        label: t(`settings.theme.${option}`),
+      })),
+    [t],
+  );
+
   return (
     <View style={styles.container}>
-      <Picker
+      <ThemedSelect
+        options={options}
         selectedValue={themePreference}
-        onValueChange={(value: ThemePreference) => setThemePreference(value)}
-        style={styles.picker}
-        dropdownIconColor={theme.textSecondary}
+        onValueChange={setThemePreference}
         accessibilityLabel={t("settings.theme.label")}
-        accessibilityRole="combobox"
-        accessible={true}
         accessibilityHint="Select application theme"
         testID="theme-selector"
-      >
-        {THEME_OPTIONS.map((option) => (
-          <Picker.Item key={option} label={t(`settings.theme.${option}`)} value={option} color={theme.text} />
-        ))}
-      </Picker>
+      />
     </View>
   );
 }
@@ -42,15 +44,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginVertical: 8,
-  },
-  picker: {
-    flex: 1,
-    height: 50,
-    ...Platform.select({
-      ios: {
-        height: 120,
-      },
-    }),
   },
 });
 
