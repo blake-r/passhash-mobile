@@ -347,7 +347,7 @@ function GeneratorScreen(): React.JSX.Element {
         {/* Card 1: Generation */}
         <Card style={styles.generationCard}>
           {/* Site tag input with version bump */}
-          <View style={styles.inputRow}>
+          <View style={[styles.inputRow, styles.inputRowRaised]}>
             <Text style={styles.inputLabel}>{t("generator.siteTag.label")}</Text>
             <View style={styles.inputWithButtonContainer}>
               <View style={styles.inputWithButton}>
