@@ -22,3 +22,6 @@ export { default as ThemeSelector } from "./ThemeSelector";
 
 export { default as SiteHintsDropdown } from "./SiteHintsDropdown";
 export type { SiteHintsDropdownProps } from "./SiteHintsDropdown";
+
+export { default as ThemedSelect } from "./ThemedSelect";
+export type { ThemedSelectProps, ThemedSelectOption } from "./ThemedSelect";

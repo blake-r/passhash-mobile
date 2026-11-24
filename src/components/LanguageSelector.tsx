@@ -1,13 +1,13 @@
 // LanguageSelector.tsx - Language selection component
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Picker } from "@react-native-picker/picker";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { View, StyleSheet, Platform } from "react-native";
+import { View, StyleSheet } from "react-native";
 
 import { supportedLanguages, LanguageCode, LANGUAGE_STORAGE_KEY } from "../i18n";
-import { useTheme } from "../theme";
+
+import ThemedSelect, { ThemedSelectOption } from "./ThemedSelect";
 
 export interface LanguageSelectorProps {
   onLanguageChange?: (language: LanguageCode) => void;
@@ -15,8 +15,16 @@ export interface LanguageSelectorProps {
 
 function LanguageSelector({ onLanguageChange }: LanguageSelectorProps): React.JSX.Element {
   const { i18n } = useTranslation();
-  const theme = useTheme();
   const [currentLanguage, setCurrentLanguage] = useState<LanguageCode>(i18n.language as LanguageCode);
+
+  const options = useMemo<ThemedSelectOption<LanguageCode>[]>(
+    () =>
+      supportedLanguages.map((lang) => ({
+        value: lang.code,
+        label: `${lang.nativeName} (${lang.name})`,
+      })),
+    [],
+  );
 
   const handleValueChange = async (value: LanguageCode): Promise<void> => {
     try {
@@ -33,24 +41,14 @@ function LanguageSelector({ onLanguageChange }: LanguageSelectorProps): React.JS
 
   return (
     <View style={styles.container}>
-      <Picker
+      <ThemedSelect
+        options={options}
         selectedValue={currentLanguage}
         onValueChange={handleValueChange}
-        style={styles.picker}
         accessibilityLabel="Language selector"
-        accessibilityRole="combobox"
-        accessible={true}
         accessibilityHint="Select application language"
-      >
-        {supportedLanguages.map((lang) => (
-          <Picker.Item
-            key={lang.code}
-            label={`${lang.nativeName} (${lang.name})`}
-            value={lang.code}
-            color={theme.text}
-          />
-        ))}
-      </Picker>
+        testID="language-selector"
+      />
     </View>
   );
 }
@@ -60,15 +58,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginVertical: 8,
-  },
-  picker: {
-    flex: 1,
-    height: 50,
-    ...Platform.select({
-      ios: {
-        height: 120,
-      },
-    }),
   },
 });
 
