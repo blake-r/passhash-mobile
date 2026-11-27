@@ -28,6 +28,7 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
+      "./plugins/withEdgeToEdgeStatusBar.js",
       "expo-font",
       "./plugins/withVersion.js",
       "./plugins/withQtMigration.js",

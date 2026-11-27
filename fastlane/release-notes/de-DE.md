@@ -9,3 +9,4 @@ Keep lines short and written for users — no file names or internal refactors.
 - Der Keeper speichert Seiten-Tags und Einstellungen verschlüsselt (AES-256-GCM, Schlüssel im Android Keystore).
 - Neues Design: neues App-Icon sowie dunkles und helles Theme.
 - Sprache und Design lassen sich jetzt im neuen Tab Einstellungen verwalten.
+- Die Edge-to-Edge-Darstellung und das Verhalten der Systemleisten unter Android wurden verbessert.
