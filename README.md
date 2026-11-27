@@ -151,9 +151,10 @@ npm run android:release
 
 ### Release notes
 
-Change history lives in `fastlane/release-notes/<locale>.md` (locales: en-US, ru-RU,
-de-DE) instead of a single `CHANGELOG.md`. Every user-visible change appends one bullet to
-each locale file; there is no dated-section bookkeeping and nothing to prune by hand.
+Google Play release history lives in `fastlane/release-notes/<locale>.md` (locales: en-US,
+ru-RU, de-DE). Every user-visible change appends one bullet to each locale file. CI rejects
+pull requests without a new bullet in every locale unless the PR template's explicit
+no-user-visible-changes checkbox is checked.
 
 ### Publishing
 
