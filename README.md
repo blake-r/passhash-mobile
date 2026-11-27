@@ -158,31 +158,26 @@ no-user-visible-changes checkbox is checked.
 
 ### Publishing
 
-Publishing a GitHub release is the only release action. The `release-android` workflow runs
-on `release: published`, builds the commit the tag points at and publishes it on Google
-Play in one go:
+Publishing a GitHub release triggers the `release-android` workflow. It builds the commit
+pointed to by the tag and uploads the AAB to the production track on Google Play as a Draft:
 
-1. `scripts/release-notes.js` collects the bullets added to each locale file since the
-   previous published release (`git diff <baseTag>..HEAD`) and writes them to
-   `fastlane/metadata/android/<locale>/changelogs/<versionCode>.txt` — the Play changelog
-   (at most 500 characters per locale; the script fails when a locale exceeds it or has no
-   new lines);
+1. `scripts/release-notes.js` collects bullets added to each locale file since the previous
+   release tag and excludes text already recorded in the checked-in Play changelog history;
 2. the signed AAB is built and validated with bundletool;
-3. fastlane uploads it to the production track with `release_status: completed`, so the
-   build goes live without a second step.
+3. fastlane uploads the AAB and R8 mapping as a Play Draft. If no new notes exist, changelog
+   upload is explicitly skipped so a stale `default.txt` cannot be reused.
 
 The version comes from the tag: `versionName` is the tag itself and `versionCode` is
-`commitDate × 1000 + commitCount % 1000`, computed from the tagged commit. If that
-versionCode was already uploaded as a draft by an earlier run, fastlane promotes it instead
-of uploading again.
+`commitDate × 1000 + commitCount % 1000`, computed from the tagged commit. Re-running an
+upload for an already uploaded versionCode leaves its current Play status unchanged.
 
-So the flow is: create a draft release in the GitHub UI, generate its notes with GitHub's
-own button (or write them by hand), publish it — and the app ships to Play. Drafts fire no
-events, so nothing happens until you publish.
+Publishing to users is a separate manual action. In Actions, run `release-android` with
+`mode: publish-draft` and the Draft's versionCode; this invokes the guarded Fastlane
+`publish` lane. To build and upload a tagged Draft manually, choose `mode: upload-draft`
+and provide its tag. An incomplete manual request fails instead of silently succeeding.
 
-A manual `workflow_dispatch` run builds without publishing unless you pass a tag; it is
-meant for checking that a build works. If Play review rejects the build, fix it, publish a
-new release and let the workflow ship it.
+A GitHub draft release does not start the workflow; publish the GitHub release to trigger
+building and uploading a Google Play Draft. That does not publish the app to users.
 
 To preview locally:
 

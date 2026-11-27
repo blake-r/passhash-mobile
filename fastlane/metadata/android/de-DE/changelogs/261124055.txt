@@ -1,0 +1,2 @@
+- Der Keeper speichert Seiten-Tags und Einstellungen verschlüsselt (AES-256-GCM, Schlüssel im Android Keystore).
+- Neues Design: neues App-Icon sowie dunkles und helles Theme.

@@ -73,6 +73,17 @@ function readBullets(file) {
   return bullets;
 }
 
+function previouslyPublished(locale) {
+  const changelogDir = path.join(METADATA_DIR, locale, "changelogs");
+  if (!fs.existsSync(changelogDir)) return new Set();
+  const bullets = new Set();
+  for (const name of fs.readdirSync(changelogDir)) {
+    if (!/^\d+\.txt$/.test(name)) continue;
+    for (const bullet of readBullets(path.join(changelogDir, name))) bullets.add(bullet);
+  }
+  return bullets;
+}
+
 function addedSince(file, baseTag) {
   const relative = path.relative(ROOT, file).split(path.sep).join("/");
   const diff = git(["diff", "--unified=0", `${baseTag}..HEAD`, "--", relative]);
@@ -96,6 +107,10 @@ function latestAncestorTag() {
     if (gitSucceeds(["merge-base", "--is-ancestor", tag, "HEAD"])) return tag;
   }
   return "";
+}
+
+function setWorkflowOutput(name, value) {
+  if (process.env.GITHUB_OUTPUT) fs.appendFileSync(process.env.GITHUB_OUTPUT, `${name}=${value}\n`);
 }
 
 function repoSlug() {
@@ -146,6 +161,7 @@ function main() {
 
   const baseTag = args.baseTag === undefined ? latestAncestorTag() : args.baseTag;
   const results = [];
+  const emptyLocales = [];
   const problems = [];
 
   for (const locale of locales) {
@@ -162,15 +178,15 @@ function main() {
         const added = addedSince(source, baseTag);
         bullets = bullets.filter((bullet) => added.has(bullet));
       }
+      const published = previouslyPublished(locale);
+      bullets = bullets.filter((bullet) => !published.has(bullet));
     } catch (error) {
       problems.push(`${locale}: ${error.message}`);
       continue;
     }
 
     if (bullets.length === 0) {
-      problems.push(
-        `${locale}: no new lines since ${baseTag || "the beginning"} — add a bullet to ${path.relative(ROOT, source)}`,
-      );
+      emptyLocales.push(locale);
       continue;
     }
 
@@ -190,10 +206,22 @@ function main() {
     });
   }
 
+  if (results.length === 0 && emptyLocales.length === locales.length && problems.length === 0) {
+    setWorkflowOutput("has_notes", "false");
+    console.log(`No unpublished Google Play release notes for ${locales.join(", ")}; changelogs skipped.`);
+    console.log(`base tag: ${baseTag || "(none)"}`);
+    return;
+  }
+
+  if (emptyLocales.length > 0) {
+    problems.push(`No unpublished release-note bullets for: ${emptyLocales.join(", ")}`);
+  }
   if (problems.length > 0) {
     for (const problem of problems) console.error(`error: ${problem}`);
     process.exit(1);
   }
+
+  setWorkflowOutput("has_notes", "true");
 
   for (const result of results) {
     const targets = [path.join(result.changelogDir, "default.txt")];

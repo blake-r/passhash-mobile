@@ -8,3 +8,4 @@ Keep lines short and written for users — no file names or internal refactors.
 
 - Keeper stores your site tags and settings encrypted (AES-256-GCM, key in Android Keystore).
 - New look: fresh app icon plus dark and light themes, system or manual.
+- Manage language and theme from the new Settings tab.
