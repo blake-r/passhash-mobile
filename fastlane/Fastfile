@@ -46,10 +46,11 @@ def promote_to_production(version_code)
 end
 
 platform :android do
-  desc "Upload a signed AAB to Google Play and publish it on the production track"
+  desc "Upload a signed AAB to Google Play as a Draft"
   lane :release do |options|
-    version_code = options[:version_code].to_i
-    UI.user_error!("Pass version_code: (from the release tag commit)") if version_code.zero?
+    version_code_text = options[:version_code].to_s
+    UI.user_error!("Pass a numeric version_code: (from the release tag commit)") unless version_code_text.match?(/\A[1-9]\d*\z/)
+    version_code = version_code_text.to_i
 
     # Lanes run with the working directory set to the fastlane folder, so every
     # path has to be resolved against the project root explicitly.
@@ -66,10 +67,7 @@ platform :android do
     end
 
     if existing.include?(version_code)
-      # A previous run already uploaded this build as a draft; publishing is enough,
-      # because Play rejects a second upload of an existing versionCode.
-      UI.important("versionCode #{version_code} is already uploaded — publishing it instead of uploading again")
-      promote_to_production(version_code)
+      UI.important("versionCode #{version_code} is already uploaded — leaving its current Play status unchanged")
       next
     end
 
@@ -86,10 +84,11 @@ platform :android do
 
     upload_to_play_store(
       track: "production",
-      release_status: "completed",
+      release_status: "draft",
       aab: aab,
       mapping: mapping,
       skip_upload_metadata: true,
+      skip_upload_changelogs: options[:skip_upload_changelogs] == "true",
       skip_upload_images: true,
       skip_upload_screenshots: true
     )
@@ -97,8 +96,9 @@ platform :android do
 
   desc "Publish an already uploaded draft release of the given versionCode"
   lane :publish do |options|
-    version_code = options[:version_code].to_i
-    UI.user_error!("Pass version_code: (the draft to publish)") if version_code.zero?
+    version_code_text = options[:version_code].to_s
+    UI.user_error!("Pass a numeric version_code: (the draft to publish)") unless version_code_text.match?(/\A[1-9]\d*\z/)
+    version_code = version_code_text.to_i
 
     promote_to_production(version_code)
   end

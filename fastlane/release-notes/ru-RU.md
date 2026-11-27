@@ -8,3 +8,4 @@ Keep lines short and written for users — no file names or internal refactors.
 
 - Keeper хранит метки сайтов и их настройки в зашифрованном виде (AES-256-GCM, ключ в Android Keystore).
 - Новый облик: новая иконка и тёмная/светлая темы — по системе или на выбор.
+- Настраивайте язык и тему на новой вкладке «Настройки».

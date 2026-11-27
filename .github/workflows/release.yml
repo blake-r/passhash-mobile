@@ -1,19 +1,29 @@
 name: release-android
 
 on:
-  # Publishing a GitHub release is the only trigger: its tag names the version,
-  # and the build uploads that version to Google Play already published.
-  # Drafts fire no events here, so creating one does nothing until it is published.
+  # Publishing a GitHub release builds and uploads its version to Google Play as a Draft.
   release:
     types: [published]
   workflow_dispatch:
     inputs:
+      mode:
+        description: Upload a tagged build as Draft or explicitly publish an existing Draft
+        type: choice
+        options:
+          - upload-draft
+          - publish-draft
+        default: upload-draft
+        required: true
       tag:
-        description: Release tag to build and publish (empty builds without publishing)
+        description: Release tag to build and upload as Draft
+        required: false
+      version_code:
+        description: Existing Google Play Draft versionCode to publish
         required: false
 
 jobs:
   release:
+    if: ${{ github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.mode == 'upload-draft' && inputs.tag != '') }}
     runs-on: ubuntu-latest
     permissions:
       contents: read # the tag already exists; nothing is written back to GitHub
@@ -119,6 +129,7 @@ jobs:
           echo "Base tag: ${BASE_TAG:-none (first release)}"
 
       - name: Generate Play changelogs for this versionCode
+        id: notes
         env:
           VERSION_CODE: ${{ steps.version.outputs.version_code }}
           BASE_TAG: ${{ steps.base.outputs.base_tag }}
@@ -136,15 +147,54 @@ jobs:
         with:
           bundler-cache: true
 
-      - name: Upload and publish on Google Play
-        if: ${{ github.event_name == 'release' || inputs.tag != '' }}
+      - name: Upload Google Play Draft
         env:
           PLAY_STORE_SERVICE_ACCOUNT_JSON_PATH: ${{ runner.temp }}/play-store-service-account.json
         run: |
           bundle exec fastlane release \
             version_code:${{ steps.version.outputs.version_code }} \
+            skip_upload_changelogs:${{ steps.notes.outputs.has_notes != 'true' }} \
             aab:android/app/build/outputs/bundle/release/app-release.aab
 
-      - name: Skip publishing notice
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.tag == '' }}
-        run: echo "::notice::Manual run without a tag built versionCode ${{ steps.version.outputs.version_code }} but did not publish it."
+      - name: Skip upload notice
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.mode == 'upload-draft' && inputs.tag == '' }}
+        run: echo "::notice::Choose a release tag to upload a Google Play Draft."
+
+  publish:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.mode == 'publish-draft' && inputs.version_code != '' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      - name: Write Play service account key
+        env:
+          PLAY_STORE_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
+        run: printf '%s' "$PLAY_STORE_SERVICE_ACCOUNT_JSON" > "$RUNNER_TEMP/play-store-service-account.json"
+
+      - name: Publish Google Play Draft
+        env:
+          PLAY_STORE_SERVICE_ACCOUNT_JSON_PATH: ${{ runner.temp }}/play-store-service-account.json
+          VERSION_CODE: ${{ inputs.version_code }}
+        run: bundle exec fastlane publish "version_code:$VERSION_CODE"
+
+  dispatch-validation:
+    if: ${{ github.event_name == 'workflow_dispatch' && ((inputs.mode == 'upload-draft' && inputs.tag == '') || (inputs.mode == 'publish-draft' && inputs.version_code == '')) }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Reject incomplete manual request
+        env:
+          MODE: ${{ inputs.mode }}
+        run: |
+          if [ "$MODE" = "publish-draft" ]; then
+            echo "::error::Provide the versionCode of the Google Play Draft to publish."
+          else
+            echo "::error::Provide the release tag to upload as a Google Play Draft."
+          fi
+          exit 1
