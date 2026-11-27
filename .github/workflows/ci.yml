@@ -10,11 +10,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: npm
+
+      - name: Validate Google Play release notes
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: node scripts/check-play-release-notes.js
 
       - run: npm ci
 

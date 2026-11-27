@@ -79,10 +79,16 @@ platform :android do
 
     UI.user_error!("AAB not found (looked in #{default_aab})") unless aab && File.exist?(aab)
 
+    # R8 minification is enabled for release builds, so crashes arrive obfuscated
+    # unless the mapping file is uploaded together with the bundle.
+    mapping = File.join(project_root, "android/app/build/outputs/mapping/release/mapping.txt")
+    UI.user_error!("R8 mapping not found at #{mapping}") unless File.exist?(mapping)
+
     upload_to_play_store(
       track: "production",
       release_status: "completed",
       aab: aab,
+      mapping: mapping,
       skip_upload_metadata: true,
       skip_upload_images: true,
       skip_upload_screenshots: true
